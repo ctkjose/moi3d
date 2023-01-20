@@ -53,7 +53,7 @@ The code in the main js script is executed sequentially. When the execution term
 
 ## Startup Scripts ##
 
-In addition of commands your can execute arbitrary javascript on **MoI** startup, and we call these startup scripts.  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order. 
+In addition of commands your can execute arbitrary javascript on **MoI** startup, and we call them "startup scripts".  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order. 
 
 To install a startup script copy the `.js` and `.htm` files to your user `startup` folder.
 
