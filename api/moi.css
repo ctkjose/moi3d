@@ -1,0 +1,230 @@
+body {
+  margin: 0;
+  background-color: #6B6B6B;
+}
+
+body, table {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-size: 11pt;
+  font-style: normal;
+  font-weight: normal;
+  color: #000000;
+  text-decoration: none;
+}
+
+.epilog {
+  font-size: 8pt;
+  text-align: center;
+  color: #FFFFFF;
+}  
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}  
+
+td {
+  border: 1px solid #505050;
+  vertical-align: top;
+  padding: 4px 8px 4px 8px;
+}  
+
+td.tddesc {
+  padding: 0;
+}    
+
+em {
+  font-weight: bold;
+}    
+
+strong {
+  font-weight: bold;
+}
+
+/* Table of Content rules */
+
+h2.toc {
+  text-align: center;
+}  
+
+td.toc {
+    width: 20%;   
+    border: 0px;
+}   
+
+td.caption {
+  text-align: center;    
+  font-size: medium;
+  background-color: #505050;
+  color: #F0F0F0;
+}  
+
+.title td {
+  font-weight: bold;
+  background-color: #A0A0A0;
+}   
+
+.odd td {
+  background-color: #F0F0F0;
+}  
+
+.even td {
+  background-color: #E0E0E0;
+}  
+
+div.ok {
+  color: #000000;
+}
+
+div.unk {
+  color: #000060;
+}
+
+div.bad {
+  color: #800000;
+}
+
+div.info {
+  margin: 0;
+  padding: 4px 8px 4px 8px;
+}
+
+div.sep {
+  border-top: 1px solid #505050;
+}
+
+div.class {
+  padding: 12px 0px 0px 0px;
+}
+
+div.method {
+  padding: 5px 8px 4px 8px;
+}
+
+.odd div.method {
+  background-color: #E6EDF0;
+}
+
+.even div.method {
+  background-color: #CEDCE3;
+}
+
+div.desc {
+  margin: 0;
+}
+
+div.desc p {
+  margin: 0;
+}
+
+div.hidden {
+  display: none;
+}
+
+/* Content rules */
+
+#content {
+  margin: 0;
+  padding: 0;
+  background-color: #6B6B6B;
+}
+
+h1 {
+  background-color: #333232;
+  color: #FF9900;
+  font-weight: bold;
+  font-size: large;
+  text-align: center;
+  margin: 24px 0px 24px 0px;
+  padding: 12px 0px 12px 0px;
+  border-top: 3px solid #FF9900;
+  border-bottom: 3px solid #FF9900;
+}    
+
+h3 {
+  background-color: #333232;
+  color: #FF9900;
+  font-weight: bold;
+  font-size: x-small;
+  text-align: center;
+  margin: 12px 0px 6px 0px;
+  padding: 4px 0px 4px 0px;
+  border-top: 2px solid #FF9900;
+  border-bottom: 2px solid #FF9900;
+}    
+
+h2 {
+  margin: 24px 12px 0px 12px;
+}
+
+h2, div.sectionb {
+  padding: 0px 10px 0px 10px;
+}
+
+div.sectionb {
+  margin: 0px 12px 24px 12px;
+}    
+
+h2 *, div.sectionb * {
+  text-decoration: none;
+}
+
+div.sectionb a {
+  color: #700000;
+  font-weight: bold;
+}    
+
+h2 a {
+  color: #FF9900;
+}    
+
+/* Rounded corner rules */
+
+.t_box {
+   background: #333232;
+}
+
+.t_top div {
+   background: url('images/ttl.png') no-repeat top left;
+}
+
+.t_top {
+   background: url('images/ttr.png') no-repeat top right;
+}
+
+.t_top div, .t_top {
+  width: 100%;
+  height: 10px;
+  font-size: 1px;
+}
+
+.t_content { 
+  padding: 0px 16px 8px 16px;
+  background-color: #333232;
+  color: #FF9900;
+  font-weight: bold;
+  font-size: medium;
+}
+
+.b_box {
+   background: #D0D0D0;
+}
+
+.b_bottom div {
+   background: url('images/sbl.png') no-repeat bottom left;
+}
+
+.b_bottom {
+   background: url('images/sbr.png') no-repeat bottom right;
+}
+
+.b_bottom div, .b_bottom {
+  width: 100%;
+  height: 10px;
+  font-size: 1px;
+}
+
+.b_content { 
+  padding: 1px 16px 0px 16px;
+  background-color: #D0D0D0;
+}

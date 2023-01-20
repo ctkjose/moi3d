@@ -1,0 +1,1 @@
+<moi:CommandButton onbuttonclick="var crvs = moi.geometryDatabase.getObjects().getCurves(); for ( var i = 0; i < crvs.length; ++i ) { var crv = crvs.item(i); if ( crv.getSubObjects().length > 1 ) crv.selected = true; }">SelPath</moi:CommandButton>

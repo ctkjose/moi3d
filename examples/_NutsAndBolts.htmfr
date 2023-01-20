@@ -1,0 +1,237 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+		var objects = moi.geometryDatabase.createObjectList(), head, shank, nut, washers, shankRebuild = true, headRebuild = true, nutRebuild = true, washersRebuild = true;
+		var units = moi.geometryDatabase.unitsShortLabel;	if ( units == '' ) units = 'mm';
+		var ratioDb=[]; ratioDb['mm']=1, ratioDb['cm']=10, ratioDb['m']=1000, ratioDb['in']=25.4, ratioDb['ft']=304.8, ratioDb['km']=1000000, ratioDb['mi']=1609344; 
+		var rt = ratioDb[units];
+		
+		function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) if (arguments[i] !==null) f.setInput( i - 1, arguments[i] ); var obj = f.calculate(); f.cancel(); return obj; }
+		function cObjectList() { var list = moi.geometryDatabase.createObjectList(); for ( var i = 0; i < arguments.length; i++ ) list.addObject( arguments[i] ); return list; }
+		function cList() { var list = moi.createList(); for ( var i = 0; i < arguments.length; i++ ) list.add( arguments[i] ); return list; }
+		function concat( list ) { for ( var i = 1; i < arguments.length; i++ ) { var arglist = arguments[i];	for ( var j = 0; j < arglist.length; j++ ) list.addObject( arglist.item(j) ); } return list;}
+		
+		function buildHex( shift, wrenchSize, height, diameter, chamferDepth, chamferAngle, chamferTop, chamferBottom) 
+		{
+			var innerRadius = wrenchSize / 2;
+			var outerRadius = wrenchSize / Math.sqrt(3);
+			var frame = moi.vectorMath.createFrame( moi.vectorMath.createPoint( 0, 0, shift ));
+			var object = factory('cylinder', true, frame, null, outerRadius, frame.evaluate( 0, 0, height ));
+			if ( diameter > 0 && diameter < wrenchSize )
+			{
+				var circle = factory( 'circle', false, frame, null, diameter, false);
+				object = factory( 'booleandifference', object, circle, false );
+				var list = moi.geometryDatabase.createObjectList();
+				list.addObject( object.item(0).getEdges().item(3) );
+				list.addObject( object.item(0).getEdges().item(4) );
+				if ( chamferAngle > 0) object = factory( 'chamfer', list, null, null, (outerRadius - innerRadius)*(chamferDepth-0.3), (outerRadius - innerRadius)*(chamferDepth-0.3)*0.57735);
+			}
+			if ( chamferAngle > 0)
+			{
+				var list = moi.geometryDatabase.createObjectList();
+				if ( chamferTop ) list.addObject( object.item(0).getEdges().item(2) );
+				if ( chamferBottom ) list.addObject( object.item(0).getEdges().item(0) );
+				if ( chamferTop || chamferBottom ) object = factory( 'chamfer', list, null, null, (outerRadius - innerRadius)*chamferDepth, ( outerRadius - innerRadius )*chamferDepth* Math.tan( chamferAngle * Math.PI / 180 ));
+			}
+			var hexShape = factory( 'polygon' , frame, frame.evaluate( innerRadius, 0, 0 ), 6, true);
+			object = factory( 'booleanintersection', object, hexShape );
+			return object;
+		}
+
+		function buildWashers( topFlag, bottomFlag, topShift, bottomShift, height, innerRadius, outerRadius ) 
+		{
+			var list = moi.geometryDatabase.createObjectList();
+			if ( topFlag ) { var frame = moi.vectorMath.createFrame( moi.vectorMath.createPoint( innerRadius, 0, topShift )); list = concat (list, factory('rectangle', frame, frame.evaluate( outerRadius-innerRadius, 0, height )));  }
+			if ( bottomFlag ) { var frame = moi.vectorMath.createFrame( moi.vectorMath.createPoint( innerRadius, 0, bottomShift )); list = concat (list, factory('rectangle', frame, frame.evaluate( outerRadius-innerRadius, 0, height ))); }	
+			list = factory( 'revolve', list, moi.VectorMath.createPoint(0,0,0), moi.VectorMath.createPoint(0,0,1), 360, false );	
+			return list;
+		}
+		
+		function buildThread ( draft, diameter, length, thread, pitch, head )
+		{
+			var profile, helix, object, frame, cutter, helixStart, helixEnd;
+			var threadDepth = pitch * Math.cos( 30 * Math.PI / 180 );
+			var shift = (thread < length)?-1:1;
+			var pointChamfer = ( pitch < diameter/2 )?pitch:diameter/2*0.95;
+			if (!draft) { helixStart = thread+shift*pitch/2 } else if ( thread == length && !head) { helixStart = thread-pitch } else { helixStart = thread }
+			helixEnd = ( draft )?pitch:-pitch/2;
+			if (helixStart<helixEnd) helixStart=helixEnd;
+			frame = moi.vectorMath.createFrontFrame();
+			frame.origin = moi.vectorMath.createPoint( diameter/2 + threadDepth / 8, 0, thread-pitch );
+			profile = factory( 'polygonedge', frame, moi.vectorMath.createPoint( diameter/2 + threadDepth / 8, 0, thread), 3 );
+			profile = factory ('fillet', profile, null, cList( false, false, true), threadDepth / 6, 'circular');
+			frame = moi.vectorMath.createTopFrame();
+			frame.origin = moi.vectorMath.createPoint( 0, 0, helixStart );
+			helix = factory( 'helix', frame, moi.vectorMath.createPoint( 0, 0, helixEnd ), moi.vectorMath.createPoint( diameter/2, 0, -pitch/2 ), null, null, null, null, pitch, 'flat', false );
+			frame.origin = moi.vectorMath.createPoint( 0, 0, 0 );
+			object = factory( 'cylinder', null, frame, null, diameter/2, moi.vectorMath.createPoint( 0, 0, length));	
+			if ( head || (length !== thread) ) { object = factory( 'chamfer', cObjectList(object.item(0).getEdges().item(0)), null, null, pointChamfer, pointChamfer ); } 
+				else { object = factory( 'chamfer', cObjectList(object.item(0).getEdges().item(0), object.item(0).getEdges().item(2)), null, null, pointChamfer, pointChamfer ); } 
+			if (thread == 0 ) return object;
+			if ( draft ) return concat (helix, object);
+			cutter = factory( 'sweep', profile, helix, cList(moi.vectorMath.createPoint( 0, 0, 0 ), moi.vectorMath.createPoint( 0, 0, 1 )), null, 'Regular', 'Flat', null, true, null, null, 'Exact' );
+			object = factory('booleandifference', object, cutter, false);
+			if ( thread < length )
+			{
+				frame.origin = moi.vectorMath.createPoint( 0, 0, thread+shift*pitch/2 );
+				helix = factory( 'helix', frame, moi.vectorMath.createPoint( 0, 0, thread + pitch/2 ), moi.vectorMath.createPoint( diameter/2, 0, 0 ), null, moi.vectorMath.createPoint( diameter/2 + threadDepth, 0, 0 ), null, 1, pitch, 'flat', false ); 
+				cutter = factory( 'sweep', profile, helix, cList(moi.vectorMath.createPoint( 0, 0, 0 ), moi.vectorMath.createPoint( 0, 0, 1 )), null, 'Regular', 'Flat', null, true, null, null, 'Exact' );
+				object = factory('booleandifference', object, cutter, false);
+			}
+			return object;
+		}
+		
+		function build( draft ) 
+		{
+			var headShift=0, nutShift=0;
+			if ( shankFlag.value ) { headShift = shankLength.value/rt; } else if ( nutFlag.value ) { headShift = nutHeight.value/rt * 2; }
+			if ( shankFlag.value ) { nutShift = shankDiameter.value*0.3/rt; } if (nutShift>nutHeight.value/rt) nutShift = nutHeight.value/rt;
+			if ( nutFlag.value && headFlag.value && nutDistance.value > 0 ) 
+				if ( shankFlag.value ) { nutShift = headShift-2*washersFlag.value*washerHeight.value/rt-nutDistance.value/rt-nutHeight.value/rt; }
+					else { headShift = nutHeight.value/rt+2*washersFlag.value*washerHeight.value/rt+nutDistance.value/rt; }
+			
+			if ( threadLength.value > shankLength.value) { threadLength.value = shankLength.value;}
+			if ( threadPitch.value > shankDiameter.value*0.8 ) threadPitch.value = shankDiameter.value*0.8;
+			if ( headRebuild ) { head = buildHex(headShift, headWrenchSize.value/rt, headHeight.value/rt, 0, chamferDepthBox.value/100+1, chamferAngleBox.value, true, false); headRebuild = false; }
+			if ( shankRebuild ) { shank = buildThread( draft, shankDiameter.value/rt, shankLength.value/rt, threadLength.value/rt, threadPitch.value/rt, headFlag.value); shankRebuild = false; }
+			if ( nutRebuild ) { nut = buildHex(nutShift, nutWrenchSize.value/rt, nutHeight.value/rt, nutDiameter.value/rt, chamferDepthBox.value/100+1, chamferAngleBox.value, true, true); nutRebuild = false; }
+			if ( washersRebuild ) washers = buildWashers ( headFlag.value, nutFlag.value, headShift-washerHeight.value/rt, nutShift+nutHeight.value/rt, washerHeight.value/rt, shankDiameter.value/rt/2*1.1, washersDiameter.value/rt/2);
+			
+			cancel();
+			objects = moi.geometryDatabase.createObjectList();
+			if ( headFlag.value ) objects = concat (objects, head );
+			if ( shankFlag.value ) objects = concat (objects, shank );
+			if ( nutFlag.value ) objects = concat (objects, nut );
+			if ( washersFlag.value ) objects = concat (objects, washers );
+			moi.geometryDatabase.addObjects(objects);
+		}
+		function cancel() { moi.geometryDatabase.removeObjects(objects); }
+		function done() 
+		{ 
+			if ( shankFlag.value ) shankRebuild = true; build( false );
+			if ( shankFlag.value && headFlag.value )
+			{
+				var uni = concat (shank, head );
+				uni = factory('booleanunion', uni);
+				moi.geometryDatabase.removeObjects(shank);
+				moi.geometryDatabase.removeObjects(head);
+				moi.geometryDatabase.addObjects(uni);
+			}
+		}
+		function updateVal()
+		{
+			headWrenchSize.value = Database.value.split('x')[0];
+			nutWrenchSize.value = headWrenchSize.value;
+			headHeight.value = Database.value.split('x')[1];
+			shankDiameter.value = Database.value.split('x')[2];
+			threadPitch.value = Database.value.split('x')[3];
+			nutHeight.value = Database.value.split('x')[4];
+			
+			shankLength.value = shankDiameter.value*3;
+			threadLength.value = shankDiameter.value*2;
+			nutDiameter.value = shankDiameter.value-threadPitch.value*Math.cos( 30 * Math.PI / 180 );
+			washerHeight.value = shankDiameter.value*0.1;
+			washersDiameter.value = headWrenchSize.value*1.3;
+			shankRebuild = true;
+			nutRebuild = true;
+			washersRebuild = true;
+			headRebuild = true;
+		}
+		</script>
+	</head>
+	<body class="commandbody" onload='if (typeof(headWrenchSize.value) !== "number") updateVal();'>
+		<div id="TitleContainer" style="width:100%; text-align:center;">
+			<strong>Ecrous et Boulons</strong>
+		</div>
+		<div id="InputContainer" class="commandoptions">
+		<table style="width:100%">
+			<col width="5"><col><col width="5">
+			<tr><td  colspan="3">
+				<select id="Database" onchange="if ( Database.value != '' ) { updateVal(); } " style="width:100%" >
+					<option value=""></option>
+					<optgroup label="ISO 4014/4032" value="">
+						<option value="3.2x1.1x1.6x0.35x1.3">M1.6 - 0.35 mm</option>
+						<option value="4x1.4x2x0.4x1.6">M2 - 0.4 mm</option>
+						<option value="5x1.7x2.5x0.45x2">M2.5 - 0.45 mm</option>
+						<option value="5.5x2x3x0.5x2.4">M3 - 0.5 mm</option>
+						<option value="7x2.8x4x0.7x3.2">M4 - 0.7 mm</option>
+						<option value="8x3.5x5x0.8x4.5">M5 - 0.8 mm</option>
+						<option value="10x4x6x1x5.2">M6 - 1 mm</option>
+						<option value="13x5.3x8x1.25x6.8">M8 - 1.25 mm</option>
+						<option selected value="16x6.4x10x1.5x8.4">M10 - 1.5 mm</option>
+						<option value="18x7.5x12x1.75x10.8">M12 - 1.75 mm</option>
+						<option value="21x8.8x14x2x12.8">M14 - 2 mm</option>
+						<option value="24x10x16x2x14.8">M16 - 2 mm</option>
+						<option value="27x11.5x18x2.25x15.8">M18 - 2.25 mm</option>
+						<option value="30x12.5x20x2.25x18">M20 - 2.25 mm</option>
+						<option value="34x14x22x2.25x19.4">M22 - 2.25 mm</option>
+						<option value="36x15x24x3x21.5">M24 - 3 mm</option>
+						<option value="41x17x27x3x23.8">M27 - 3 mm</option>
+						<option value="46x18.7x30x3.5x25.6">M30 - 3.5 mm</option>
+						<option value="55x22.5x36x4x31">M36 - 4 mm</option>
+						<option value="65x26x42x4.5x34">M42 - 4.5 mm</option>
+						<option value="75x30x48x5x38">M48 - 5 mm</option>
+						<option value="85x35x56x5.5x45">M56 - 5.5 mm</option>
+						<option value="95x40x64x6x51">M64 - 6 mm</option>
+					</optgroup>
+					<optgroup label="ASME B18.2.1/B18.2.2" value="">
+						<option value='9.525x4.2333x6.35x1.27x5.74' >1/4" - 20 UNC</option>
+						<option value='11.90625x5.292x7.9375x1.411x6.93' >5/16" - 18 UNC</option>
+						<option value='14.2875x6.35x9.525x1.588x8.56' >3/8" - 16 UNC</option>
+						<option value='19.05x8.73125x12.7x1.954x11.38' >1/2" - 13 UNC</option>
+						<option value='23.8125x10.715625x15.875x2.309x14.2' >5/8" - 11 UNC</option>
+						<option value='28.575x12.7x19.05x2.54x16.89' >3/4" - 10 UNC</option>
+						<option value='33.3375x14.684375x22.225x2.822x19.71' >7/8" - 9 UNC</option>
+						<option value='38.1x17.065625x25.4x3.175x22.53' >1" - 8 UNC</option>
+						<option value='42.8625x19.05x28.575x3.628x25.37' >1 1/8" - 7 UNC</option>
+						<option value='47.625x21.43125x31.75x3.628x27.78' >1 1/4" - 7 UNC</option>
+						<option value='52.3875x23.01875x34.925x4.233x30.63' >1 3/8" - 6 UNC</option>
+						<option value='57.15x25.4x38.1x4.233x33.45' >1 1/2" - 6 UNC</option>
+						<option value='66.675x29.36875x44.45x5.08x39.01' >1 3/4" - 5 UNC</option>
+						<option value='76.2x34.13125x50.8x5.644x44.68' >2" - 4.5 UNC</option>
+						<option value='85.725x38.1x57.15x5.644x50' >2 1/4" - 4.5 UNC</option>
+						<option value='95.25x42.06875x63.5x6.35x55.56' >2 1/2" - 4 UNC</option>
+					</optgroup>
+				</select>
+			</td></tr>
+		</table>
+		<table style="width:100%">
+			<col width="5"><col><col width="3">
+			<tr><td colspan="3"><moi:CheckButton id="headFlag" default="true"><u>Tête</u></moi:CheckButton></td></tr>
+			<tr><td style="width:70%"><nobr>Taille de la Clé</nobr></td><td style="width:2em;"><moi:NumericInput id="headWrenchSize" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Hauteur</td><td style="width:2em;"><moi:NumericInput id="headHeight" /></td><td style="width:2em;">mm</td></tr>
+		</table>
+		<table style="width:100%">
+			<col width="5"><col><col width="3">
+			<tr><td colspan="3"><moi:CheckButton id="shankFlag" default="true"><u>Emmanchement</u></moi:CheckButton></td></tr>
+			<tr><td style="width:70%">Diamètre</td><td style="width:2em;"><moi:NumericInput id="shankDiameter" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Longueur</td><td style="width:2em;"><moi:NumericInput id="shankLength" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%"><nobr>Pas de Vis</nobr></td><td style="width:2em;"><moi:NumericInput id="threadPitch" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%"><nobr>Longueur de Filetage</nobr></td><td style="width:2em;"><moi:NumericInput id="threadLength" /></td><td style="width:2em;">mm</td></tr>
+		</table>
+		<table style="width:100%">
+			<col width="5"><col><col width="3">
+			<tr><td colspan="3"><moi:CheckButton id="washersFlag" default="true"><u>Rondelles</u></moi:CheckButton></td></tr>
+			<tr><td style="width:70%">Diamètre</td><td style="width:2em;"><moi:NumericInput id="washersDiameter" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Hauteur</td><td style="width:2em;"><moi:NumericInput id="washerHeight" /></td><td style="width:2em;">mm</td></tr>
+		</table>
+		<table style="width:100%">
+			<col width="5"><col><col width="3">
+			<tr><td colspan="3"><moi:CheckButton id="nutFlag" default="true"><u>Ecrou</u></moi:CheckButton></td></tr>
+			<tr><td style="width:70%"><nobr>Taille</nobr></td><td style="width:2em;"><moi:NumericInput id="nutWrenchSize" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Hauteur</td><td style="width:2em;"><moi:NumericInput id="nutHeight" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Diamètre</td><td style="width:2em;"><moi:NumericInput id="nutDiameter" /></td><td style="width:2em;">mm</td></tr>
+			<tr><td style="width:70%">Distance</td><td style="width:2em;"><moi:NumericInput id="nutDistance" value="0"  /></td><td style="width:2em;">mm</td></tr>
+		</table>
+		<table style="width:100%; padding-top:0.5em;"><tr><td>Chanfrein:</td></tr></table>
+		<table style="width:100%; padding-top:0.2em;">
+			<col width="5"><col><col width="3">
+			<tr><td>Angle</td><td><moi:Slider id="chamferAngleSlider" min="0" max="30" style="width:90%"   /></td><td style="width:2em;"><moi:UnsignedIntegerInput id="chamferAngleBox" value="30"  binding="chamferAngleSlider.value = this.value" /></td></tr>
+			<tr><td>Profondeur</td><td><moi:Slider id="chamferDepthSlider" min="0" max="30" style="width:90%"   /></td><td style="width:2em;"><moi:UnsignedIntegerInput id="chamferDepthBox" value="20" binding="chamferDepthSlider.value = this.value" /></td></tr>
+		</table>
+		</div>
+		<moi:CommandDoneCancel />
+	</body>
+</html>
+	

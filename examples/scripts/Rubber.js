@@ -1,0 +1,1 @@
+script: /* Set lighting options for Rubber */ var v = moi.view; v.lightingStyle = 'MoreFill'; v.specularHighlights = true; v.specularBrightness = 0.4; v.specularFocusSize = 0.6; v.metallicLighting = false; v.fixedLightPositions = true; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

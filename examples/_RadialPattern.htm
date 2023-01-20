@@ -1,0 +1,117 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var pattern, splane, shape, bplane, lastCount, lastCShift, lastSize, lastLayers, lastRadius, lastRShift, lastSShift, lastTwist, lastRotate;
+			function random(a, b) { return Math.round(Math.random()*(b-a)+a) }
+			function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) f.setInput( i - 1, arguments[i] ); var objects = f.calculate(); f.cancel(); return objects; }
+			function concat( list ) { for ( var i = 1; i < arguments.length; i++ ) { var arglist = arguments[i]; for ( var j = 0; j < arglist.length; j++ ) list.addObject( arglist.item(j) ); } return list; }
+			function init(obj, vp)
+			{
+				pattern = moi.geometryDatabase.createObjectList();
+				if ( obj.length > 0 )
+				{
+					shape = obj;
+					splane = vp;
+					var bboxc = obj.getBoundingBox().center;
+					splane.origin = moi.VectorMath.createPoint(bboxc.x, bboxc.y, bboxc.z);
+				}
+				else
+				{
+					splane = moi.VectorMath.createFrame(bplane.origin, bplane.xaxis, bplane.yaxis)
+					shape = factory( 'circle', false, splane, splane.evaluate( 0.5, 0, 0 ) );
+				}
+				lastCount = lastCShift = lastSize = lastLayers = lastRadius = lastRShift = lastSShift = lastTwist = lastRotate = -1;
+				setInterval(UpdatePattern,20);
+			}
+			function UpdatePattern()
+			{
+				if ( lastCount === Count.value && lastCShift === CShift.value && lastSize === Size.value && lastLayers === Layers.value && lastRadius === Radius.value && lastRShift === RShift.value && lastSShift === SShift.value && lastTwist === Twist.value && lastRotate === Rotate.value ) return;
+				lastCount = Count.value; lastCShift = CShift.value; lastSize = Size.value; lastLayers = Layers.value; lastRadius = Radius.value; lastRShift = RShift.value; lastSShift = SShift.value; lastTwist = Twist.value; lastRotate = Rotate.value;
+				moi.geometryDatabase.removeObjects( pattern );
+				pattern = moi.geometryDatabase.createObjectList();
+				var cCount = Count.value;
+				var cRadius = Radius.value;
+				var cSize = Size.value;
+				var cAngle = 0;
+				
+				for ( var i=0; i<Layers.value; i++ )
+				{
+					if (cSize > 0)
+					{
+						var clone = factory( 'rotate', shape, splane, Rotate.value + cAngle, null, null, true);
+						cplane = moi.VectorMath.createFrame(bplane.evaluate(cRadius*Math.cos(cAngle/180*Math.PI), cRadius*Math.sin(cAngle/180*Math.PI), 0 ), bplane.xaxis, bplane.yaxis)
+						clone = factory( 'orient', clone, splane, cplane, false);
+						clone = factory( 'scale', clone, cplane.origin, cSize/10, null, null, false );
+						var clones = factory( 'arraycircular', clone, bplane, cCount, 360.0 );
+						pattern = concat( pattern, clone, clones);
+					}
+					cRadius += RShift.value;
+					cCount += CShift.value;
+					cSize += SShift.value; if ( cSize < 0 ) cSize = 0;
+					cAngle += Twist.value;
+				}
+				moi.geometryDatabase.addObjects( pattern );
+			}
+			function randomize()
+			{
+				Layers.value = random(1,16);		Twist.value =random(-10,10);
+				Count.value = random(2,20);		CShift.value = random(0,10);
+				Radius.value = random(1,20);	RShift.value = random(1,5);
+				Size.value = random(1,40);		SShift.value = random(-2,2);
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="PickPrompt" class="commandprompt">Pick center point</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt"><strong onclick="randomize()">Radial pattern</strong></div>
+		</div>
+		
+		<div id="PatternOptions" class="hiddencommandoptions">
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td>Layers:</td><td><moi:Slider id="Layersslider" min="1" max="16" style="width:90%" /></td>
+					<td><moi:UnsignedIntegerInput id="Layers" style="width:3em;" default="8" binding="Layersslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>Count:</td><td><moi:Slider id="Countslider" min="2" max="20" style="width:90%" /></td>
+					<td><moi:UnsignedIntegerInput id="Count" style="width:3em;" default="10" binding="Countslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>CShift:</td><td><moi:Slider id="CShiftslider" min="0" max="10" style="width:90%" /></td>
+					<td><moi:UnsignedIntegerInput id="CShift" style="width:3em;" default="5" binding="CShiftslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>Radius:</td><td><moi:Slider id="Radiusslider" min="1" max="20" style="width:90%" /></td>
+					<td><moi:NumericInput id="Radius" style="width:3em;" default="3" binding="Radiusslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>RShift:</td><td><moi:Slider id="RShiftslider" min="1" max="5" style="width:90%" /></td>
+					<td><moi:NumericInput id="RShift" style="width:3em;" default="3" binding="RShiftslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>Size:</td><td><moi:Slider id="Sizeslider" min="1" max="40" style="width:90%" /></td>
+					<td><moi:NumericInput id="Size" style="width:3em;" default="10" binding="Sizeslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td onclick="SShift.value=0">SShift:</td><td><moi:Slider id="SShiftslider" min="-5" max="5" style="width:90%" /></td>
+					<td><moi:NumericInput id="SShift" style="width:3em;" default="0" binding="SShiftslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td onclick="Twist.value=0">Twist:</td><td><moi:Slider id="Twistslider" min="-10" max="10" style="width:90%" /></td>
+					<td><moi:NumericInput id="Twist" style="width:3em;" default="0" binding="Twistslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td onclick="Rotate.value=0">Rotate:</td><td><moi:Slider id="Rotateslider" min="-180" max="180" style="width:90%"/></td>
+					<td><moi:NumericInput id="Rotate" style="width:3em;" default="0" binding="Rotateslider.value = this.value"/></td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="CancelContainer"><moi:CommandCancel /></div>
+		<div id="DoneCancelContainer" style="display:none"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

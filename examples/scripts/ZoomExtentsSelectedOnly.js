@@ -1,0 +1,1 @@
+script:/* Zoom extents selected */ var vp = moi.ui.getActiveViewport(); vp.zoom( 0.9 ); vp.reset();

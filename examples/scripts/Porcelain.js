@@ -1,0 +1,1 @@
+script: /* Set lighting options for Porcelain */ var v = moi.view; v.lightingStyle = 'CustomLevels'; v.specularHighlights = true; v.specularBrightness = 0.28; v.specularFocusSize = 2.0; v.metallicLighting = false; v.fixedLightPositions = true; v.customKeyLightLevel = 0.08; v.customFillLightLevel = 1.0;

@@ -1,0 +1,60 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			function generateRandomCurves()
+			{
+				for ( var x = 0; x<curvesNum.value; ++x )
+				{
+					var cfactory = moi.command.createFactory( 'curve' );
+					for ( var y = 0; y<pointsNum.value; ++y )
+					{
+						var pt = moi.VectorMath.createPoint( x+(Math.random()-0.5)*XShift.value/100, y+(Math.random()-0.5)*YShift.value/100, (Math.random()-0.5)*ZShift.value/100);
+						cfactory.createInput('point');
+						cfactory.setInput( y, pt  );
+					}
+					cfactory.commit();
+				}
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Random curve generator</strong>
+		</div>
+		<div id="MorphOptions" class="commandprompt">
+		<table style="width:100%; padding-top:0.2em;">
+			<col>
+			<col width="5">
+			<tr><td>Curves count</td><td style="width:2em;"><moi:UnsignedIntegerInput id="curvesNum" value="40" /></td></tr>
+			<tr><td>Points per curve</td><td style="width:2em;"><moi:UnsignedIntegerInput id="pointsNum" value="40" /></td></tr>
+		</table>
+		<table style="width:100%; padding-top:1em;">
+			<col width="5">
+			<col>
+			<col width="5">
+			<col width="1">
+			<tr>
+				<td>X</td>
+				<td><moi:Slider id="XSlider" min="0" max="100" style="width:90%"   /></td>
+				<td style="width:2em;"><moi:UnsignedIntegerInput id="XShift" value="0"  binding="XSlider.value = this.value" /></td>
+				<td>%</td>
+			</tr>
+			<tr>
+				<td>Y</td>
+				<td><moi:Slider id="YSlider" min="0" max="100" style="width:90%"   /></td>
+				<td style="width:2em;"><moi:UnsignedIntegerInput id="YShift" value="0"  binding="YSlider.value = this.value" /></td>
+				<td>%</td>
+			</tr>	
+			<tr>
+				<td>Z</td>
+				<td><moi:Slider id="ZSlider" min="0" max="100" style="width:90%"   /></td>
+				<td style="width:2em;"><moi:UnsignedIntegerInput id="ZShift" value="100"  binding="ZSlider.value = this.value" /></td>
+				<td>%</td>
+			</tr>				
+		</table>
+		</div>
+		<moi:CommandDoneCancel />
+	</body>
+</html>
+	

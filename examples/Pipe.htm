@@ -1,0 +1,55 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		
+		<script>
+			function ShowRadius2( show )
+			{
+				Radius2.style.display = (show ? 'block' : 'none');
+			}
+			
+			function Initialize()
+			{
+				ShowRadius2( Tapered.value );
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectionPrompt" class="commandprompt">Sélection Courbe du Rail</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Options du Tube</div>
+		</div>
+		
+		<div id="PipeOptions" class="hiddencommandoptions">
+		
+			<table>
+				<tr>
+					<td>Rayon Ext:</td>
+					<td><input id="OuterRadius1" class="numericinput" style="persist:true"></td>
+				</tr>
+				<tr>
+					<td>Rayon Int:</td>
+					<td><input id="InnerRadius1" class="numericinput" style="persist:true"></td>
+				</tr>
+			</table>
+			
+			<moi:CheckButton id="Tapered" onbuttonclick="ShowRadius2(this.value);">Effilé</moi:CheckButton>
+
+			<table id="Radius2">
+				<tr>
+					<td>Rayon Ext 2:</td>
+					<td><input id="OuterRadius2" class="numericinput" style="persist:true"></td>
+				</tr>
+				<tr>
+					<td>Rayon Int 2:</td>
+					<td><input id="InnerRadius2" class="numericinput" style="persist:true"></td>
+				</tr>
+			</table>
+			
+			<moi:PushButton id="Update">Mise à Jour</moi:PushButton>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

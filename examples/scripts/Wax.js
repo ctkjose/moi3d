@@ -1,0 +1,1 @@
+script: /* Set lighting options for Wax */ var v = moi.view; v.lightingStyle = 'CustomLevels'; v.specularHighlights = true; v.specularBrightness = 0.9; v.specularFocusSize = 1.5; v.metallicLighting = false; v.fixedLightPositions = true; v.customKeyLightLevel = 0.08; v.customFillLightLevel = 0.982;

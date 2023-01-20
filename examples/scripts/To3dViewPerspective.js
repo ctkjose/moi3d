@@ -1,0 +1,1 @@
+script:/* Set perspective 3D view */ moi.ui.mainWindow.viewpanel.getViewport('3D').projection = 'Perspective'; moi.ui.mainWindow.viewpanel.mode = '3D';

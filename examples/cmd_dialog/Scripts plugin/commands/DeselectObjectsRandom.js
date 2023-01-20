@@ -1,0 +1,1 @@
+script: /* Deselect random objects */ var percent = 30; var objs = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < objs.length; ++i ) { if ( Math.random() * 100 > percent ) objs.item(i).selected = false; }

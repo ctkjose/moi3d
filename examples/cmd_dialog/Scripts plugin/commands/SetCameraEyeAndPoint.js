@@ -1,0 +1,1 @@
+script: /* set camera by eye and lookat points */ var vm = moi.vectorMath; var eye = vm.createPoint( 10, 10, 10 ); var lookat = vm.createPoint( 0, 0, 0 ); moi.ui.mainWindow.viewpanel.getViewport( '3D' ).setCameraAndTarget( eye, lookat );

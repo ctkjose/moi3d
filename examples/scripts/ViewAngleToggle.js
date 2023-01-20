@@ -1,0 +1,2 @@
+script: /* Toggle mesh angle */ var newang, ang = moi.view.meshAngle; if ( ang == 5 ) newang = 10; else if ( ang == 10 ) newang = 25; else newang = 5; moi.view.meshAngle = newang; var sidepane = moi.ui.getUIPanel('moi://ui/SidePane.htm').document; if ( !sidepane.getElementById('meshangval') ) { sidepane.body.insertAdjacentHTML( 'beforeEnd', '<div id="meshangval" style="position:absolute; right:5px; bottom:5px;"><p/div>' ); } sidepane.getElementById('meshangval').innerText = newang;
+

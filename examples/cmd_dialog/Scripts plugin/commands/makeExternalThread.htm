@@ -1,0 +1,98 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Make External Thread</strong>
+		</div>
+		
+		<div id="InputContainer" class="commandoptions" style="width:100%; padding-top:0.75em; padding-left:0.85em;">
+			
+			Thread size<br>
+			<select id="threadSize">
+			
+				<optgroup label="Metric - Standard">
+					<option value="3x0.5"> M3 x 0.5 </option>
+					<option value="4x0.7"> M4 x 0.7 </option>
+					<option value="5x0.8"> M5 x 0.8 </option>
+					<option value="6x1"> M6 x 1 </option>
+					<option value="8x1.25"> M8 x 1.25 </option>
+					<option value="10x1.5"> M10 x 1.5 </option>
+					<option value="12x1.5"> M12 x 1.75 </option>
+				</optgroup>
+				
+				<!--Add whitespace between groups-->
+				<optgroup disabled="disabled" style="margin-top: .25em;"></optgroup>
+				
+				<optgroup label="Metric - Fine">
+				<option value="2x0.25"> M2 x 0.25 </option>
+					<option value="3x0.35"> M3 x 0.35 </option>
+					<option value="4x0.5"> M4 x 0.5 </option>
+					<option value="5x0.5"> M5 x 0.5 </option>
+					<option value="6x0.75"> M6 x 0.75 </option>
+				</optgroup>
+				
+				<optgroup disabled="disabled" style="margin-top: .25em;"></optgroup>
+				
+				<optgroup label="Imperial - Coarse">
+					<option value="3.5052x0.79375"> 6 - 32 UNC </option>
+					<option value="4.1656x0.79375"> 8 - 32 UNC </option>
+					<option value="4.826x1.058333"> 10 - 24 UNC </option>
+					<option value="5.4864x1.058333"> 12 - 32 UNC </option>
+					<option value="6.35x1.27"> 1/4 - 20 UNC </option>
+					<option value="7.9375x1.411111"> 5/16 - 18 UNC </option>
+					<option value="9.525x1.5875"> 3/8 - 16 UNC </option>
+					<option value="11.1125x1.814285"> 7/16 - 14 UNC </option>
+					<option value="12.7x1.953846"> 1/2 - 13 UNC </option>
+				</optgroup>
+				
+				<!--
+				
+				This script produces threads with 60 degrees flank angle
+				like metric, metric fine, UNC and UNF threads.
+				
+				Adding new thread sizes to the lists above is simple:
+				For each additional thread size add a line formatted exactly like shown next
+				
+				<option value="THREADDIAMETERxPITCH"> NAME </option>
+				
+				THREADDIAMETER must be entered in millimeters. 
+				Diameters in inches must be converted to millimeters using the formula
+				THREADDIAMETER = Diameter-in-inches * 25.4
+				
+				Seperate THREADDIAMETER and PITCH with a lower case x
+				
+				PITCH must be entered in turns per millimeter.
+				Imperial TPI must be converted to turns/mm using the formula 
+				PITCH = 25.4 / TPI. 
+				
+				NAME is the text that appears in the scripts dropdown list
+				
+				-->
+
+			</select>
+			
+			<br><br>
+			
+			Thread length<br>
+			<moi:DistanceInput id="threadLength" value="10">  <br>	
+			<br>
+			Additional length<br> 
+			without thread <br>
+			<moi:DistanceInput id="LengthWithoutThread" value="0"><br>
+			<br>
+			<moi:CheckButton id="chamfer" default="true">Chamfer thread end</moi:CheckButton>
+			<moi:CheckButton id="reverse">Left threaded</moi:CheckButton>
+			<moi:CheckButton id="timeIt">Time it	</moi:CheckButton>
+			<br>
+
+		</div>
+		
+		<moi:CommandDoneCancel />
+		
+	</body>
+</html>
+	

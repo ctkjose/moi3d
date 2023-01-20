@@ -1,0 +1,79 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		
+		<style>
+			.numdisplay
+			{
+				text-align:right;
+				padding-left:1em;
+			}
+			
+			#DistanceContainer input
+			{
+				width:5em;
+			}
+		</style>
+
+		<script>
+			var g_BasePt = null;
+		
+			function OnGetDistancePoint( pointpicker )
+			{
+				if ( g_BasePt != null )
+				{
+					var pt = pointpicker.pt;
+								
+					SetVal( 'space', moi.vectorMath.distance( g_BasePt, pt ) );
+					SetVal( 'xdist', pt.x - g_BasePt.x );
+					SetVal( 'ydist', pt.y - g_BasePt.y );
+					SetVal( 'zdist', pt.z - g_BasePt.z );
+				}
+			}
+			
+			function SetVal( name, numval )
+			{
+				var sval = numval.toFixed( 2 );
+		
+				window[name].value = sval.replace( /\.*0+$/, '' ); // Remove trailing 0 or .00
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+
+		<div class="commandheader">
+			<div id="StartPrompt" class="commandprompt">Pick first point</div>
+			<div id="EndPrompt" class="hiddencommandprompt">Pick second point</div>
+		</div>
+
+		<div id="DistanceContainer" style="width:100%; display:none;"> 
+			<table>
+				<tr>
+					<td>Distance:</td>
+					<td><input id="space"></td>
+				</tr>
+				
+				<tr>
+					<td>x:</td>
+					<td><input id="xdist"></td>
+				</tr>
+				
+				<tr>
+					<td>y:</td>
+					<td><input id="ydist"></td>
+				</tr>
+				
+				<tr>
+					<td>z:</td>
+					<td><input id="zdist"></td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="CancelContainer"><moi:CommandCancel /></div>
+
+		<div id="DoneContainer" style="display:none;"><moi:CommandDoneCancel /></div>
+		
+	</body>
+</html>

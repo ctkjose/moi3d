@@ -1,0 +1,1 @@
+script: /* Enable history updates on objects created by the last run command */ var a = moi.command.lastCommandRevisionStart; var b = moi.command.lastCommandRevisionEnd; var objects = moi.geometryDatabase.getObjects(); for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( obj.databaseRevision> a && obj.databaseRevision <= b ) obj.updateWithHistory = true; }

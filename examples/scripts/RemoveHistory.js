@@ -1,0 +1,1 @@
+script: /* Remove history data from selected objects */ moi.geometryDatabase.getSelectedObjects().callMethod( 'deleteHistoryData' );

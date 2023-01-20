@@ -1,0 +1,1 @@
+script:var v = moi.ui.mainWindow.viewpanel.getViewport('3D'); v.leftRightAngle = 45; v.upDownAngle = 90; v.tiltAngle = 0;

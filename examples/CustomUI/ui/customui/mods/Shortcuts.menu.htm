@@ -1,0 +1,31 @@
+<html>
+	<body class="MenuBody">
+	<moi:FlyoutHeader/>
+	<script>
+		var line = '', title, cmd='', html = '', list = [], file = moi.filesystem.openFileStream( moi.settings.getIniPath(), 'r' );
+		while (line != '[Shortcut Keys]' && !file.AtEOF) line = file.readLine();
+		while ( !file.AtEOF) 
+		{
+			line = file.readLine();
+			if (line[0]=='[' && line[line.length - 1] ==']') break;
+			title = line.match(/\/\*\!(.+)\*\//);
+			if (title && title.length > 1) 
+			{
+				title = title[1].trim() + " ["+line.split('=')[0]+"] ";
+				cmd = line.replace(line.split('=', 1)[0] + '=', '');
+				list.push({'title' : title, 'cmd' : cmd});
+			}
+		}		
+		file.close();
+		if (list.length > 0) 
+		{
+			list.sort( function (a,b) { return ((a.title < b.title) ? -1 : ((a.title > b.title) ? 1 : 0));});
+			for (var i in list) { html += '<moi:MenuItem onclick="moiWindow.endDialog(0);" command=\'' + list[i].cmd + '\'>' + list[i].title + '</moi:MenuItem>'; }
+		}
+		document.write(html);
+	</script>
+	</body>
+</html>
+
+
+

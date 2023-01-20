@@ -1,0 +1,26 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+		function DeleteAllLines()
+		{
+			var gd = moi.geometryDatabase;
+			gd.removeObjects( gd.getObjects().getConstructionLines() );
+		}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Drag to create Construction Lines</div>
+		</div>
+		
+		<div>
+			<moi:PushButton id="delete_all" onclick="DeleteAllLines()" style="width:50%">Clear</moi:PushButton>
+		</div>
+
+		<div>
+			<moi:CommandDoneCancel/>
+		</div>
+	</body>
+</html>

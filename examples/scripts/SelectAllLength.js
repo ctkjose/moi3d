@@ -1,0 +1,1 @@
+script: /* Select objects smaller than the given size */ var size = 1.0; var objs = moi.geometryDatabase.getObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); var bbox = obj.getBoundingBox(); if ( bbox.diagonalLength < size ) obj.selected = true; }

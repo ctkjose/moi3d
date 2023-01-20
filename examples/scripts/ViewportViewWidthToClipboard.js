@@ -1,0 +1,1 @@
+script: /* Output print width to clipboard */ var pix_width = 2560; var pix_height = 2048; var zoom = moi.ui.getActiveViewport().fieldOfViewAngle; var width = zoom * pix_width / pix_height; moi.copyTextToClipboard( width.toFixed(3) );

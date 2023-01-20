@@ -1,0 +1,37 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Create Euler Spiral</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>ScaleFactor:</td>
+				<td><input id="aScale" class="numericinput" default="15.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>LengthFactor:</td>
+				<td><input id="tLength" class="numericinput" default="3.0" style="persist:true;"></td>
+			</tr>			
+
+			<tr>
+				<td>Curvature:</td>
+				<td><moi:Slider id="curve_slider" onvaluechange="moi.ui.fireUIEvent(id);" value="2.0" min="0.0" max="5.0"/></td>
+				<td><moi:NumericInput id="nValue" style="width:3em; decimalPlaces:3; persist:false;"binding="this.value = curve_slider.value"/></td>
+			</tr>
+
+			<tr>
+				<td>Intervals(pts):</td>
+				<td><input id="numintervals" class="unsigned integerinput" default="125"></td>
+			</tr>
+
+			</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

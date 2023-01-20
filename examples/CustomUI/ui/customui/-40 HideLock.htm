@@ -1,0 +1,4 @@
+<moi:Spacer/>
+<moi:CommandButton icon="icons/HideIcon.png" onbuttonclick="var gd = moi.geometryDatabase; if ( event.ctrlKey ) { gd.showSubset(); } else if ( event.button == 2 ) { gd.isolate(); } else { gd.hide(); }"><moi:Text textid="Hide"/></moi:CommandButton>
+<moi:Spacer/>
+<moi:CommandButton icon="icons/LockIcon.png" onbuttonclick="var gd = moi.geometryDatabase; if ( event.ctrlKey ) { gd.unlockSubset(); } else if ( event.button == 2 ) { gd.isolateLock(); } else { gd.lock(); }"><moi:Text textid="Lock"/></moi:CommandButton>

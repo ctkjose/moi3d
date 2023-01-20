@@ -1,0 +1,84 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var objects, lastc=-1, face, edge, isoF = moi.command.createFactory( 'isocurve' ), pointF = moi.command.createFactory( 'point' ), arrayF = moi.command.createFactory( 'arraycurve' );
+			
+			function setEdge(e)
+			{
+				edge = e;
+				var faces = e.getFacesOfEdge();
+				if ( faces.length != 1 ) return 0;
+				face = faces.item(0);
+				return 1;
+			}	
+			
+			function init() { objects = moi.geometryDatabase.createObjectList(); setInterval(Update, 10);	}
+			function done() { objects.setProperty( 'selected', true ); edge.selected = false; }		
+			function cancel() {	moi.geometryDatabase.removeObjects(objects); edge.selected = false; }		
+			function CreatePoint( pt ) { pointF.setInput( 0, pt ); return pointF.calculate(); }
+			function MakePointsAlongCurve( crv, numpoints )
+			{
+				var startpt = crv.getStartPt();		
+				arrayF.setInput( 0, CreatePoint(startpt) );
+				arrayF.setInput( 1, crv );
+				arrayF.setInput( 2, 'NumItems' );
+				arrayF.setInput( 3, numpoints );
+				arrayF.setInput( 4, 0.0 );
+				arrayF.setInput( 5, 'Freeform' );			
+				var result = arrayF.calculate();		
+				var points = new Array();
+				points.push( startpt );					
+				for ( var i = 0; i < result.length; ++i ) points.push( result.item(i).pt );				
+				return points;
+			}
+			
+			function Update()
+			{
+				if ( lastc === isocount.value ) return;
+				lastc = isocount.value;
+				moi.geometryDatabase.removeObjects(objects);
+				objects = moi.geometryDatabase.createObjectList();
+				var points = MakePointsAlongCurve( edge, moi.ui.commandUI.isocount.value );
+
+				for ( var i = 0; i < points.length; ++i )
+				{
+					isoF.setInput( 0, face );
+					isoF.setInput( 1, points[i] );
+					isoF.setInput( 2, dir.value );
+					var isoV = isoF.calculate();
+					for ( var j=0; j<isoV.length; j++) objects.addObject(isoV.item(j));
+				}
+				moi.geometryDatabase.addObjects(objects);
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Select source edge</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">MultiIso options</div>
+		</div>
+		<div id="Options" class="hiddencommandoptions">
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td ><moi:Text textid="Isocurve direction label"/></td>
+					<td colspan=2>
+						<select id="dir">
+							<moi:Option value="both" textid="Isocurve direction both"/>
+							<moi:Option value="u" textid="Isocurve direction u"/>
+							<moi:Option value="v" textid="Isocurve direction v"/>
+						</select>
+					</td>
+				</tr> 
+				<tr>
+					<td><nobr>Iso count:</nobr></td>
+					<td><moi:Slider id="isocountSlider" min="0" max="100" style="width:90%"   /></td>
+					<td><moi:UnsignedIntegerInput id="isocount" style="width:3em;" default="20" binding="isocountSlider.value = this.value"/></td>
+				</tr>
+			</table>
+		</div>
+		<div id="DoneCancelContainer"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

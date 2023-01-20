@@ -1,0 +1,40 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Elliptical Helix Options:</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>CoilHalfWidth:</td>
+				<td><input id="rx" class="numericinput" default="12.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>CoilHalfHeight:</td>
+				<td><input id="ry" class="numericinput" default="6.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>z scale:</td>
+				<td><input id="kz" class="numericinput" default="1.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Number Coils</td>
+				<td><input id="numcoils" class="unsignedintegerinput" default="8"></td>
+			</tr>				
+				
+			<tr>
+				<td>Pts per Coil:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="40"></td>
+			</tr>
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

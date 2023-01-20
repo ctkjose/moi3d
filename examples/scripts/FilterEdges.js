@@ -1,0 +1,1 @@
+script: /* Turn on selection filter for Types > Edges */ moi.selection.setFilter( 'Types', 'Edges', true );

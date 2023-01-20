@@ -1,0 +1,1 @@
+script: /* Opens Lighting Options Dialog */ moi.ui.createDialog( 'moi://ui/LightingOptions.htm' );

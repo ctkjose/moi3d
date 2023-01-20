@@ -1,0 +1,35 @@
+<html>
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectObjectsPrompt" class="commandprompt">Sélection de la Surface(s) à Etendre</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Longueurs d'Extention</div>
+		</div>
+		
+		<div id="Options" class="hiddencommandoptions">
+			<table>
+				<tr>
+					<td>UMin:</td>
+					<td><moi:NumericInput id="umin" default="0.5"/>
+				</tr>
+				<tr>
+					<td>UMax:</td>
+					<td><moi:NumericInput id="umax" default="0.5"/>
+				</tr>
+				<tr>
+					<td>VMin:</td>
+					<td><moi:NumericInput id="vmin" default="0.5"/>
+				</tr>
+				<tr>
+					<td>VMax:</td>
+					<td><moi:NumericInput id="vmax" default="0.5"/>
+				</tr>
+			</table>
+
+			<div>
+				<moi:CheckButton id="deleteinputs" default="true"><moi:Text textid="Delete input objects"/></moi:CheckButton>
+			</div>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

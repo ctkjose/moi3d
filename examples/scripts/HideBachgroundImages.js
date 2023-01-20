@@ -1,0 +1,1 @@
+script:var images = moi.view.getBackgroundImages(); for ( var i = 0; i < images.length; ++i ) images.item(i).hidden = !images.item(i).hidden;

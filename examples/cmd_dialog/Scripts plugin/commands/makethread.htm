@@ -1,0 +1,46 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+<script>
+	function GetStart() {
+		return start;
+	}
+</script>
+
+	</head>
+
+	<body class="commandbody">
+
+			<div id="TitleContainer" style="width:100%; display:none;	 text-align:center;"> 
+						<strong>Make Metric Thread</strong>
+			</div>
+
+			<div id="DiameterContainer" class="commandoptions" style="width:100%; padding-top:0.75em; padding-left:0.85em;">
+						Thread diameter<moi:Spacer/>
+						<input id="diameterinput" class="numericinput" style="width:3.5em; decimalPlaces:0; persist:true;" binding0="numericValue = threadDiameter.value">
+						<moi:Slider id="threadDiameter" value="6" min="3" mid="6" max="12" style="persist:false; width:100%;"/>					
+						<br></br>
+			</div>
+			
+			<div id="LengthContainer" class="commandoptions" style="width:100%; padding-top:0.75em; padding-left:0.85em;">
+						Thread length<moi:Spacer/>
+						<input id="lengthinput" class="numericinput" style="width:3.5em; decimalPlaces:0; persist:true;" binding0="numericValue = threadLength.value">
+						<moi:Slider id="threadLength" value="20" min="5" mid="25" max="50" style="persist:false; width:100%;"/>					
+						<br></br>
+			</div>
+			
+			<div id="uLengthContainer" class="commandoptions" style="width:100%; padding-top:0.75em; padding-left:0.85em;">
+						Unthreaded length<moi:Spacer/>
+						<input id="ulengthinput" class="numericinput" style="width:3.5em; decimalPlaces:0; persist:true;" binding0="numericValue = uthreadLength.value">
+						<moi:Slider id="uthreadLength" value="10" min="0" mid="25" max="50" style="persist:false; width:100%;"/>					
+						<br></br>
+			</div>
+
+			
+			<div id="StartContainer" style="display:none;  width:100%; padding-top:0.75em;">
+						<moi:PushButton id="startbutton" onbuttonclick="start = true;" style="width:48%;">Start</moi:PushButton>
+			</div>
+
+
+	</body>
+</html>

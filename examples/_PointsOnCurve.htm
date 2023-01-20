@@ -1,0 +1,60 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			function UpdateControls()	
+			{
+				skipd.style.display = (mode.value === 'Exact' ? 'none' : 'block' ); 
+			}
+		</script>		
+	</head>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Points on curve</strong>
+		</div>
+		<div id="InputContainer" class="commandoptions">
+		<table style="width:100%">
+			<col width="5">
+			<col>
+			<col width="5">
+			<tr>
+				<td>Distance</td>
+				<td><moi:Slider id="SliderP" min="0.1" max="10" style="width:90%"   /></td>
+				<td><moi:NumericInput id="PointDist" default="1" style="width:4em;" binding="SliderP.value = this.value" /></td>
+			</tr>
+			<tr>
+				<td>Mode</td>
+				<td colspan=3>
+					<moi:Select id="mode" style="width:100%" default="Adaptive" oninit="UpdateControls();" onchange="UpdateControls();">
+					<moi:Option value="Adaptive">Adaptive</moi:Option>
+					<moi:Option value="Exact">Exact</moi:Option>
+					</moi:Select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=3>
+					<div id="skipd" style="display:none;" ><moi:CheckButton id="skip" default="false">Skip straight lines</moi:CheckButton></div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=3>
+					<moi:CheckButton id="Polyline" default="false">Convert curve to polyline</moi:CheckButton>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=3>
+					<moi:CheckButton id="Labels" default="false">Labels</moi:CheckButton>
+				</td>
+			</tr>
+			<tr>
+				<td colspan=3>
+					<moi:CheckButton id="Copy" default="false">Copy to clipboard</moi:CheckButton>
+				</td>
+			</tr>
+		</table>	
+		</div>
+		<moi:CommandDoneCancel />
+	</body>
+</html>
+	

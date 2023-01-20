@@ -1,0 +1,103 @@
+<html>
+    <body class="MenuBody">
+	<moi:FlyoutHeader/>
+	<script>
+         /*
+            Extras
+            8/20/2022, Larry Fahnoe, fahnoe@FahnoeTech.com
+
+            A modification of Scripts.menu.htm from Max Smirnov's
+            CustomUI but intended for those who do not use CustomUI.
+
+            Copy the Extras.htm and .js files to your personal startup
+            folder.
+
+            It would be nice if additional[] was not hard coded, but
+            have not figured out a simple way to generate it.  These
+            commands do not have buttons in the UI and are copied from
+            the Additional Commands section of MoI's Command Reference.
+          */
+
+	 var additional = [ 'ArrayGem', 'BoundingBox', 'BoundingBoxCenter',
+                            'ExplodeMove', 'Flip', 'IncrementalSave', 'Make2D',
+                            'Merge', 'Rebuild', 'RemoveDuplicates',
+                            'ShrinkTrimmedSrf', 'ViewProject' ];
+	 var maxlines = 40;
+
+	 function makeList() {
+	     function CutExt( str) {
+                 return str.substring( 0, str.lastIndexOf( '.'));
+             }
+
+	     function StripFileName( str) {
+                 return CutExt( str.substring( str.lastIndexOf( '\\') + 1));
+             }
+
+	     function writeList( cmds, cols) {
+		 var lines = Math.ceil( cmds.length / cols);
+                 var cln = 0;
+		 document.write ( '<tr><td style="vertical-align:top;">');
+		 for ( var i = 0; i < cmds.length; ++i) {
+		     cln++;
+		     document.write ( '<moi:MenuItem command="' + cmds[ i] + '">' +
+                                      cmds[ i] + '</moi:MenuItem>');
+		     if (( cln === lines) && (( i + 1) !== cmds.length)) {
+                         document.write ( '</td><td style="vertical-align:top;">');
+                         cln = 0;
+                     }
+		 }
+		 document.write ( '</td></tr>');
+	     }
+
+             // Get list of built-in commands
+             var cmdDir = moi.filesystem.getCommandsDir();
+             var files = moi.filesystem.getFiles( cmdDir, '*.js' );
+             var cmdFiles = [];
+             for ( var i = 0; i < files.length; i++) {
+                 cmdFiles.push( StripFileName( files.item( i)));
+             }
+
+             // Only show Additional Commands which have a corresponding .js file
+             var cmdAdditional = [];
+             for ( var i = 0; i < additional.length; i++) {
+                 if ( cmdFiles.indexOf( additional[ i]) != -1) {
+                     cmdAdditional.push( additional[ i]);
+                 }
+             }
+
+             // Get list of personal commands
+	     var dir = moi.filesystem.getAppDataDir() + 'commands';
+	     var files = moi.filesystem.getFiles( dir, '*.js');
+	     var cmdAddOn = [];
+	     for ( var i = 0; i < files.length; ++i) {
+		 cmdAddOn.push( StripFileName( files.item( i)));
+	     }
+
+	     cmdAdditional.sort( function( a, b) {
+                 var x = a.toLowerCase();
+                 var y = b.toLowerCase();
+                 return x < y ? -1 : x > y ? 1 : 0;
+             });
+	     cmdAddOn.sort( function( a, b) {
+                 var x = a.toLowerCase();
+                 if ( x[ 0] == '_')
+                     x = x.slice( 1);
+                 var y = b.toLowerCase();
+                 if ( y[ 0] == '_')
+                     y = y.slice( 1);
+                 return x < y ? -1 : x > y ? 1 : 0;
+             });
+	     var cols = Math.ceil(( cmdAdditional.length + cmdAddOn.length + 1) / maxlines);
+	     
+	     document.write ( '<table>');
+             writeList( cmdAdditional, cols);
+	     if ( cmdAddOn.length > 0) {
+                 document.write( '<tr><td colspan=' + cols + '><moi:MenuSeparator/></td></tr>');
+                 writeList( cmdAddOn, cols);
+             }
+	     document.write ( '</table>');
+	 }
+	 makeList();
+	</script>
+    </body>
+</html>

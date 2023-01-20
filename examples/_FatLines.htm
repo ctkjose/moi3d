@@ -1,0 +1,92 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var objects, lines, lineIsClosed, bln, lastwidth, frame;
+			var baseline, baseshape=[];
+			var cPt = moi.VectorMath.createPoint;
+			
+			function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) if (arguments[i] !==null) f.setInput( i - 1, arguments[i] ); var obj = f.calculate(); f.cancel(); return obj; }
+			function cfactory (points, flags) { var f = moi.command.createFactory( 'curve' ), inp = 0; for (var i=0; i<points.length; i++) { f.createInput( 'point' ); f.setInput( inp++, points[i]); if ( flags[i] ) { f.createInput( 'bool' ); f.setInput( inp++, true ); } var obj = f.calculate(); f.cancel(); return obj; }}
+			function ccfactory (points, flags) { var f = moi.command.createFactory( 'curve' ), inp=0; for (var p in points) { f.createInput( 'point' ); f.setInput( inp++, points[p]); if ( flags[p] ) { f.createInput( 'bool' ); f.setInput( inp++, true );}} var obj = f.calculate(); f.cancel(); return obj; }
+			function prebuildObj()
+			{
+				baseline = factory('line', cPt(0,0,0), cPt(1,0,0));
+				baseshape[1] =  factory('rect3pts', cPt(0,-1,0), cPt(1,-1,0), cPt(0,1,0));
+				baseshape[2] =  ccfactory([cPt(0,0,0), cPt(0.1,1.333,0), cPt(0.9,1.333,0), cPt(1,0,0), cPt(0.9,-1.333,0), cPt(0.1,-1.333,0), cPt(0,0,0)],[1,0,0,1,0,0,0,1]);
+			}
+			
+			function init()
+			{
+				lines=[];
+				lineIsClosed=[];
+				bln = moi.geometryDatabase.getSelectedObjects().getCurves();
+				if ( bln.length == 0 ) return false;
+				bln.setProperty( 'displayMode',1);
+				bln.setProperty( 'selected',0);
+	
+				for ( var i = 0; i<bln.length; i++)
+				{
+					var cline = moi.geometryDatabase.createObjectList();
+					cline.addObject(bln.item(i));
+					lines.push(cline);
+					lineIsClosed.push(bln.item(i).isClosed);
+				}
+				frame = moi.VectorMath.createTopFrame();
+				objects = moi.geometryDatabase.createObjectList();
+				prebuildObj();
+				updategeometry();
+				setInterval(updategeometry, 20);
+				return true;
+			}
+			
+			function done() { bln.setProperty( 'displayMode',0); bln.setProperty( 'selected',1); }
+			function cancel() { done(); moi.geometryDatabase.removeObjects(objects); }
+			function updategeometry()
+			{
+				var startTime = new Date();
+				if ( lastwidth === width.value ) return;
+				lastwidth = width.value;
+				moi.geometryDatabase.removeObjects(objects);
+				objects = moi.geometryDatabase.createObjectList();
+				var newobjects = moi.geometryDatabase.createObjectList();
+				var cshape = factory('scale1d', baseshape[lineType.value], cPt(0,0,0), null, cPt(0,1,0), cPt(0,width.value*1/2,0));
+				var fastmode=( lineType.value == 1)?true:false;
+				for ( var i = 0; i<lines.length; i++)
+				{
+					if ( fastmode || lineIsClosed[i]) { var ln = factory('offset', lines[i], width.value*1/2, frame, 'Sharp', 1, 0, 1, 1); }
+						else { var ln = factory ('flow', cshape, baseline.item(0), lines[i].item(0), 0, 1, 0); }
+					for (var j = 0; j<ln.length; j++) newobjects.addObject(ln.item(j));
+				}
+				objects = factory('booleanunion', newobjects);
+				if ( objects.length == 0 ) objects=newobjects;
+				moi.geometryDatabase.addObjects(objects);
+				var period = (new Date() - startTime);
+				progressinfo.innerHTML = period +" ms";
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="Title" class="commandprompt"><strong>Lignes Epaisses</strong></div>
+		</div>
+		
+		<div id="Options" class="commandoptions">
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td>Type:</td>
+					<td colspan="2"><select id="lineType" onchange="" style="width:100%" ><option value="1">Rectangle</option><option value="2">Pointue</option></select></td>
+				</tr>
+				<tr>
+					<td>Largeur:</td>
+					<td><moi:Slider id="widthSlider" min="0.1" mid="2" max="10" style="width:90%"   /></td>
+					<td><moi:NumericInput id="width" style="width:3em;" default="0.5" binding="widthSlider.value = this.value"/></td>
+				</tr>
+			</table>
+		</div>
+		<div id="progressinfo" class="commandoptions" style="text-align:center; font-size:100%;">&nbsp;</div>
+		<div id="DoneCancelContainer"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

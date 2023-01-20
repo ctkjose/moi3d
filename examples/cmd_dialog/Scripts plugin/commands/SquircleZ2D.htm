@@ -1,0 +1,76 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<style>
+			.numdisplay
+			{
+				text-align:right;
+				padding-left:1em;
+			}
+			
+			#DistanceContainer input
+			{
+				width:5em;
+			}
+		</style>
+
+		<script>
+			var g_BasePt = null;
+		
+			function OnGetDistancePoint( pointpicker )
+			{
+				if ( g_BasePt != null )
+				{
+					var pt = pointpicker.pt;
+				
+					SetVal( 'space', moi.vectorMath.distance( g_BasePt, pt ) );
+
+				}
+			}
+			
+			function SetVal( name, numval )
+			{
+				var sval = numval.toFixed( 3 );
+		
+				window[name].value = sval.replace( /\.*0+$/, '' ); // Remove trailing 0 or .00
+			}
+		</script>
+	</head>	
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Create Squircle</div>
+			<div id="FirstPrompt" class="commandprompt">Pick first point</div>
+			<div id="SecondPrompt" class="hiddencommandprompt">Pick second point</div>
+		</div>	
+
+		<div id="SquircleOptions" class="hiddencommandoptions">
+			<table>
+			<tr>
+				<td>height:</td>
+				<td><input id="height" class="numericinput" default="10.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Pts to Plot:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="100"></td>
+			</tr>
+			</table>
+			
+			<table style="width:100%">
+				<col width="5">
+				<col>
+				<col width="5">
+				<tr>
+					<td>Shape:</td>
+					<td><moi:Slider id="shapeslider"
+					onvaluechange="moi.ui.fireUIEvent(id);" value="0.5" min="0.04" mid="0.5" max="5.0" style="width:100%;"/></td>
+					<td><moi:NumericInput id="shape" style="width:3em; decimalPlaces:3; persist:false;"binding="this.value = shapeslider.value"/></td>
+				</tr>
+			</table>			
+		</div>
+			
+		<moi:CommandDoneCancel />
+	</body>
+</html>

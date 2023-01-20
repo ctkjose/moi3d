@@ -1,0 +1,24 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="CenterPrompt" class="commandprompt"><moi:Text textid="Pick center point prompt"/></div>
+		</div>
+		
+		<div class="commandoptions">
+			<table>
+				<tr>
+					<td>Radius:</td>
+					<td>
+						<input id="radius" default="1.0" class="numericinput" style="persist:true;">
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,52 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Create Fresnels,Sin,Cos</div>
+		</div>
+		
+		<table class="commandoptions">
+				<tr>
+					<td>Build:</td>
+					<td>
+						<select id="Build">
+							<option value="S_Fresnel">Fresnel_S(x)</option>
+							<option value="C_Fresnel">Fresnel_C(x)</option>
+
+							
+						</select>
+					</td>
+				</tr>
+			<tr>
+				<td>yScale#:</td>
+				<td><input id="yScale" class="numericinput" default="15.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>xScale#:</td>
+				<td><input id="xScale" class="numericinput" default="2.0" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>Length#:</td>
+				<td><input id="tLength" class="numericinput" default="15.0" style="persist:true;"></td>
+			</tr>			
+
+			<tr>
+				<td>Curvature#:</td>
+				<td><input id="nValue" class="numericinput" default="2.0" style="persist:true;"></td>
+			</tr>	
+
+			<tr>
+				<td>Intervals(pts):</td>
+				<td><input id="numintervals" class="unsigned integerinput" default="100"></td>
+			</tr>
+
+			</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

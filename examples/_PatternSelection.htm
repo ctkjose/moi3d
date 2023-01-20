@@ -1,0 +1,38 @@
+<html xmlns:moi>
+	<head>
+		<script>
+			var selectedObjects;
+			function updateSelection()
+			{
+				var cn = 0;
+				for (var i=0; i<selectedObjects.length; ++i)
+				{
+					selectedObjects.item(i).selected = ( pattern.value[cn] === '1' || pattern.value[cn] === '+') ? true : false;
+					cn = (cn < pattern.value.length-1) ? cn+1 : 0; 
+				}
+			}
+			function initPattern() 
+			{
+				selectedObjects = moi.geometryDatabase.getSelectedObjects();
+				if ( selectedObjects.getCurves().length > 1 && selectedObjects.getCurves().length ===  selectedObjects.length ) { moi.geometryDatabase.sortCurves(selectedObjects); }
+				if ( pattern.value === '' ) { pattern.value = "+-" }
+				updateSelection();
+				pattern.addEventListener ("input", updateSelection, false);
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="InputContainer" class="commandoptions">
+			<table style="width:100%">
+				<col width="5">
+				<col>
+				<tr>
+					<td>Pattern:</td>
+					<td align="center"><moi:TextInput id="pattern" default="+-" style="width:100%"/></td>
+				</tr>
+			</table>	
+		</div>
+		<moi:CommandDoneCancel /> 
+	</body>
+</html>
+	

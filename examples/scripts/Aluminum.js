@@ -1,0 +1,1 @@
+script: /* Set lighting options for Aluminum */ var v = moi.view; v.lightingStyle = 'MoreFill'; v.specularHighlights = true; v.specularBrightness = 0.38; v.specularFocusSize = 0.73; v.metallicLighting = true; v.fixedLightPositions = true; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

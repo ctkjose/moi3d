@@ -1,0 +1,107 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<title>Assign preset name</title>
+		
+		<style>
+			table {
+				width:100%;
+				height:100%;
+			}
+			
+			select {
+				width:100%;
+				height:100%;
+				allowdblclick:true;
+			}
+		</style>
+		
+		<script>
+			function EndDialog()
+			{
+				var val;
+				
+				if ( window['namelist'] != undefined )
+					val = namelist.value;
+				
+				if ( !val )
+					moiWindow.endDialog(-1);
+				else
+					moiWindow.endDialog(val);
+			}
+		</script>
+	</head>
+	
+	<body class="DialogBody">
+		<table>
+			<tr style="height:5px">
+				<td>
+					<div>Select name to assign:</div>
+				</td>
+			</tr>
+		
+			<tr>
+				<td>
+					<script>
+						function escape( text )
+						{
+							return text.
+								replace(/&/gmi, '&amp;').
+								replace(/"/gmi, '&quot;').
+								replace(/>/gmi, '&gt;').
+								replace(/</gmi, '&lt;')
+						}
+						
+						var namearray = new Array();
+						
+						// This should find the commands folder on the Mac version.
+						var filename =  'D:\\Resources\\03-Cad\\03Moi\\Templates\\PresetNames.txt';						
+						
+						// On Windows it would be like this:						
+						//var filename = 'c:\\Program Files (x86)\\MoI 3.0 beta Nov-6-2012\\commands\\PresetNames.txt';
+						
+						try
+						{
+							var file = moi.filesystem.openFileStream( filename, 'r' );
+							
+							while ( !file.atEOF )
+								namearray.push( file.readLine() );
+						}
+						catch(e)
+						{
+						}
+						
+						if ( namearray.length > 0 )
+						{
+							document.write( '<select id="namelist" size="5" ondblclick="EndDialog();">' );
+						
+							for ( var i = 0; i < namearray.length; ++i )
+							{
+								var name = escape(namearray[i]);
+								var html = '<option value="' + name + '">' + name + '</option>';
+								document.write( html );
+							}
+						
+							document.write( '</select>' );
+						}
+						else
+						{
+							document.write( '<div>No names found in PresetNames.txt file.</div>' );
+						}
+					</script>
+					
+				</td>
+			</tr>
+			
+			<tr style="height:5px">
+				<td>
+					<div style="text-align:right; white-space:nowrap">
+						<moi:PushButton id="DialogOK" class="dialogokcancelbtn" onbuttonclick="EndDialog();"><moi:Text textid="Dialog ok button"/></moi:PushButton>
+						<moi:Spacer />
+						<moi:PushButton id="DialogCancel" class="dialogokcancelbtn" onbuttonclick="moiWindow.endDialog(-1);"><moi:Text textid="Dialog cancel button"/></moi:PushButton>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

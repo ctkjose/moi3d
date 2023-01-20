@@ -1,0 +1,1 @@
+script: /* import file */ moi.geometryDatabase.fileImport( moi.filesystem.getProcessDir() + 'templates\\RalPalette.3dm' );

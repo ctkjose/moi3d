@@ -1,0 +1,71 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var copyF, lineF, isectF, vbreps, vcurves;
+			
+			function prepareToRun()
+			{
+				copyF =  moi.command.createFactory( 'copy' );
+				lineF = moi.command.createFactory( 'line' );
+				isectF = moi.command.createFactory( 'intersect' );
+				vbreps = moi.geometryDatabase.getSelectedObjects().getBReps();  
+				vcurves = moi.geometryDatabase.getSelectedObjects().getCurves();
+				return true;
+			}
+			
+			function dropCurves ( vFrom, vTo )
+			{
+				var lineV, isectV, isectT, fromPt, toPt, nvcurve, nvcurves = moi.GeometryDatabase.createObjectList();
+				for ( var i = vFrom; i < vTo; i++)
+				{
+					fromPt = vcurves.item(i).getStartPt();
+					lineF.setInput( 0, fromPt );
+					lineF.setInput( 1, moi.vectorMath.createPoint( fromPt.x, fromPt.y, fromPt.z - 10000 ));
+					lineV = lineF.calculate();
+					isectV = moi.GeometryDatabase.createObjectList();
+					for ( var icnt=0; icnt<vbreps.length; icnt++) 
+					{ 
+						isectT = moi.GeometryDatabase.createObjectList();
+						isectT.addObject(lineV.item(0)); 		
+						isectT.addObject(vbreps.item(icnt)); 		
+						isectF.setInput( 0, isectT );
+						isectT = isectF.calculate();
+						for ( var obj = 0; obj < isectT.length; obj++) { isectV.addObject( isectT.item(obj) ); }
+					}	
+					if (isectV.length > 0)
+					{
+						toPt = isectV.item(0).pt;
+						if  (isectV.length >1)
+						{
+							var dst = moi.vectorMath.distance(isectV.item(0).pt, fromPt);
+							for ( var icnt = 1; icnt < isectV.length; icnt++)
+							{
+								var tmpdst = moi.vectorMath.distance(isectV.item(icnt).pt, fromPt);
+								if  ( tmpdst < dst ) { dst = tmpdst; toPt=isectV.item(icnt).pt; }
+							}
+						}
+						
+						var mlist = moi.GeometryDatabase.createObjectList();
+						mlist.addObject(vcurves.item(i));
+						
+						copyF.setInput( 0, mlist );
+						copyF.setInput( 1, fromPt );
+						copyF.setInput( 2, toPt );
+						copyF.setInput( 3, true );
+						nvcurve = copyF.calculate();
+						nvcurves.addObject( nvcurve.item(0) );
+					}
+				}
+				moi.geometryDatabase.addObjects(nvcurves);
+			}
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vDrop</strong>
+		</div>
+		<div id="progress" class="commandoptions"><moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" /></div>
+	</body>
+</html>

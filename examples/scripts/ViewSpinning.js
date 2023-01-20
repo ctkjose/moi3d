@@ -1,0 +1,1 @@
+script: /* click and drag mouse to spin view */ moi.view.spinInteractive();

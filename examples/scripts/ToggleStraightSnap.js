@@ -1,0 +1,1 @@
+script:moi.drawingAids.straightSnap = !moi.drawingAids.straightSnap;

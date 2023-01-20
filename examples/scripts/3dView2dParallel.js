@@ -1,0 +1,1 @@
+script: /* Set 3D view from current 2D view */ var v2d = moi.ui.getActiveViewport(); if ( v2d && !v2d.is3DView ) { var v3d = moi.ui.mainWindow.viewpanel.getViewport('3D'); v3d.projection = 'Parallel'; v3d.setCameraAndTarget( v2d.camerapt, v2d.targetpt ); v3d.fieldOfViewAngle = v2d.fieldOfViewAngle; moi.ui.mainWindow.viewpanel.mode = '3D'; }

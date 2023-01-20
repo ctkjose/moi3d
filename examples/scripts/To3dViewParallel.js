@@ -1,0 +1,1 @@
+script:/* Set parallel 3D view */ moi.ui.mainWindow.viewpanel.getViewport('3D').projection = 'Parallel'; moi.ui.mainWindow.viewpanel.mode = '3D';

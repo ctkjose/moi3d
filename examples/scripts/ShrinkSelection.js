@@ -1,0 +1,1 @@
+script: function es(edg){ var i,f; for (i=0; i<edg.length; i++) {f=edg.item(i).getFacesOfEdge(); f.setProperty('selected',0);}} var gd = moi.geometryDatabase; gd.invertSelection(); var so = gd.getSelectedObjects(), sf=so.getFaces(), i; gd.invertSelection(); for ( i=0; i<sf.length;i++) es(sf.item(i).getEdges());

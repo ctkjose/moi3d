@@ -1,0 +1,1 @@
+script: /* untilt view */ moi.ui.mainWindow.viewpanel.getViewport('3D').tiltAngle = 0.0;

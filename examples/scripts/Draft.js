@@ -1,0 +1,1 @@
+script: /* Set lighting options for Draft */ var v = moi.view; v.lightingStyle = 'CustomLevels'; v.specularHighlights = true; v.specularBrightness = 0.3;  v.specularFocusSize = 0.16; v.metallicLighting = true; v.fixedLightPositions = false; v.customKeyLightLevel = 2.0; v.customFillLightLevel = 2.0;

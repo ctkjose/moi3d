@@ -1,0 +1,42 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectionPrompt" class="commandprompt">Select Chain Path</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Chain options</div>
+		</div>
+
+		<div id="ChainOptions" class="hiddencommandoptions">	
+		<table>			
+			<tr>
+				<td>LinkLength:</td>
+				<td><input id="linkLength" class="numericinput" default="2.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>LinkHeight:</td>
+				<td><input id="linkHeight" class="numericinput" default="1.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>CornerRadius:</td>
+				<td><input id="cornerRadius" class="numericinput" default="0.5" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>ProfileRadus:</td>
+				<td><input id="profileRadius" class="numericinput" default="0.15" style="persist:true;"></td>
+			</tr>			
+		</table>			
+
+			<moi:CheckButton id="TwistedChain">TwistedChain</moi:CheckButton>
+			<moi:CheckButton id="Rigid"  default= true >Rigid</moi:CheckButton>		
+			<moi:PushButton id="Update">Update</moi:PushButton>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

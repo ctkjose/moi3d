@@ -1,0 +1,1 @@
+script: /* Camera view Options Dialog */ moi.ui.createDialog( 'moi://ui/CameraView.htm' );

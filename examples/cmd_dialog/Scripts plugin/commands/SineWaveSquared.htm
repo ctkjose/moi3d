@@ -1,0 +1,35 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Sine wave Squared options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>Amplitude</td>
+				<td><input id="amplitude" class="numericinput" default="5.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Length</td>
+				<td><input id="len" class="numericinput" default="20.0" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Num cycles:</td>
+				<td><input id="numcycles" class="unsignedintegerinput" default="6"></td>
+			</tr>
+			
+			<tr>
+				<td>Pts per cycle:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="80"></td>
+			</tr>
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

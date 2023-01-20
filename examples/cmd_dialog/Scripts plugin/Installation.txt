@@ -1,0 +1,11 @@
+1. Unzip the file , there are two folder named "command" and "ui"
+
+2. Copy the content of "Command" folder to MOI instalation "Command" Folder
+
+3. Copy the Content of "u" folder to MOI instalation "ui" Folder
+
+4. Create a shortcut key and assign Following line
+
+
+script:moi.ui.createDialog( 'Plugins.htm', 'resizeable,defaultWidth:43em,defaultHeight:32em' )
+

@@ -1,0 +1,211 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<style>
+			.tt { position: relative; }
+			.tt:hover .tti { visibility: visible; opacity: .9;  }
+			.tti {position: absolute; display:inline; text-align: center; left: 20px; bottom: -2px; padding: 3px 10px; color: #fff; background-color: #555; border-radius: 3px; visibility: hidden; opacity: 0; -webkit-transition: opacity .4s ease-in-out; z-index: 10; }
+			moi\:UnitsLabel { padding-left:0;}
+		</style>
+		<script>
+		var sourceobjects, sourceobjectsNum, objects, mirrorobjects, baseframe, mirrorframe, copyF, scaleF, mirrorF;
+		var liC = lmX = lmY = lmZ = lrX = lrY = lrZ = lsX = lsY = lsZ = 0;
+		
+		function init(obj)
+		{
+			sourceobjects = obj;
+			sourceobjectsNum = obj.length;
+			objects = moi.geometryDatabase.createObjectList();
+			mirrorobjects = moi.geometryDatabase.createObjectList();
+			baseframe = moi.VectorMath.createTopFrame();
+			mirrorframe = moi.VectorMath.createTopFrame();
+			baseframe.origin = sourceobjects.getBoundingBox().min;
+			mirrorframe.origin = sourceobjects.getBoundingBox().center;
+			sourceobjects.setProperty('selected',0);
+			resetSettings();
+			progressinfo.innerHTML = "&nbsp;";
+			setInterval(buildArray, 20);
+		}
+		
+		function resetSettings()
+		{
+			 iC.value = 1;
+			 mX.value = 0;		mY.value = 0;		mZ.value = 0;
+			 rX.value = 0;		rY.value = 0;		rZ.value = 0;
+			 sX.value = 100;	sY.value = 100;	sZ.value = 100;
+			 mirrorX.value = 0;	mirrorY.value = 0;	// mirrorZ.value = 0;	
+		}
+		
+		function setNewBaseframe(frame) 
+		{
+			baseframe = moi.VectorMath.createFrame( frame.origin, frame.xaxis, frame.yaxis );
+			liC = 0;
+		}
+		
+		function setNewTargetframe(frame) 
+		{
+			mX.value = frame.origin.x-baseframe.origin.x;
+			mY.value = frame.origin.y-baseframe.origin.y;
+			mZ.value = frame.origin.z-baseframe.origin.z;
+		}
+		
+		function randomize()
+		{
+			if (iC.value < 11) iC.value = Math.floor(Math.random()*9)+2;
+			mX.value = Math.random()*20-10;		mY.value = Math.random()*20-10;		mZ.value = Math.random()*20-10;
+			rX.value = Math.random()*60-30;		rY.value = Math.random()*60-30;		rZ.value = Math.random()*60-30;
+			sX.value = 110-Math.random()*20;	sY.value = 110-Math.random()*20;	sZ.value = 110-Math.random()*20;
+		}
+		
+		function nextIteration()
+		{
+			for ( var i=0; i<objects.length; i++) sourceobjects.addObject(objects.item(i));
+			for ( var i=0; i<mirrorobjects.length; i++) sourceobjects.addObject(mirrorobjects.item(i));
+			objects = moi.geometryDatabase.createObjectList();
+			mirrorobjects = moi.geometryDatabase.createObjectList();
+			resetSettings();
+		}
+		
+		function done()
+		{
+		}
+		
+		function cancel()
+		{
+			moi.geometryDatabase.removeObjects(objects);
+			moi.geometryDatabase.removeObjects(mirrorobjects);
+			for ( var i=sourceobjectsNum; i<sourceobjects.length; i++) moi.geometryDatabase.removeObject(sourceobjects.item(i));
+			sourceobjects.setProperty('selected',1);
+		}
+
+		function processObject(frame, object, mX, mY, mZ, rX, rY, rZ, sX, sY, sZ)
+		{
+			var newframe = moi.VectorMath.createFrame( frame.evaluate(mX, mY, mZ), frame.xaxis, frame.yaxis);
+			newframe.xaxis = moi.VectorMath.createPoint((Math.cos(rY)*Math.cos(rZ))*sX, (Math.sin(rX)*Math.sin(rY)*Math.cos(rZ)-Math.cos(rX)*Math.sin(rZ))*sX, (Math.cos(rX)*Math.sin(rY)*Math.cos(rZ)+Math.sin(rX)*Math.sin(rZ))*sX);
+			newframe.yaxis = moi.VectorMath.createPoint((Math.cos(rY)*Math.sin(rZ))*sY, (Math.sin(rX)*Math.sin(rY)*Math.sin(rZ)+Math.cos(rX)*Math.cos(rZ))*sY, (Math.cos(rX)*Math.sin(rY)*Math.sin(rZ)-Math.sin(rX)*Math.cos(rZ))*sY);
+	//		newframe.zaxis = moi.VectorMath.createPoint(-Math.sin(rY)*sZ, Math.sin(rX)*Math.cos(rY)*sZ, Math.cos(rX)*Math.cos(rY)*sZ);
+
+			orientF.setInput(0, object); orientF.setInput(1, frame); orientF.setInput(2, newframe); orientF.setInput(3, true); object = orientF.calculate();
+			if ( sX !==1 || sY !==1 || sZ !==1 ) { scaleF.setInput(0, object); scaleF.setInput(1, newframe.origin); scaleF.setInput(2, sZ/sY/sX); scaleF.setInput(3, newframe.evaluate(0,0,1)); scaleF.setInput(5, 1); object = scaleF.calculate(); }
+			
+			newframe.xaxis.x /= sX; newframe.xaxis.y /= sX; newframe.xaxis.z /= sX;  newframe.yaxis.x /= sY; newframe.yaxis.y /= sY; newframe.yaxis.z /= sY;
+			return {object:object, frame:newframe}
+		}
+		
+		function buildArray()
+		{
+			if ( liC == iC.value && lmX == mX.value && lmY == mY.value && lmZ == mZ.value && lrX == rX.value && lrY == rY.value && lrZ == rZ.value && lsX == sX.value && lsY == sY.value && lsZ == sZ.value ) return;
+			liC = iC.value; lmX = mX.value; lmY = mY.value; lmZ = mZ.value; lrX = rX.value; lrY = rY.value; lrZ = rZ.value; lsX = sX.value; lsY = sY.value; lsZ = sZ.value; 
+			var startTime = new Date();
+			moi.geometryDatabase.removeObjects(objects);
+			moi.geometryDatabase.removeObjects(mirrorobjects);
+			orientF = moi.command.createFactory( 'orient' );		scaleF= moi.command.createFactory( 'scale1d' );		mirrorF= moi.command.createFactory( 'mirror' );
+			
+			objects = moi.geometryDatabase.createObjectList();
+			mirrorobjects = moi.geometryDatabase.createObjectList();
+			var frame = moi.VectorMath.createFrame(baseframe.origin, baseframe.xaxis, baseframe.yaxis);
+			var cmX=mX.value, cmY=mY.value, cmZ=mZ.value;
+			var csX=sX.value*0.01, csY=sY.value*0.01, csZ=sZ.value*0.01;
+			var crX=rX.value/180*Math.PI, crY=rY.value/180*Math.PI, crZ=rZ.value/180*Math.PI;
+			
+			var nextobject = sourceobjects;
+			for ( var n = 1; n<iC.value; n++)
+			{
+				var prc = processObject(frame, nextobject, cmX, cmY, cmZ, crX, crY, crZ, csX, csY, csZ);
+				frame = prc.frame;
+
+				nextobject = prc.object;
+				for (var i=0; i<nextobject.length; i++) { objects.addObject(nextobject.item(i)); }
+				if ( adaptiveScaling.value) { cmX *= csX; cmY *= csY; cmZ *= csZ; }
+				crX +=rX.value/180*Math.PI, crY += rY.value/180*Math.PI, crZ += rZ.value/180*Math.PI;
+			}
+			
+			if ( mirrorX.value || mirrorY.value )
+			{
+				for ( var i=sourceobjectsNum; i<sourceobjects.length; i++) mirrorobjects.addObject(sourceobjects.item(i));
+				for ( var i=0; i<objects.length; i++) mirrorobjects.addObject(objects.item(i));
+				mirrorF.setInput(0, mirrorobjects);
+				mirrorF.setInput(1, mirrorframe);
+				mirrorF.setInput(2, mirrorframe.evaluate(mirrorX.value, mirrorY.value, 0));
+				mirrorF.setInput(3, false);
+				mirrorobjects = mirrorF.calculate();
+			} 
+			
+			moi.geometryDatabase.addObjects(objects);
+			moi.geometryDatabase.addObjects(mirrorobjects);
+			orientF.cancel();	scaleF.cancel();	mirrorF.cancel();
+			var period = (new Date() - startTime);
+			progressinfo.innerHTML = "Objects: "+(sourceobjects.length+objects.length+mirrorobjects.length)+" ("+period +" ms)";
+		}		
+
+		</script>		
+	</head>
+	<body class="commandbody">
+		<div ondblclick="randomize()" id="TitleContainer" style="width:100%; text-align:center;"><strong>Array 3D</strong></div>
+		<div id="Options" class="hiddencommandoptions">
+		<table style="width:100%; padding-top:0.5em;">
+			<col width="5"><col><col width="5"><col width="1">
+			<tr>
+				<td onclick="" ><div class="tt">N<div class="tti"><nobr>Item count</nobr></div></div></td><td><moi:Slider id="iCslider" min="1" max="50" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:UnsignedIntegerInput id="iC" value="1"  style="width:3em;" binding="iCslider.value = this.value" /></td><td></td>
+			</tr>
+			<tr>
+				<td onclick="mXslider.value = 0;" ><div class="tt">mX<div class="tti"><nobr>move X</nobr></div></div></td><td><moi:Slider id="mXslider" min="-10" max="10" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="mX" value="0"  style="width:3em;" binding="mXslider.value = this.value" /></td><td><moi:UnitsLabel /></td>
+			</tr>
+			<tr>
+				<td onclick="mYslider.value = 0;" ><div class="tt">mY<div class="tti"><nobr>move Y</nobr></div></div></td><td><moi:Slider id="mYslider" min="-10" max="10" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="mY" value="0"  style="width:3em;" binding="mYslider.value = this.value" /></td><td><moi:UnitsLabel /></td>
+			</tr>
+			<tr>
+				<td onclick="mZslider.value = 0;" ><div class="tt">mZ<div class="tti"><nobr>move Z</nobr></div></div></td><td><moi:Slider id="mZslider" min="-10" max="10" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="mZ" value="0"  style="width:3em;" binding="mZslider.value = this.value" /></td><td><moi:UnitsLabel /></td>
+			</tr>
+			<tr>
+				<td onclick="rXslider.value=0;"><div class="tt">rX<div class="tti"><nobr>rotate X</nobr></div></div></td><td><moi:Slider id="rXslider" min="-60" max="60" style="width:90%"   /></td>
+				<td style="width:3em;"><moi:NumericInput id="rX" value="0"  style="width:3em;" binding="rXslider.value = this.value" /></td><td>&deg;</td>
+			</tr>
+			<tr>
+				<td onclick="rYslider.value=0;"><div class="tt">rY<div class="tti"><nobr>rotate Y</nobr></div></div></td><td><moi:Slider id="rYslider" min="-60" max="60" style="width:90%"   /></td>
+				<td style="width:3em;"><moi:NumericInput id="rY" value="0"  style="width:3em;" binding="rYslider.value = this.value" /></td><td>&deg;</td>
+			</tr>
+			<tr>
+				<td onclick="rZslider.value=0;"><div class="tt">rZ<div class="tti"><nobr>rotate Z</nobr></div></div></td><td><moi:Slider id="rZslider" min="-60" max="60" style="width:90%"   /></td>
+				<td style="width:3em;"><moi:NumericInput id="rZ" value="0"  style="width:3em;" binding="rZslider.value = this.value" /></td><td>&deg;</td>
+			</tr>			
+			<tr>
+				<td onclick="sXslider.value=100"><div class="tt">sX<div class="tti"><nobr>scale X</nobr></div></div></td><td><moi:Slider id="sXslider" min="90" mid="100" max="110" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="sX" value="100"  style="width:3em;" binding="sXslider.value = this.value" /></td><td onclick="sY.value = sX.value; sZ.value = sX.value;">%</td>
+			</tr>			
+			<tr>
+				<td onclick="sYslider.value=100"><div class="tt">sY<div class="tti"><nobr>scale Y</nobr></div></div></td><td><moi:Slider id="sYslider" min="90" mid="100" max="110" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="sY" value="100"  style="width:3em;" binding="sYslider.value = this.value" /></td><td onclick="sX.value = sY.value; sZ.value = sY.value;">%</td>
+			</tr>	
+			<tr>
+				<td onclick="sZslider.value=100"><div class="tt">sZ<div class="tti"><nobr>scale Z</nobr></div></div></td><td><moi:Slider id="sZslider" min="90" mid="100" max="110" style="width:90%"  /></td>
+				<td style="width:3em;"><moi:NumericInput id="sZ" value="100"  style="width:3em;" binding="sZslider.value = this.value" /></td><td onclick="sX.value = sZ.value; sY.value = sZ.value;">%</td>
+			</tr>
+			<tr>
+				<td></td><td colspan="3" align="left"><moi:CheckButton id="adaptiveScaling" default="true"><nobr>Adaptive scaling</nobr></moi:CheckButton></td>
+			</tr>
+
+		</table>
+		<table style="width:100%; padding-top:0.5em;">
+			<col width="5"><col><col>
+			<tr>
+				<td></td>
+				<td><moi:CheckButton id="mirrorX" default="false">X mirror</moi:CheckButton></td>
+				<td><moi:CheckButton id="mirrorY" default="false">Y mirror</moi:CheckButton></td>
+				<!-- <td><moi:CheckButton id="mirrorZ" default="false">Z</moi:CheckButton></td> -->
+			</tr>
+		</table>
+		<table style="width:100%; padding-top:0.5em;">
+			<tr><td colspan="4"><div id="progressinfo" class="commandoptions" style="text-align:center; font-size:100%;">&nbsp;</div></td></tr>
+			<tr><td colspan="4"><moi:PushButton onclick="nextIteration();" style="align:center; padding:0em; width:100%;">Next iteration</moi:PushButton></td></tr>			
+		</table>
+		</div>
+		<div id="Prompt" class="commandoptions" style="text-align:center; font-size:100%;">Select objects</div>
+		<div id="Buttons" class="commandoptions"><moi:CommandDoneCancel /></div>
+	</body>
+</html>
+	

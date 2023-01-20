@@ -1,0 +1,1 @@
+script: /* Save snapshot of current view into view stack */ var vp = moi.ui.mainWindow.viewpanel.getViewport('3D'); var data = new Object; data.camera = vp.cameraPt; data.target = vp.targetPt; var cm = moi.command; var views = new Array(); try { v = cm.getOption( 'views' ); if ( v ) views = v; } catch(e) {} views.push( data ); cm.setOption( 'views', views );

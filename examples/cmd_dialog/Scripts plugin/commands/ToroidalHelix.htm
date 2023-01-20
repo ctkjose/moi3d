@@ -1,0 +1,35 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Toroidal helix options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>Radius1:</td>
+				<td><input id="radius1" class="numericinput" default="10.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Radius2:</td>
+				<td><input id="radius2" class="numericinput" default="2.0" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Num turns:</td>
+				<td><input id="numturns" class="unsignedintegerinput" default="5"></td>
+			</tr>
+			
+			<tr>
+				<td>Pts per turn:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="10"></td>
+			</tr>
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

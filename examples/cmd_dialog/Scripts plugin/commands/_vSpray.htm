@@ -1,0 +1,141 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var pprocessed = 0, pointstreampicker, pointF, pointV, lineF, lineV, isectF, isectV, surface, vp, perspective, campt, camFrame, vdirection, pcnt = 0;	
+			
+			function createPoints()
+			{	
+				var vpoints = moi.geometryDatabase.createObjectList();
+				var readytoprocess = pointstreampicker.numPoints;
+				if ( pprocessed < readytoprocess )
+				{
+					if (!pprocessed) 
+					{
+						vp = moi.ui.getLastClickedViewport();
+						perspective = (vp.name === "3D" && vp.projection === "Perspective");
+						camFrame = vp.cameraFrame;
+						campt = camFrame.origin;
+						vdirection=(campt.z>0)?vsize.value:-vsize.value;
+					}
+					var ptgroup = [];
+					var nextpt = pointstreampicker.getPoint(readytoprocess-1);
+					for ( var ptcnt = 0; ptcnt<numpoints.value; ptcnt++)
+					{
+						if (perspective) 
+						{ 
+							ptgroup[ptcnt] = camFrame.evaluate( camFrame.distancex(nextpt)+Math.random()*scatter.value-scatter.value/2, camFrame.distancey(nextpt)+Math.random()*scatter.value-scatter.value/2, camFrame.distancez(nextpt));
+						}
+						else
+						{
+							ptgroup[ptcnt] = camFrame.evaluate( camFrame.distancex(nextpt)+Math.random()*scatter.value-scatter.value/2, camFrame.distancey(nextpt)+Math.random()*scatter.value-scatter.value/2, camFrame.distancez(nextpt));
+						}
+					}
+					for ( var ptcnt = 0; ptcnt<numpoints.value; ptcnt++)
+					{
+						var pt = ptgroup[ptcnt];
+						if ( perspective )
+						{
+							var npt = moi.vectorMath.createPoint( (pt.x - campt.x)*100+campt.x, (pt.y - campt.y)*100+campt.y, (pt.z - campt.z)*100+campt.z );
+							lineF.setInput( 0, campt );
+							lineF.setInput( 1, npt );
+						}
+						else
+						{
+							lineF.setInput( 0, camFrame.evaluate( camFrame.distancex( pt ), camFrame.distancey( pt ) , camFrame.distancez( pt ) - 10000));
+							lineF.setInput( 1, camFrame.evaluate( camFrame.distancex( pt ), camFrame.distancey( pt ) , camFrame.distancez( pt ) + 10000));
+						}
+						lineV = lineF.calculate();
+						var iobj = moi.geometryDatabase.createObjectList();
+						iobj.addObject( surface );
+						iobj.addObject( lineV.item(0) );
+						isectF.setInput ( 0, iobj );
+						isectV = isectF.calculate();
+						if (isectV.length > 0)
+						{
+							if  (isectV.length >1)
+							{
+								var dst = moi.vectorMath.distance(isectV.item(0).pt, campt);
+								pt = isectV.item(0).pt;
+								for ( var icnt = 1; icnt < isectV.length; icnt++)
+								{
+									var tmpdst = moi.vectorMath.distance(isectV.item(icnt).pt, campt);
+									if  ( tmpdst < dst ) { dst = tmpdst; pt=isectV.item(icnt).pt; }
+								}
+							}
+							else
+							{ pt = isectV.item(0).pt;}
+							
+							if (vdirection === 0) 
+							{
+								pointF.setInput( 0, pt );
+								pointV=pointF.calculate();
+								vpoints.addObject(pointV.item(0));
+							}
+							else
+							{
+								lineF.setInput( 0, pt );
+								lineF.setInput( 1, moi.vectorMath.createPoint( pt.x, pt.y, pt.z+vdirection) );
+								lineV = lineF.calculate();
+								vpoints.addObject(lineV.item(0));
+							}
+							
+							pcnt +=isectV.length;
+							progressinfo.innerHTML = pcnt;
+						}
+					}
+					moi.geometryDatabase.addObjects(vpoints);
+					pprocessed = readytoprocess;
+				}
+			}
+			
+			function init() 
+			{
+				lineF = moi.command.createFactory( 'line' );
+				pointF = moi.command.createFactory( 'point' );
+				isectF = moi.command.createFactory( 'intersect' );
+				var breps = moi.geometryDatabase.getSelectedObjects().getFaces();
+				if (breps.length !== 1) return false;
+				surface = breps.item(0);
+				pointstreampicker = moi.ui.createPointStreamPicker();
+				setInterval(createPoints, 1);
+				return true;
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vSpray</strong>
+		</div>
+		<div id="sprayOptions" class="commandoptions">
+			<div id="numPoints">
+			<table style="width:100%">
+				<col width="5">
+				<col>
+				<col width="5">
+				<col width="1">
+				<tr>
+						<td>Count</td>
+						<td><moi:Slider id="pSlider" min="1" max="20" value="1" style="width:100%;"  binding="numpoints.value = this.value" onmouseout="if (numpoints.value > 1 && scatter.value === 0 ) { scatter.value =1 }" /></td>
+						<td><moi:UnsignedIntegerInput id="numpoints" default="1"  style="width:3em;"/></td>
+						<td style="padding-left:0; font-size:80%;" >pt</td>
+				</tr>
+				<tr>
+						<td>Scatter</td>
+						<td><moi:Slider id="dSlider" min="0" max="50" value="0" style="width:100%;"  binding="scatter.value = this.value" /></td>
+						<td><moi:UnsignedIntegerInput id="scatter" default="0"  style="width:3em;"/></td>
+						<td><moi:UnitsLabel style="padding-left:0;" /></td>
+				</tr>
+				<tr>
+						<td onclick="vsize.value=1">vSize</td>
+						<td><moi:Slider id="sSlider" min="0" max="5" value="1" style="width:100%;"  binding="vsize.value = this.value" /></td>
+						<td><moi:UnsignedIntegerInput id="vsize" default="1"  style="width:3em;"/></td>
+						<td><moi:UnitsLabel style="padding-left:0;" /></td>
+				</tr>
+			</table>
+			</div>
+		</div>
+		<moi:CommandDoneCancel />
+		<div id="progressinfo" class="commandoptions" style="text-align:center; font-size:75%;">-</div>
+	</body>
+</html>

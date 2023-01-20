@@ -1,0 +1,91 @@
+<html>
+    <head>
+	<script src="RectWidthHeight.js"></script>
+
+	<script>
+	 var g_BoxFactory = null;
+	 
+	 function OnExtrusionPoint( pointpicker )
+	 {
+	     try
+	     {
+		 if ( g_BoxFactory != null )
+		 {
+		     extrusion.value = g_BoxFactory.getInput(0).getValue().distanceZ( pointpicker.pt );
+		 }
+	     }
+	     catch(e)
+	     {
+	     }
+	 }
+	</script>
+    </head>
+    
+    <body class="commandbody">
+	<div class="commandheader">
+	    <div id="DimensionPrompt" class="commandprompt">Choose lumber</div>
+	    <div id="FirstRectPrompt" class="hiddencommandprompt"><moi:Text textid="Pick corner point prompt"/></div>
+	    <div id="LastRectPrompt" class="hiddencommandprompt"><moi:Text textid="Pick other corner prompt"/></div>
+	    <div id="ExtrusionPrompt" class="hiddencommandprompt"><moi:Text textid="Pick extrusion prompt"/></div>
+	</div>
+	
+	<div id="InputContainer" class="commandoptions">
+            <table>
+                <tr>
+	            <td>Profile:</td>
+	            <td>
+                        <select id="dimensions">
+		            <optgroup>
+                                <option value="0.75x0.75x19x19"> 1x1 </option>
+                                <option value="0.75x1.5x19x28"> 1x2 </option>
+		                <option value="0.75x2.5x19x64"> 1x3 </option>
+		                <option value="0.75x3.5x19x89"> 1x4 </option>
+		                <option value="0.75x5.5x19x140"> 1x6 </option>
+		                <option value="0.75x7.25x19x184"> 1x8 </option>
+		                <option value="0.75x9.25x19x235"> 1x10 </option>
+		                <option value="0.75x11.25x19x286"> 1x12 </option>
+		            </optgroup>
+		            
+		            <optgroup>
+		                <option value="1.5x1.5x38x28"> 2x2 </option>
+		                <option value="1.5x2.5x38x64"> 2x3 </option>
+		                <option selected value="1.5x3.5x38x89"> 2x4 </option>
+		                <option value="1.5x5.5x38x140"> 2x6 </option>
+		                <option value="1.5x7.25x38x184"> 2x8 </option>
+		                <option value="1.5x9.25x38x235"> 2x10 </option>
+		                <option value="1.5x11.25x38x286"> 2x12 </option>
+		            </optgroup>
+		            
+		            <optgroup>
+		                <option value="3.5x3.5x89x89"> 4x4 </option>
+		                <option value="3.5x5.5x89x140"> 4x6 </option>
+		                <option value="3.5x7.25x89x184"> 4x8 </option>
+		                <option value="3.5x9.25x89x235"> 4x10 </option>
+		                <option value="3.5x11.25x89x286"> 4x12 </option>
+		            </optgroup>
+		            
+		            <!--
+		                 Actual lumber sizes are given in both inches and millimeters:
+		                 
+		                 <option value="INxINxMMxMM"> NAME </option>
+
+                                 Ref: https://www.archtoolbox.com/lumber-dimensions/
+		            -->
+	                </select>
+                    </td>
+                </tr>
+                <tr>
+	            <td>Length:</td>
+	            <td><moi:DistanceInput id="extrudeLength" default="0"/></td>
+                </tr>
+            </table>
+	</div>
+
+	<div id="HiddenContainer" class="hiddencommandoptions">
+	    <moi:WidthHeightInput/>
+	    <moi:ExtrusionInput/>
+        </div>
+
+	<moi:CommandDoneCancel />
+    </body>
+</html>

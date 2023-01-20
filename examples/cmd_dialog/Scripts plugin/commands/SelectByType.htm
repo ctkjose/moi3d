@@ -1,0 +1,19 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Select object</div>
+		</div>
+
+		<div class="commandoptions">
+			<moi:CheckButton id="subtype" style="persist:true" default=false>Subtype</moi:CheckButton>
+		</div>
+
+		<div id="CancelContainer"><moi:CommandCancel /></div>
+
+		<div id="DoneCancelContainer" style="display:none;"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

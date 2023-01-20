@@ -1,0 +1,137 @@
+<html>
+	<head>
+	<title>MOI Plugins<title/>
+			<moi:Title textid="Plugins dialog title"/>
+		
+		<style>
+			moi\:TabButton {
+				display:block;
+				padding:0.3em 1em 0.3em 0.5em;
+				font-size:105%;
+				text-align:left;
+				
+				
+				border:1px solid transparent;
+				border-top-left-radius:5px;
+				border-bottom-left-radius:5px;
+
+				background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(235, 235, 235)), color-stop(50%, rgb(186, 186, 186)), color-stop(100%, rgb(136, 136, 136)));
+				
+				position:relative;
+				left:1px;
+				z-index:1;
+			}
+			
+			moi\:TabButton.active {
+				background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(200, 200, 200)), color-stop(50%, rgb(100, 100, 100)), color-stop(100%, rgb(50, 50, 50)));
+				border-color:rgb(153,153,153);
+				border-right-color:#F3F6FF;
+				color:white
+			}
+			
+			#TabContainer {
+				margin-top:0.5em;
+			}
+			
+			iframe {
+				padding:5px 10px;
+				max-height:5em;
+				border:1px solid gray;
+				background:rgb(229,229,229);
+			}
+		</style>
+		
+		<script>
+		
+	
+			var g_LoadingFrame = null;
+			var g_LoadedFrame = null;
+		
+			function RemoveFrame( frame )
+			{
+				frame.parentNode.removeChild( frame );
+			}
+		
+			function OnFrameLoaded()
+			{
+				// When the frame is finished loading, remove any previous one and set the
+				// new one to be displayed.
+			
+				var startframe = document.getElementById('StartFrame');
+				if ( startframe )
+					RemoveFrame( startframe );
+					
+				if ( g_LoadedFrame != null )
+					RemoveFrame( g_LoadedFrame );
+
+				if ( g_LoadingFrame != null )
+					g_LoadingFrame.style.display = '';
+					
+				g_LoadedFrame = g_LoadingFrame;
+				g_LoadingFrame = null;
+			}
+		
+			function Update()
+			{
+				// Load the document corresponding to the active tab.
+				if ( g_LoadingFrame != null )
+					RemoveFrame( g_LoadingFrame );
+					
+				g_LoadingFrame = document.createElement( 'IFRAME' );
+				g_LoadingFrame.className = 'flex';
+				g_LoadingFrame.style.display = 'none';
+				g_LoadingFrame.src = 'moi://ui/'  + TabContainer.activeTab + 'plugins.htm';
+				g_LoadingFrame.onload = OnFrameLoaded;
+				
+				UpperContainer.appendChild( g_LoadingFrame );
+			}
+			
+			function Initialize()
+			{
+				var InitTab = 'Points';
+
+				try { InitTab = moi.command.getOption( 'plugins.htm_lastused' ); }
+				catch(e) { }
+
+				TabContainer.activeTab = InitTab;
+			}
+			
+			function Shutdown()
+			{
+				// Remember the active tab.
+				moi.command.setOption( 'plugins.htm_lastused', TabContainer.activeTab );
+			}
+			
+		</script>
+	</head>
+
+	<body class="DialogBody vbox" onload="Initialize();" onunload="Shutdown();">
+
+		<flex_hbox id="UpperContainer">
+			<moi:TabContainer id="TabContainer" ontabchange="Update();">
+				<moi:TabButton id="point" no_end_styles="true"><moi:Text textid="Plugins Point tab"/>Points</moi:TabButton>
+				<moi:TabButton id="curve"><moi:Text textid="Plugins Curve tab"/>Curves</moi:TabButton>
+				<moi:TabButton id="Surface"><moi:Text textid="Plugins Surface tab"/>Surfaces</moi:TabButton>
+				<moi:TabButton id="solid"><moi:Text textid="Plugins Solid tab"/>Solids</moi:TabButton>
+				<moi:TabButton id="construct"><moi:Text textid="Plugins Construct tab"/>Construct</moi:TabButton>
+				<moi:TabButton id="transform"><moi:Text textid="Plugins Transform tab"/>Transfer</moi:TabButton>
+				<moi:TabButton id="EditSelection"><moi:Text textid="Plugins EditSelection tab"/>Edit-Selection</moi:TabButton>
+				<moi:TabButton id="style"><moi:Text textid="Plugins Style tab"/>Styles</moi:TabButton>
+				<moi:TabButton id="View"><moi:Text textid="Plugins View tab"/>Views</moi:TabButton>
+				<moi:TabButton id="utility"no_end_styles="true"><moi:Text textid="Plugins Utility tab"/>Utilities</moi:TabButton>	
+			</moi:TabContainer>
+			
+			<iframe id="StartFrame" class="flex"></iframe>
+		</flex_hbox>
+		
+				
+		<div style="text-align:right; white-space:nowrap">
+			<moi:PushButton id="DialogClose" class="dialogokcancelbtn" onclick="moiWindow.endDialog(0);"><moi:Text textid="Dialog close button"/></moi:PushButton>
+			<moi:MacOnly class="MacOnlyDialogCloseButtonSpacer"/>
+		</div>
+		
+	</body>
+</html>
+
+
+

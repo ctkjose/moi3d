@@ -1,0 +1,1 @@
+var z=2, vp=['3D','Left','Right','Top','Bottom','Front','Back']; for (var n in vp) { var v = moi.ui.mainWindow.viewpanel.getViewport(vp[n]); v.reset(); v.zoom(z);}

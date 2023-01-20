@@ -1,0 +1,1 @@
+script:/* wireframe v1.0 */ var gd = moi.geometryDatabase; var so=gd.getSelectedObjects(); if (so.length>0) { so.setProperty( 'displayMode',1); so.setProperty( 'selected', 0); } else { gd.getObjects().setProperty( 'displayMode',0); }

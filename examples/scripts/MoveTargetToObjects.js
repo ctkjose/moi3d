@@ -1,0 +1,1 @@
+script:var objs = moi.geometryDatabase.getSelectedObjects(); if ( objs.length > 0 ) { moi.ui.mainWindow.viewpanel.getViewport('3D').targetPt = objs.getBoundingBox().center; } 

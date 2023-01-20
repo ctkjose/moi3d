@@ -1,0 +1,1 @@
+script: /* Toggle using hidden edge display for selected objects only */ moi.view.hiddenLinesSelectedOnly = !moi.view.hiddenLinesSelectedOnly;

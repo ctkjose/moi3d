@@ -1,0 +1,92 @@
+<html>
+	<head>
+		<script>
+			function UpdateImportAsOptions()
+			{
+				var m = importas.value;
+				CurveEndOptions.style.display = (m == 'curve' || m ==  'interpcurve' ? '' : 'none');
+				closedpoly.style.display = (m == 'polyline' ? '' : 'none');
+			}
+
+			function UserDelimiterOptions()
+			{
+				if ( delimiter.value == 'user' )
+				{
+					UserDelimiter.style.display = '';
+					delimiter.blur();
+				}
+				else
+				{
+					UserDelimiter.style.display = 'none';
+				}
+			}
+		</script>
+
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="ImportPrompt" class="hiddencommandprompt">Choose point file import options</div>
+		</div>
+		
+		<div id="ImportOptions" class="hiddencommandoptions">
+			<table id="DelimiterOptions">
+				<tr>
+					<td>Delimiters:</td>
+					
+					<td>
+						<moi:Select id="delimiter" onchange="UserDelimiterOptions();" oninit="UserDelimiterOptions();">
+							<option value=",">Comma</option>
+							<!--<option value="003B">Semicolon</option> -->
+							<option value=" ">Space</option>
+							<option value="	">Tab</option>
+							<option value="user">Other</option>
+						</moi:Select>
+					</td>
+
+					<td id="UserDelimiter" style="display:none">
+						<input id="text" class="textinput" style="width:1em; font-weight:bold">
+					</td>
+				</tr>
+			</table>
+
+			<table  id="ImportAsOptions">
+				<tr>
+					<td>Import as:</td>
+					
+					<td>
+						<moi:Select id="importas" onchange="UpdateImportAsOptions();" oninit="UpdateImportAsOptions();">
+							<option value="points">Points</option>
+							<option value="polyline">Polyline</option>
+							<option value="curve">Control pts</option>
+							<option value="interpcurve">Through pts</option>
+						</moi:Select>
+					</td>
+				</tr>
+			</table>
+
+			<table id="CurveEndOptions" style="display:none">
+				<tr>
+					<td>Curve end:</td>
+					
+					<td>
+						<moi:Select id="curveend">
+							<option value="open">Open</option>
+							<option value="closed">Closed</option>
+							<option value="kink">Kink</option>
+							<option value="line">Line</option>
+						</moi:Select>
+					</td>
+				</tr>
+			</table>
+
+			<moi:CheckButton id="closedpoly" style="persist:true" default=true style="display:none">Closed polyline</moi:CheckButton>
+
+			<!-- <moi:PushButton id="file">File</moi:PushButton> -->
+
+			<moi:CommandDoneCancel />
+
+		</div>
+
+	</body>
+</html>

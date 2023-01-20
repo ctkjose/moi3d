@@ -1,0 +1,89 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var pts, objs, lastt=-1, curve;
+			
+			function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) f.setInput( i - 1, arguments[i] ); var obj = f.calculate(); f.cancel(); return obj; }			
+
+			function done() { }
+			function cancel() { moi.geometryDatabase.removeObjects(objs); moi.geometryDatabase.removeObjects(curve);}
+			function midPoint (weight1, point1, point2)
+			{
+				var vx = point1.x*weight1+point2.x*(1-weight1);
+				var vy = point1.y*weight1+point2.y*(1-weight1);
+				var vz = point1.z*weight1+point2.z*(1-weight1);
+				return moi.VectorMath.createPoint(vx, vy, vz);
+			}
+			
+			function casteljau(pt, t, lines)
+			{
+				o = moi.geometryDatabase.createObjectList();
+				var p=[];
+				var n=pt.length;
+				for (var i=0; i<n; i++) p[i]=pt[i];
+				for (var cn=n-1; cn>0; cn--)
+				{
+					for (var i=0; i<cn; i++) 
+					{
+						if ( lines ) { var lineV = factory("line", p[i], p[i+1]); if (cn<n-1) o.addObject(lineV.item(0));	}
+						p[i]=midPoint(t, p[i], p[i+1]);
+					}
+				}
+				var pV = factory("point", p[0]);
+				o.addObject(pV.item(0));
+				return o;
+			}
+			
+			function init() 
+			{ 	
+				objs 
+				pts=[];
+				objs = moi.geometryDatabase.createObjectList();
+				var src = moi.geometryDatabase.getSelectedObjects().getCurves();
+				if (src.length !==1) { moi.ui.alert ("Select one polyline"); return false; }
+				var srcs = src.item(0).getSubObjects();
+				pts.push(srcs.item(0).getStartPt());
+				for (var i=0; i< srcs.length; i++) { pts.push(srcs.item(i).getEndPt()); }			
+				var f = moi.command.createFactory( 'interpcurve' );				
+				for (var i = 0; i<101; i++)
+				{
+					var p = casteljau(pts, i/100, false);
+					f.createInput('point');
+					f.setInput( i, p.item(0).pt );
+				}
+				curve = f.calculate();
+				f.cancel();
+				moi.geometryDatabase.addObjects(curve);
+				setInterval(updategeometry, 20); /* update time (20 ms) */ 
+				return true;
+			}
+			function updategeometry()
+			{
+				if ( lastt === t.value ) return;
+				moi.geometryDatabase.removeObjects(objs);
+				objs = casteljau(pts, 1-t.value/100, DrawLines.value );
+				moi.geometryDatabase.addObjects(objs);
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="Title" class="commandprompt">deCasteljau</div>
+		</div>
+		
+		<div id="Options" class="commandoptions">
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td>Pos:</td>
+					<td><moi:Slider id="tSlider" min="0" max="100" style="width:90%"   /></td>
+					<td><moi:NumericInput id="t" style="width:3em;" default="50" binding="tSlider.value = this.value"/></td>
+				</tr>
+			</table>
+			<table style="width:100%; text-align:center;"><tr><td style="width:100%;"><moi:CheckButton id="DrawLines" default="false" ><nobr>Draw lines<nobr></moi:CheckButton></td></tr></table>
+		</div>
+		<div id="DoneCancelContainer"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

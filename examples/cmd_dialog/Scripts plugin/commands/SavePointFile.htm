@@ -1,0 +1,67 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<script>
+			function UpdateImportAsOptions()
+			{
+				var m = importas.value;
+				CurveEndOptions.style.display = (m == 'curve' || m ==  'interpcurve' ? 'block' : 'none');
+				closedpoly.style.display = (m == 'polyline' ? 'inline' : 'none');
+			}
+
+			function UserDelimiterOptions()
+			{
+				if ( delimiter.value == 'user' )
+				{
+					UserDelimiter.style.display = 'inline';
+					delimiter.blur();
+				}
+				else
+				{
+					UserDelimiter.style.display = 'none';
+				}
+			}
+		</script>
+
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Select points to export</div>
+			<div id="SavePrompt" class="hiddencommandprompt">Choose point export options</div>
+		</div>
+
+		<div id="SaveOptions" class="hiddencommandoptions">
+			<table id="DelimiterOptions">
+				<tr>
+					<td>Delimiters:</td>
+					
+					<td>
+						<select id="delimiter" onchange="UserDelimiterOptions();" oninit="UserDelimiterOptions();">
+							<option value=",">Comma</option>
+							<!--<option value="003B">Semicolon</option> -->
+							<option value=" ">Space</option>
+							<option value="	">Tab</option>
+							<option value="user">Other</option>
+						</select>
+					</td>
+
+					<td id="UserDelimiter" style="display:none">
+						<input id="text" class="textinput" style="width:1em; font-weight:bold">
+					</td>
+				</tr>
+			</table>
+
+			<table  id="DigitsOption">
+				<tr>
+					<td>Decimal Places:</td>
+					<td><input id="digits" default="6" class="unsignedintegerinput"></td>
+				</tr>
+			</table>
+		</div>
+
+		<moi:CommandDoneCancel />
+
+	</body>
+</html>

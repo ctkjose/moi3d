@@ -1,0 +1,1 @@
+script: /* Set free rotation style */ moi.view.rotationStyle = 'Free';

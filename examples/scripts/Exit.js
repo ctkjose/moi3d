@@ -1,0 +1,1 @@
+script: /* Exit MoI */ moi.ui.mainWindow.close();

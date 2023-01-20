@@ -1,0 +1,28 @@
+<html>
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt"><moi:Text textid="Offset select prompt"/></div>
+			<div id="CurveSidePrompt" class="hiddencommandprompt"><moi:Text textid="Offset pick side prompt"/></div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Offset options</div>
+		</div>
+
+		<div id="CurveOptions" class="hiddencommandoptions">
+			<table>
+				<tr>
+					<td><moi:Text textid="Offset distance label"/></td>
+					<td><moi:DistanceInput id="curvedistanceinput" default="1.0"/></td>
+				</tr>
+				
+				<tr>
+					<td>Num steps:</td>
+					<td><moi:IntegerInput id="numstepsinput" style="width:5em" default="5"/></td>
+				</tr>
+			</table>
+
+			<moi:CheckButton id="curvetrim" default="true"><moi:Text textid="Offset curve trim checkbox"/></moi:CheckButton>
+			<moi:CheckButton id="curvebothsides" default="false"><moi:Text textid="Offset curve both sides checkbox"/></moi:CheckButton>
+		</div>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

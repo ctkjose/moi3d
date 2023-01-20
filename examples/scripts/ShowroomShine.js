@@ -1,0 +1,1 @@
+script: /* Set lighting options for Showroom Shine */ var v = moi.view; v.lightingStyle = 'LessFill'; v.specularHighlights = true; v.specularBrightness = 0.3; v.specularFocusSize = 1.0; v.metallicLighting = true; v.fixedLightPositions = true; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

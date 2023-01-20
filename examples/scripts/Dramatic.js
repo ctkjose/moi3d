@@ -1,0 +1,1 @@
+script: /* Set lighting options for Dramatic */ var v = moi.view; v.lightingStyle = 'KeyOnly'; v.specularHighlights = true; v.specularBrightness = 0.14; v.specularFocusSize = 0.44; v.metallicLighting = false; v.fixedLightPositions = false; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

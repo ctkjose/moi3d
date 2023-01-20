@@ -1,0 +1,1 @@
+script:moi.ui.createDialog( 'moi://ui/ObjectSnapMenu.htm' );

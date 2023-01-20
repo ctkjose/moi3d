@@ -1,0 +1,174 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var ocurves, scurves, curves = [], lastlockpts=-1, lastdistort=-1;
+			var rebuildF = moi.command.createFactory( 'rebuildcurve' );
+			
+			function updateCurves()
+			{
+				if ( lastlockpts === lockpts.value && lastdistort === distort.value ) return;
+				
+				moi.geometryDatabase.removeObjects(ocurves);
+				ocurves = moi.geometryDatabase.createObjectList();				
+				
+				for ( var i=0; i<curves.length; i++ )
+				{
+					var curveF = moi.command.createFactory( 'curve' );
+					for ( var p=0; p<curves[i].length; p++)
+					{
+						curveF.createInput('point');
+						if ( p >= lockpts.value && p < (curves[i].length - lockpts.value) )
+						{ curveF.setInput(p, moi.VectorMath.createPoint( curves[i][p].sx+curves[i][p].dx*distort.value*distx.value, curves[i][p].sy+curves[i][p].dy*distort.value*disty.value, curves[i][p].sz+curves[i][p].dz*distort.value*distz.value)); } 
+						else 
+						{ curveF.setInput(p, moi.VectorMath.createPoint( curves[i][p].sx, curves[i][p].sy, curves[i][p].sz)); }
+					}
+					if ( scurves.item(i).isClosed )
+					{
+						curveF.createInput('point');
+						if ( lockpts.value === 0 && curves[i].length > 0)
+						{ curveF.setInput(p, moi.VectorMath.createPoint( curves[i][0].sx+curves[i][0].dx*distort.value*distx.value, curves[i][0].sy+curves[i][0].dy*distort.value*disty.value, curves[i][0].sz+curves[i][0].dz*distort.value*distz.value)); } 
+						else 
+						{ curveF.setInput(p, moi.VectorMath.createPoint( curves[i][0].sx, curves[i][0].sy, curves[i][0].sz)); }
+					}
+					var curveV = curveF.calculate();
+					if (curveV.length > 0) { ocurves.addObject(curveV.item(0)); }
+				}
+				moi.geometryDatabase.addObjects(ocurves);
+				lastlockpts = lockpts.value;
+				lastdistort = distort.value;
+			}
+			
+			function randomizePoints()
+			{
+				for ( var i=0; i<curves.length; i++ )
+				{
+					for ( var p=0; p<curves[i].length; p++)
+					{	
+						curves[i][p].dx = (Math.random()-0.5)/5;
+						curves[i][p].dy = (Math.random()-0.5)/5;
+						curves[i][p].dz = (Math.random()-0.5)/5;
+					}
+				}
+				lastdistort=-1;
+			}
+			
+			function done(flag)
+			{
+				if (flag) { moi.geometryDatabase.removeObjects(scurves); }
+				else { scurves.setProperty( 'displayMode',0); moi.geometryDatabase.removeObjects(ocurves); }
+			}
+			
+			function RebuildCurve( curve, numpoints )
+			{
+				var list = moi.geometryDatabase.createObjectList();
+				list.addObject( curve );
+				rebuildF.setInput( 0, list );
+				rebuildF.setInput( 1, 'numpoints' ); // mode = 'numpoints'
+				rebuildF.setInput( 2, 0.001 );       // tolerance for tolerance-using mode, must be a valid value even if not used.
+				rebuildF.setInput( 3, numpoints );   // number of points to use
+				rebuildF.setInput( 4, false );       // delete input objects
+				rebuildF.setInput( 5, false );       // keep corners
+				
+				var output = rebuildF.calculate();
+				if ( output.length != 1 ) return false;
+				return output.item(0);
+			}
+			
+			function initpoints()
+			{
+				lastlockpts=-1, lastdistort=-1;
+			
+				var gd = moi.geometryDatabase;
+				var obj = gd.getObjects();
+				obj.setProperty( 'showPoints', false); 
+				
+				for ( var i=0; i<scurves.length; i++ )
+				{
+					var curve = scurves.item(i);
+					
+					var dorebuild = rebuild.value;
+					if ( dorebuild )
+					{
+						curve = RebuildCurve( curve, rebuildnumpoints.value );
+						if ( !curve )
+							continue;
+							
+						gd.addObject( curve );
+					}					
+					
+					curve.showPoints = true;
+					gd.selectAll();
+					obj.setProperty( 'selected', false);
+					curve.selected = false;
+					
+					var objectpicker = moi.ui.createObjectPicker();
+					objectpicker.allowEditPoints();
+					objectpicker.done();
+					gd.copyToClipboardCommand( objectpicker.objects );
+					gd.pasteFromClipboard();
+					var points = gd.getSelectedObjects();
+					gd.removeObjects(points);
+					curve.showPoints = false;
+					
+					curves[i]=[];
+					for ( var p=0; p<points.length; p++)
+					{	
+						curves[i][p]={};
+						curves[i][p].sx = points.item(p).pt.x;
+						curves[i][p].sy = points.item(p).pt.y;
+						curves[i][p].sz = points.item(p).pt.z;
+					}
+					randomizePoints();
+					
+					if ( dorebuild )
+						gd.removeObject( curve );
+				}
+			}
+			
+			function init() 
+			{
+				scurves = moi.geometryDatabase.getSelectedObjects().getCurves();
+				if ( scurves.length === 0 ) { return false }
+				
+				initpoints();
+
+				scurves.setProperty( 'displayMode',1);
+				ocurves = moi.geometryDatabase.createObjectList();
+				setInterval(updateCurves,20);
+				return true;
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;">
+		<strong>Distorsions</strong>
+		</div>
+		<div id="InputContainer" class="commandoptions">
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col><col width="5">
+				<tr>
+					<td onclick= "randomizePoints();">Distorsion</td>
+					<td colspan=2><moi:Slider id="distortslider" min="0" max="200" style="width:90%"   /></td>
+					<td><moi:UnsignedIntegerInput id="distort" style="width:3em;" default="0" binding="distortslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td onclick= "randomizePoints();"><nobr>Verrouiller Pts.</nobr></td>
+					<td  colspan=2><moi:Slider id="lockptsslider" min="0" max="3" style="width:90%"   /></td>
+					<td><moi:UnsignedIntegerInput id="lockpts" style="width:3em;" default="0" binding="lockptsslider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td>Axes</td>
+					<td><moi:CheckButton id="distx" default="true">X</moi:CheckButton></td>
+					<td><moi:CheckButton id="disty" default="true">Y</moi:CheckButton></td>
+					<td><moi:CheckButton id="distz" default="true">Z</moi:CheckButton></td>
+				</tr>
+				<tr>
+					<td colspan=4><moi:CheckButton id="rebuild" style="display:-webkit-inline-box">Rebuild</moi:CheckButton>:&nbsp;<moi:UnsignedIntegerInput id="rebuildnumpoints" default="10"/></td>
+				</tr>
+			</table>
+		</div>
+		<moi:CommandDoneCancel /> 
+	</body>
+</html>
+	

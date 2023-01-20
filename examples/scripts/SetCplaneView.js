@@ -1,0 +1,1 @@
+script:moi.view.setCPlane( moi.ui.mainWindow.viewpanel.getViewport('3D').targetFrame );

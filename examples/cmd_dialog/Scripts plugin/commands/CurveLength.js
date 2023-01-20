@@ -1,0 +1,1 @@
+/* Calculate length of selected curves and copy to the clipboard as text */ var crvs = moi.geometryDatabase.getSelectedObjects().getCurves(); var len = 0.0; for ( var i = 0; i < crvs.length; ++i ) len += crvs.item(i).getLength(); moi.copyTextToClipboard( len );

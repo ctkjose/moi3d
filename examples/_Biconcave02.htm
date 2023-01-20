@@ -1,0 +1,43 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<script>
+		</script>
+		</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Options Biconcaves</div>
+		</div>
+		
+		<table class="commandoptions">
+
+			<tr>
+				<td>Module Carré</td>
+				<td><input id="mValue" class="numericinput" default="0.9447" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Hauteur Centre</td>
+				<td><input id="cHeight" class="numericinput" default="0.5" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Demie Longueur</td>
+				<td><input id="Lradius" class="numericinput" default="3.9" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Pts Par Courbe</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="500"></td>
+			</tr>
+		</table>
+
+			<moi:CheckButton id="BottomCurve" default= false >Courbe du Bas</moi:CheckButton>
+			<moi:CheckButton id="LeftCurve" default= false >Courbe de Gauche</moi:CheckButton>		
+		</div>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,262 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var objects, flist, parents, lastparameter, ptface, faces, face=[], facemode=false, timer, edge, edgelength, espt = {}, pointpicker;
+			function concat( list ) { for ( var i = 1; i < arguments.length; i++ ) { var arglist = arguments[i];	for ( var j = 0; j < arglist.length; j++ ) list.addObject( arglist.item(j) ); } return list;}
+			function factory( commit, fname ) { var f = moi.command.createFactory( fname ); for ( var i = 2; i < arguments.length; i++ ) { if (fname == "polyline") f.createInput( 'point' ); f.setInput( i - 2, arguments[i] );}  if ( commit ) { f.commit(); return; }	var obj = f.calculate(); f.cancel(); return obj;}
+			function getParents(faces)
+			{
+				var parents = [], parentsOut = { del:moi.geometryDatabase.createObjectList(), add:moi.geometryDatabase.createObjectList(), srf:moi.geometryDatabase.createObjectList() };
+				for ( var f=0; f<faces.length; f++)
+				{
+					var p = faces.item(f).getParentBRep();
+					if (parents[p.id] === undefined) { if (p.getSubObjects().getFaces().length === 1) parentsOut.srf.addObject(p); parentsOut.del.addObject(p); parents[p.id]= moi.geometryDatabase.createObjectList() };
+					parents[p.id].addObject(faces.item(f));
+				}
+				for ( p in parents )
+				{
+					var separated = factory (0, 'separate', parents[p]);
+					var cn = 0;
+					for ( var f=0; f<separated.length; f++) {	cn +=separated.item(f).getSubObjects().getFaces().length;	if ( cn == parents[p].length ) break; }
+					for ( var a=f+1; a<separated.length; a++ ) parentsOut.add.addObject(separated.item(a));
+				}
+				return parentsOut;
+			}
+			
+			function midPoint(weight1, point1, point2)
+			{
+				var vx = point1.x*weight1+point2.x*(1-weight1);
+				var vy = point1.y*weight1+point2.y*(1-weight1);
+				var vz = point1.z*weight1+point2.z*(1-weight1);
+				return moi.VectorMath.createPoint( vx, vy, vz );
+			}
+			
+			function scanFaces( edge, face, addArr )
+			{
+				var list = ( addArr )? addArr : [];
+				var pwt = moi.VectorMath.pointsWithinTolerance;
+				var stop = false;
+				var firstRun = true;
+				var lastedge = edge;
+				var lastface = face;
+				var status = -1;
+				while (!stop)
+				{
+					var cl = list.length;
+					var fe = lastface.getEdges();
+					if (fe.length>4) break;
+					list[cl]={};
+					list[cl].face = lastface;
+					if (firstRun)
+					{
+						list[cl].p1 = lastedge.getStartPt();
+						list[cl].p2 = lastedge.getEndPt();
+						firstRun = false;
+					}
+					else
+					{
+						list[cl].p1 = list[cl-1].p3;
+						list[cl].p2 = list[cl-1].p4;
+					}
+					list[cl].n = fe.length;
+					for ( var f = 0; f<fe.length; f++ ) if ( fe.item(f).id === lastedge.id ) break;
+					if (fe.length == 4)
+					{
+						lastedge = fe.item((f+2)%fe.length);
+						var tspt = fe.item((f+1)%fe.length).getStartPt(), tept = fe.item((f+1)%fe.length).getEndPt(), tmp;
+						list[cl].p3 = lastedge.getStartPt();
+						list[cl].p4 = lastedge.getEndPt();						
+						if ( pwt(tspt, list[cl].p2) ) { if ( pwt(tept, list[cl].p3) ) { list[cl].p4 = lastedge.getStartPt(); list[cl].p3 = lastedge.getEndPt(); } }
+						else	if ( pwt(tept, list[cl].p2) ) { if ( pwt(tspt, list[cl].p3) ) { list[cl].p4 = lastedge.getStartPt(); list[cl].p3 = lastedge.getEndPt(); } }
+							else	if ( pwt(tspt, list[cl].p1) ) { if ( pwt(tept, list[cl].p4) ) { list[cl].p4 = lastedge.getStartPt(); list[cl].p3 = lastedge.getEndPt(); } }
+								else	if ( pwt(tspt, list[cl].p4) ) { list[cl].p4 = lastedge.getStartPt(); list[cl].p3 = lastedge.getEndPt(); } 
+					}
+					if (fe.length == 3)
+					{
+						lastedge = fe.item((f+1)%fe.length);
+						if ( pwt(lastedge.getStartPt(), list[cl].p1) || pwt(lastedge.getStartPt(), list[cl].p2) )
+							{ list[cl].p3 = lastedge.getEndPt();	list[cl].p4 = lastedge.getEndPt(); }	else	{ list[cl].p3 = lastedge.getStartPt(); list[cl].p4 = lastedge.getStartPt();	}
+						status = 1;
+						break;
+					}
+					var nf = lastedge.getFacesOfEdge();
+					if ( nf.length === 1 ) { status = 1; break; }
+					lastface = ( nf.item(0).id === lastface.id )?nf.item(1) : nf.item(0);
+					for ( var f = 0; f<list.length; f++) if ( list[f].face.id === lastface.id ) { status = 0; stop = true; }
+				}
+				list[0].status = status;
+				return list;
+			}
+			
+			function init() 
+			{ 
+				var edges = moi.geometryDatabase.getSelectedObjects().getEdges();
+				faces = moi.geometryDatabase.getSelectedObjects().getFaces();
+				if (edges.length >0) { if ( edges.length >1 ) { moi.ui.alert("Select edge or face(s)"); return false; }}
+					else  if ( faces.length === 0 ) { moi.ui.alert("Select edge or face(s)"); return false; }  else { facemode = true; }
+				
+				if ( facemode )
+				{
+					ptface = faces.item(0);
+					for ( var f=0; f<faces.length; f++) 
+					{
+						face[f]={};
+						face[f].pt=[];	
+						face[f].cpt={x:0, y:0, z:0};
+						
+						var edges = faces.item(f).getEdges();
+						var jedges = factory( false, 'join', edges);
+						var sourceEdges = jedges.item(0).getSubObjects();
+						for ( var e = 0; e < sourceEdges.length; e++ ) face[f].pt.push( sourceEdges.item(e).getStartPt() );
+						for ( var p = 0; p < face[f].pt.length; p++ ) {	face[f].cpt.x += face[f].pt[p].x;	face[f].cpt.y += face[f].pt[p].y;	face[f].cpt.z += face[f].pt[p].z;	}
+															face[f].cpt.x /= face[f].pt.length;	face[f].cpt.y /= face[f].pt.length;	face[f].cpt.z /= face[f].pt.length;
+					}
+					var closestface=0, closestedgepoint, fdistance = 1e10, pdistance = 1e10;
+					var vp = moi.ui.getLastClickedViewport();
+					if (!vp) { vp = moi.ui.mainWindow.viewpanel.getViewport('3D'); }
+					var campoint = vp.cameraPt;
+					for ( var f=0; f<face.length; f++) {	var cfdistance = pDistance(face[f].cpt, campoint);	if ( cfdistance < fdistance ) { fdistance = cfdistance; closestface = f; }}
+					for ( var f=0; f<face[closestface].pt.length; f++) {	var cpdistance = pDistance(face[closestface].pt[f], campoint);	if ( cpdistance < pdistance ) { pdistance = cpdistance; closestedgepoint = f; }}
+					edge = factory( false, 'line', moi.VectorMath.createPoint(face[closestface].cpt.x, face[closestface].cpt.y, face[closestface].cpt.z), face[closestface].pt[closestedgepoint]).item(0);
+				}
+				else
+				{
+					edge = edges.item(0);
+					faces = edge.getFacesOfEdge();
+					flist = scanFaces (edge, faces.item(0));
+					if ( (faces.length === 2) && (flist[0].status !== 0)) flist = scanFaces (edge, faces.item(1), flist);
+					faces = moi.geometryDatabase.createObjectList();
+					for ( var f = 0; f<flist.length; f++ ) faces.addObject(flist[f].face);
+				}
+				edgelength = edge.getLength()/100;
+				espt.x = edge.getStartPt().x;	espt.y = edge.getStartPt().y;	espt.z = edge.getStartPt().z;
+				
+				objects = moi.geometryDatabase.createObjectList();
+				parents = getParents (faces);
+				moi.geometryDatabase.addObjects(parents.add);
+				updategeometry();
+				parents.del.setProperty('hidden', 1);
+				
+				edge.selected = true;
+				return true;
+			}
+			
+			function pDistance(p1, p2)
+			{
+				var xd = p1.x-p2.x, yd = p1.y-p2.y, zd = p1.z-p2.z;
+				return Math.sqrt(xd*xd+yd*yd+zd*zd);
+			}
+			
+			function bindSlider(pp) 
+			{ 
+				parameter.value=100-Math.round(pDistance(pp.pt, espt)/edgelength);
+				if (parameter.value<0) parameter.value=0;
+				if (parameter.value>100) parameter.value=100;
+				updategeometry();
+			}
+			
+			function done() 
+			{ 
+				parents.del.setProperty('hidden', 0);
+				moi.geometryDatabase.removeObjects(parents.del); 
+				factory( true, 'join', concat (objects, parents.add));
+			}
+			
+			function cancel() 
+			{
+				clearInterval(timer);
+				moi.geometryDatabase.removeObjects(objects);
+				moi.geometryDatabase.removeObjects(parents.add);
+				parents.del.setProperty('hidden', 0);
+			
+			}			
+			function updategeometry()
+			{
+				if ( lastparameter === parameter.value ) return;
+				lastparameter = parameter.value
+				moi.geometryDatabase.removeObjects(objects);
+				objects = moi.geometryDatabase.createObjectList();
+				
+				if (facemode)
+				{
+					for ( var f = 0; f < face.length; f++ )
+					{
+						if (parameter.value !==0 || face[f].pt.length > 4 )
+						{
+							var loft = moi.geometryDatabase.createObjectList();
+							for ( var p = 0; p < face[f].pt.length; p++ )
+							{
+								if ( face[f].pt.length < 5 )
+									{ var line = factory( false, 'line', face[f].pt[p], midPoint(parameter.value/100,  face[f].cpt,face[f].pt[p] )); }
+								else	{ var line = factory( false, 'polyline', face[f].pt[p], midPoint(parameter.value/100,  face[f].cpt,face[f].pt[p] ), moi.VectorMath.createPoint(face[f].cpt.x, face[f].cpt.y, face[f].cpt.z)); }
+								if (line.length>0) loft.addObject(line.item(0));
+							}
+							loft = factory( false, 'loft', loft, null, "straight", 0, 1);
+							if (loft.length>0) objects.addObject(loft.item(0));
+						}
+						if (parameter.value !==100 && face[f].pt.length < 5 )
+						{
+							var line1 = factory( false, 'line', midPoint(parameter.value/100,  face[f].cpt,face[f].pt[0] ), midPoint(parameter.value/100,  face[f].cpt,face[f].pt[1] ));
+							var line2 = factory( false, 'line', midPoint(parameter.value/100,  face[f].cpt,face[f].pt[3%face[f].pt.length] ), midPoint(parameter.value/100,  face[f].cpt,face[f].pt[2] ));
+							loft = factory( false, 'loft', concat(line1, line2));
+							if (loft.length>0) objects.addObject(loft.item(0));
+						}
+					}
+				}
+				else
+				{
+					for ( var f = 0; f < flist.length; f++ )
+					{
+						if (parameter.value >=0 || parameter.value <=100 )
+						{
+							if ( mirrorFlag.value )
+							{
+								var mPar = 50 - Math.abs(parameter.value-50);
+								var line1 = factory( false, 'polyline', flist[f].p3, midPoint((100-mPar)/100, flist[f].p3, flist[f].p4), midPoint(mPar/100, flist[f].p3, flist[f].p4), flist[f].p4 );
+								var line2 = factory( false, 'polyline', flist[f].p1, midPoint((100-mPar)/100, flist[f].p1, flist[f].p2), midPoint(mPar/100, flist[f].p1, flist[f].p2), flist[f].p2 );
+							}
+							else
+							{
+								var line1 = factory( false, 'polyline', flist[f].p3, midPoint(parameter.value/100, flist[f].p3, flist[f].p4), flist[f].p4 );
+								var line2 = factory( false, 'polyline', flist[f].p1, midPoint(parameter.value/100, flist[f].p1, flist[f].p2), flist[f].p2 );
+							}
+						}
+						else 
+						{
+							var line1 = factory( false, 'polyline', flist[f].p3, flist[f].p4 );
+							var line2 = factory( false, 'polyline', flist[f].p1, flist[f].p2 );
+						}
+						if (flist[f].n === 3) line1 = factory( false, 'point', flist[f].p3 );
+
+						var loft = moi.geometryDatabase.createObjectList();
+						if (line1.length>0) loft.addObject(line1.item(0));
+						if (line2.length>0) loft.addObject(line2.item(0));
+						loft = factory( false, 'loft', loft, null, "straight", 0, 0);
+						if (loft.length>0) objects.addObject(loft.item(0));				
+					}
+				}
+				moi.geometryDatabase.addObjects(objects);
+			}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div id="Options" class="commandoptions">
+			<table style="width:100%; text-align:center;">
+				<col><col width="5">
+				<tr>
+					<td><strong><nobr>subd Split</nobr></strong></td>
+					<td><moi:NumericInput id="parameter" style="width:3em;" default="50" onchange="updategeometry();"/></td>
+				</tr>
+			</table>
+		</div>
+		<div id="Mirror" class="hiddencommandoptions">
+			<table style="width:100%; text-align:center;">
+			<col><col>
+				<tr><td><moi:CheckButton id="mirrorFlag" default="false">mirrored</moi:CheckButton></td></tr>
+			</table>	
+		</div>
+		<div id="DoneCancelContainer"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

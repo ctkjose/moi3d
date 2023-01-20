@@ -1,0 +1,1 @@
+script: /* Set lighting options for Glass */ var v = moi.view; v.lightingStyle = 'Hemispheric'; v.specularHighlights = true; v.specularBrightness = 80.0; v.specularFocusSize = 10.0; v.metallicLighting = true; v.fixedLightPositions = true; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

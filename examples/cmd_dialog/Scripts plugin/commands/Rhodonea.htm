@@ -1,0 +1,36 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Rhodonea options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>Scale factor:</td>
+				<td><input id="a_value" class="numericinput" default="10.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Shape factor:</td>
+				<td><input id="k_value" class="numericinput" default="6.0" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Theta multiple:</td>
+				<td><input id="theta_multiple" class="unsigned integerinput" default="1"></td>
+			</tr>			
+
+			<tr>
+				<td>Pts per circle:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="200"></td>
+			</tr>
+			
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

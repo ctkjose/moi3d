@@ -1,0 +1,1 @@
+script: /* Set property panel units display */ var sp = moi.ui.sidePane; sp.g_PropPanelUnits = (sp.g_PropPanelUnits == 'Inches' ? '' : 'Inches'); sp.UpdatePropertiesPanel();

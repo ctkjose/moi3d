@@ -1,0 +1,1 @@
+script:moi.geometryDatabase.invertSelection(); )

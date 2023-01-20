@@ -1,0 +1,1 @@
+script:moi.drawingAids.objectSnap = !moi.drawingAids.objectSnap;

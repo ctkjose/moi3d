@@ -1,0 +1,1 @@
+script: /* Toggle grid and axis lines */ moi.grid.display = !moi.grid.display; moi.grid.showXYAxes = moi.grid.display;

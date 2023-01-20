@@ -1,0 +1,1 @@
+script: /* Center view on selection, no zoom */ var objs = moi.geometryDatabase.getSelectedObjects(); if ( objs.length > 0 ) { moi.ui.getActiveViewport().targetPt = objs.getBoundingBox().center; }

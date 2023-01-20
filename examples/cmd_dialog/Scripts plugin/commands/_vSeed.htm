@@ -1,0 +1,112 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var vcurves, surfaces, lineV, gemV, arrayF;
+			function prepareToRun()
+			{
+				vcurves = moi.geometryDatabase.getSelectedObjects().getCurves();
+				surfaces =  moi.geometryDatabase.getSelectedObjects().getBReps();
+				arrayF = moi.command.createFactory( 'arraycurve' );
+			}
+			
+			function prepareVector()
+			{
+				if (vsize.value === 0 )
+				{
+					gemV = moi.geometryDatabase.createObjectList();
+					var pointF = moi.command.createFactory( 'point' );
+					for ( var pcnt = 0; pcnt < vcurves.length; pcnt++) 
+					{
+						pointF.setInput( 0, vcurves.item(pcnt).getStartPt() );
+						var npt = pointF.calculate();
+						gemV.addObject( npt.item(0) );
+					}
+				}
+				else
+				{
+					var circleD = 0.01, sft = 100;
+					var lineF = moi.command.createFactory( 'line' );
+					lineF.setInput( 0, moi.VectorMath.createPoint(0, 0, sft));
+					lineF.setInput( 1, moi.VectorMath.createPoint(0, 0, sft+vsize.value));
+					lineV = lineF.calculate();
+					
+					var circleF = moi.command.createFactory( 'circle3pt' );
+					circleF.setInput( 0, moi.VectorMath.createPoint(-circleD, 0, sft));
+					circleF.setInput( 1, moi.VectorMath.createPoint(circleD, 0, sft));
+					circleF.setInput( 2, moi.VectorMath.createPoint(0, circleD, sft));
+					var circleV = circleF.calculate();
+					
+					lineV.addObject(circleV.item(0));
+					moi.GeometryDatabase.addObjects( lineV );
+					
+					if ( surfaces.length > 0 ) { vcurves.addObject( surfaces.item(0) ); }
+					
+					var gemF = moi.command.createFactory( 'arraygem' );
+					gemF.setInput( 0, lineV );	
+					gemF.setInput( 1, vcurves );
+					gemF.setInput( 2, 10000 );
+					gemV = gemF.calculate();
+					moi.GeometryDatabase.removeObjects( lineV );
+				}
+				moi.GeometryDatabase.addObjects( gemV ); 
+			}
+			
+			function seedVectors( fromV, toV)
+			{
+				for ( var i = fromV; i < toV; i++ )
+				{
+					var list = moi.GeometryDatabase.createObjectList();
+					list.addObject( gemV.item(i) );
+					
+					var crlen = vcurves.item(i).getLength(); 
+					var vnum = Math.round( crlen / dist.value );
+					
+					if (vnum > 0)
+					{
+						arrayF.setInput( 0, list );
+						arrayF.setInput( 1, vcurves.item(i));
+						if ( vnum > 1 ) { arrayF.setInput( 2, 'Distance' );  arrayF.setInput( 4, crlen/vnum); } else { arrayF.setInput( 2, 'NumItems' ); arrayF.setInput( 3, 2);}
+						arrayF.setInput( 5, 'None' );
+						if ( surfaces.length > 0 ) arrayF.setInput( 7, surfaces.item(0) ); 
+						list = arrayF.calculate();
+						moi.GeometryDatabase.addObjects( list ); 
+					}
+				}
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vSeed</strong>
+		</div>
+		<div id="Options" class="commandoptions">
+		<table style="width:100%; padding-top:0.2em;">
+			<col width="5">
+			<col>
+			<col width="5">
+			<col width="1">
+			<tr>
+				<td onclick="dist.value = 1">Distance</td>
+				<td><moi:Slider id="distSlider" min="0.1" max="5" style="width:90%"   /></td>
+				<td style="style="width:3em;""><moi:NumericInput id="dist" value="1"  style="width:3em;" binding="distSlider.value = this.value" /></td>
+				<td><moi:UnitsLabel style="padding-left:0;" /></td>
+			</tr>
+			<tr>
+				<td onclick="vsize.value = 1">vSize</td>
+				<td><moi:Slider id="vsizeSlider" min="-1" max="3" style="width:90%"   /></td>
+				<td style="width:3em;"><moi:NumericInput id="vsize" value="1"  style="width:3em;" binding="vsizeSlider.value = this.value" /></td>
+				<td><moi:UnitsLabel style="padding-left:0;" /></td>
+			</tr>
+		</table>
+		</div>
+		<div id="buttons" class="commandoptions">
+		<moi:CommandDoneCancel />
+		</div>
+		<div id="progress" class="hiddencommandoptions">
+		<moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" />
+		</div>
+		<div id="progressinfo" class="commandoptions" style="text-align:center; font-size:75%;"></div>
+	</body>
+</html>
+	

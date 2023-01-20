@@ -1,0 +1,27 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Create Fibonacci Points</div>
+		</div>
+		
+		<table class="commandoptions">
+
+			<tr>
+				<td>Number of Seeds:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="100"></td>
+			</tr>
+
+			<tr>
+				<td>First Seed Number:</td>
+				<td><input id="numFirstSeed" class="unsigned integerinput" default="1"></td>
+			</tr>
+			
+			</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

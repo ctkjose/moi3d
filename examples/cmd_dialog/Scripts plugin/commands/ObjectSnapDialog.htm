@@ -1,0 +1,101 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi.css" type="text/css">
+
+		<title>Osnaps</title>
+		
+		<style>
+			moi\:MenuItem
+			{
+				dismissFlyout:false;
+				autocheck:false;
+				padding-right:0;
+			}
+		</style>
+		
+		<script>
+			function SetAll( val )
+			{
+				// Set the given value on each menu item.
+				
+				var allitems = document.body.all.tags( 'MenuItem' );
+				for ( var i = 0; i < allitems.length; ++i )
+					allitems.item(i).checked = val;
+			}
+			
+			function AreAllChecked()
+			{
+				// Determine if all menu items are checked.
+			
+				var allitems = document.body.all.tags( 'MenuItem' );
+				for ( var i = 0; i < allitems.length; ++i )
+				{
+					if ( !allitems(i).checked )
+						return false;
+				}
+				
+				return true;
+			}
+		
+			function DoClick( item )
+			{
+				// Do batch processing if it is a right-click or if the alt key was down.
+				var BatchProcess = (window.event.button == 2 || window.event.altKey);
+			
+				if ( !BatchProcess)
+				{
+					// No batch processing, just flip the check and that's it.
+					item.checked = !item.checked;
+				}
+				else
+				{
+					if ( !item.checked || AreAllChecked() )
+					{
+						// If the clicked one is not checked, or all menu items are checked, this one
+						// will become the single checked item.
+						SetAll( false );
+						item.checked = true;
+					}
+					else
+					{
+						// Otherwise, this item is checked and only some other items are checked,
+						// check them all.
+						SetAll( true );
+					}
+				}
+			}
+		</script>
+	</head>
+
+	<body class="MenuBody">
+		<table>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapOrigin">Orig</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapAxis">Axis</moi:MenuItem></td>		
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapEnd">End</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapMid">Mid</moi:MenuItem></td>
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapCen">Cen</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapInt">Int</moi:MenuItem></td>
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapQuad">Quad</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapPt">Pt</moi:MenuItem></td>
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapOn">On</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapPerp">Perp</moi:MenuItem></td>
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapTan">Tan</moi:MenuItem></td>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapPerpPerp">P/P</moi:MenuItem></td>
+			</tr>
+			<tr>
+				<td><moi:MenuItem onbuttonclick="DoClick(this);" binding0="checked = moi.drawingAids.objectSnapTanTan">T/T</moi:MenuItem></td>
+			</tr>
+		</table>		
+	</body>
+</html>

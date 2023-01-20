@@ -1,0 +1,1 @@
+script: /* Show all edges of visible objects */ var breps = moi.geometryDatabase.getObjects().getBReps(); for ( var i = 0; i < breps.length; ++i ) { var brep = breps.item(i); if ( !brep.hidden ) brep.getEdges().setProperty( 'hidden', false ); }

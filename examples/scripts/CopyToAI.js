@@ -1,0 +1,1 @@
+script: /* Copy AI format to clipboard */ moi.geometryDatabase.copyToClipboardAI();

@@ -1,0 +1,1 @@
+script:var vp = moi.ui.mainWindow.viewpanel.getViewport('3D'); vp.projection = 'Parallel'; var as13 = Math.asin(1/3); vp.setAngles( 90 - (Math.asin(Math.tan(as13)) * 180/Math.PI), as13 * 180/Math.PI );

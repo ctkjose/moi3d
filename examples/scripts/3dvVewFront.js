@@ -1,0 +1,1 @@
+script:moi.ui.mainWindow.viewpanel.getViewport('3D').setAngles( 90, 0 );

@@ -1,0 +1,1 @@
+script:moi.ui.mainWindow.viewpanel.mode = 'Split';

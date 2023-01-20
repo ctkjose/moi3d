@@ -1,0 +1,1 @@
+script: /* open line tools */ moi.command.execCommandSet( 'lines' );

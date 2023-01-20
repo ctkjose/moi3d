@@ -1,0 +1,1 @@
+script: /* Set mesh angle to fine */moi.view.meshAngle = (moi.view.meshAngle == '5' ? '10' : '5');

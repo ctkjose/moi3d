@@ -1,0 +1,1 @@
+var z=1.2, vp=['3D','Left','Right','Top','Bottom','Front','Back']; for (var n in vp) moi.ui.mainWindow.viewpanel.getViewport(vp[n]).zoom(z)

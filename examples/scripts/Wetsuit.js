@@ -1,0 +1,1 @@
+script: /* Set lighting options for Wetsuit */ var v = moi.view; v.lightingStyle = 'Hemispheric'; v.specularHighlights = true; v.specularBrightness = 0.19; v.specularFocusSize = 1.5; v.metallicLighting = false; v.fixedLightPositions = true; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

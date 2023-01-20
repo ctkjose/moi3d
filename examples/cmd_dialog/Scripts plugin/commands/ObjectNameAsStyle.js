@@ -1,0 +1,1 @@
+script: /* Set object name as style name + num */ var objs = moi.geometryDatabase.getObjects(); var styles = moi.geometryDatabase.getObjectStyles(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); obj.name = styles.item(obj.styleIndex).name + '_' + i; }

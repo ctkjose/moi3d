@@ -1,0 +1,1 @@
+script:if ( moi.ui.mainWindow.viewpanel.mode != 'split' ) { moi.ui.mainWindow.viewpanel.mode = 'split' } else { var viewport = moi.ui.getViewportUnderMouse(); if ( viewport ) viewport.viewpanel.mode = viewport.name; }

@@ -1,0 +1,52 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Braid options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>Bights:</td>
+				<td><input id="qBights" class="unsignedintegerinput" default="8" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Leads:</td>
+				<td><input id="pLeads" class="unsignedintegerinput" default="3" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Cord Diameter:</td>
+				<td><input id="cordDiam" class="numericinput" default="0.25" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Midrange Radius:</td>
+				<td><input id="MidRadius" class="numericinput" default="2.2" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>Tube Height:</td>
+				<td><input id="tubeHeight" class="numericinput" default="2.4" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Tube ZPlyStart:</td>
+				<td><input id="tubeZStart" class="numericinput" default="0.0" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>NumPoints:</td>
+				<td><input id="numpoints" class="unsignedintegerinput" default="500"></td>
+			</tr>
+		</table>
+
+			<moi:CheckButton id="DiskCheckbox">disk</moi:CheckButton>
+			<moi:CheckButton id="MirrorItCheckbox">mirrorIt</moi:CheckButton>			
+		<moi:CommandDoneCancel />
+	</body>
+</html>

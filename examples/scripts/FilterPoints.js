@@ -1,0 +1,1 @@
+script: /* Turn on selection filter for Types > Points */ moi.selection.setFilter( 'Types', 'Points', true );

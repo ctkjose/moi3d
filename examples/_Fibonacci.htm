@@ -1,0 +1,144 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var factory, pointV, ptfactory, objlist = moi.geometryDatabase.createObjectList(), objlistPt = moi.geometryDatabase.createObjectList(); 
+			
+			function alert( msg )
+			{
+				moi.ui.alert( msg );
+			}
+
+			var g_style_index = 1;// Color may be Red
+
+//  This function for colors is not used in this script.
+			function AssignColors( factory )
+			{
+				var styles = moi.geometryDatabase.getObjectStyles();
+				var curves = factory.getCreatedObjects();
+			//	for ( var i = 0; i < curves.length; ++i, ++g_style_index )
+				for ( var i = 0; i < curves.length; ++i )	
+				{
+					if ( g_style_index == styles.length )
+					{
+						g_style_index = 0;
+					}
+					var curve = curves.item(i);
+					curve.styleIndex = g_style_index;
+				}
+			}
+
+function Cancel()
+{
+	moi.geometryDatabase.removeObjects(objlist);
+	moi.geometryDatabase.removeObjects(objlistPt);	
+}			
+			
+function Polar2Cartesian( theta, radius )
+{
+	var z = 0.0;
+	var x = radius * Math.cos(theta);
+	var y = radius * Math.sin(theta);
+	return moi.vectorMath.createPoint( x, y, z );	
+}
+
+function FermatCurve(numSeeds, numFirstSeed, numpoints, showFCurve)
+{
+	//	phi = (sqrt(5) - 1) / 2 = 0.618034 approximately.
+	var two_pi_phi = Math.PI * (Math.sqrt(5) - 1);
+	//	(Avoids dividing by 2 then multiplying by 2.)
+	// (j+1) is the seed number.
+	// If n = numpoints = 11, i/(n-1) = (1/1, 2/10, 3/10, ... 10/10). 
+	if (showFCurve)
+	{
+	//  Save origin to curve.
+	factory.createInput( 'point' );
+	factory.setInput( factory.numInputs - 1, moi.vectorMath.createPoint( 0, 0, 0) );	
+	//  For each seed = seedID = (j+1), add fraction i/(n-1) to j.
+	//  So t = ()0+1/10, 2/10, 3/10, ... 1.0, 1+1/10, 1.2, 1.3, ... 2.0, ... numSeeds)
+		for ( var j = 0; j < numSeeds; ++j )
+		{
+			for ( var i = 1; i < numpoints; ++i )
+			{
+				var t = j + (i / (numpoints - 1));			
+				var theta = two_pi_phi * t;
+				var radius = Math.sqrt( t );
+				//>>>> Insert z value formula here, with z value changing depending upon
+				//     randomly selected j value.  z value could ramp up from 0 to the next seed,
+				//     and then ramp down to 0 to the next seed.
+				//	   Pass z value to Polar2Cartesian function.
+				var pt = Polar2Cartesian( theta, radius );		
+				factory.createInput( 'point' );
+				factory.setInput( factory.numInputs - 1, pt );	
+			}
+		}	
+		objlist = factory.calculate();
+		factory.cancel();
+		moi.geometryDatabase.addObjects(objlist);
+		objlist.lockSelection();
+	}
+
+	// Fibonacci points:
+	// (This would not work as a separate function.)
+	for ( var j = 0; j < numSeeds; ++j )
+	{
+		var seedID = numFirstSeed + j ;
+		var radius = Math.sqrt( seedID );
+		var theta = two_pi_phi * seedID ;
+		var pt = Polar2Cartesian( theta, radius );		
+		ptfactory.setInput( 0, pt );
+		pointV = ptfactory.calculate();
+		objlistPt.addObject( pointV.item(0) );
+	}
+}	
+
+function Update()				
+{
+	moi.geometryDatabase.removeObjects(objlist);
+	moi.geometryDatabase.removeObjects(objlistPt);
+	objlist = moi.geometryDatabase.createObjectList();
+	objlistPt = moi.geometryDatabase.createObjectList();
+	factory = moi.command.createFactory( 'interpcurve' );
+	ptfactory = moi.command.createFactory( 'point' );
+	FermatCurve(numSeeds.value, numFirstSeed.value, numpoints.value, showFCurve.value);
+	moi.geometryDatabase.addObjects(objlistPt);
+	objlistPt.lockSelection();	
+}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Fleur de Fibonacci</strong>
+		</div>
+		<div id="Options" class="commandprompt">	
+		
+			<table style="width:100%">
+				<tr>
+					<td>Nb de Graines:</td>
+					<td><moi:UnsignedIntegerInput id="numSeeds" style="width:3em;" default="89"></td>					
+				</tr>
+			</table>
+
+			<table style="width:100%">
+				<tr>
+					<td>1ère Graine:</td>
+					<td><moi:UnsignedIntegerInput id="numFirstSeed" style="width:3em;" default="1"></td>
+				</tr>
+			</table>
+
+			<table style="width:100%">
+				<tr>
+					<td>Pts de la Courbe:</td>
+					<td><moi:UnsignedIntegerInput id="numpoints" style="width:3em;" default="100"></td>
+				</tr>
+
+				<tr>
+					<td colspan = "3"><moi:CheckButton id="showFCurve" default="true" >Voir Courbe de Fermat</moi:CheckButton></td>
+				</tr>
+			</table>			
+		
+			<moi:CommandDoneCancel />
+		</div>
+	</body>
+</html>

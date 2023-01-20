@@ -1,0 +1,322 @@
+<html xmlns:moi>  
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var tolerance=moi.GeometryDatabase.tolerance;
+			var faces = moi.geometryDatabase.createObjectList();
+			var m;
+			var sourceObject;
+			
+			function roundT(value) { return Math.round(value/tolerance/2)*tolerance*2; }
+			
+			var Vector3 = function ( x, y, z ) { this.x = x || 0; this.y = y || 0; this.z = z || 0; };
+			
+			Vector3.prototype =
+			{ 	constructor: Vector3,
+				set: function ( x, y, z ) {	this.x = x; this.y = y; this.z = z; return this; },
+				setX: function ( x ) { this.x = x; return this; },
+				setY: function ( y ) { this.y = y; return this; },
+				setZ: function ( z ) { this.z = z; return this; },
+				copy: function ( v ) { this.x = v.x;	this.y = v.y; this.z = v.z; return this; },
+				add: function ( v ) { this.x += v.x; this.y += v.y; this.z += v.z; return this; },
+				sub: function ( v ) { this.x -= v.x; this.y -= v.y; this.z -= v.z; return this; },
+		
+				subVectors: function ( a, b ) { this.x = a.x - b.x; this.y = a.y - b.y; this.z = a.z - b.z; return this; },
+				multiplyScalar: function ( scalar ) { this.x *= scalar; this.y *= scalar; this.z *= scalar; return this; },
+				divideScalar: function ( scalar ) { if ( scalar !== 0 ) { var invScalar = 1 / scalar; this.x *= invScalar; this.y *= invScalar; this.z *= invScalar; } else { this.x = 0; this.y = 0; this.z = 0; } return this; },
+				dot: function ( v ) { return this.x * v.x + this.y * v.y + this.z * v.z; },
+				length: function () { return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z ); },
+				normalize: function () { return this.divideScalar( this.length() ); },
+				cross: function ( v ) { var x = this.x, y = this.y, z = this.z; this.x = y * v.z - z * v.y; this.y = z * v.x - x * v.z; this.z = x * v.y - y * v.x; return this; },
+				clone: function () { return new Vector3( this.x, this.y, this.z ); }
+			};
+			
+			var Mesh = function () { this.vertices = []; this.faces = []; }
+			Mesh.prototype =
+			{
+				constructor: Mesh,
+				addVertex: function ( vertex, existCheck ) 
+				{ 
+					var tmpx = roundT(vertex.x), tmpy = roundT(vertex.y), tmpz = roundT(vertex.z);	
+					var verticesLength = this.vertices.length; 
+					
+					if ( existCheck === true )  for ( var i = verticesLength-1; i >= 0; i--) if (this.vertices[i].c.x == tmpx && this.vertices[i].c.y == tmpy && this.vertices[i].c.z == tmpz) return i; 
+					this.vertices[verticesLength] = new Vector3 (vertex.x, vertex.y, vertex.z);  
+					this.vertices[verticesLength].c = new Vector3 (tmpx, tmpy, tmpz);  
+					this.vertices[verticesLength].faces = [];	
+					this.vertices[verticesLength].edges = [];	
+					return verticesLength;
+				},
+				
+				addFace: function ( faceVertices ) 
+				{
+					var currentFace = this.faces.length; 		
+					this.faces[currentFace] = {};				
+														
+					this.faces[currentFace].vertices = [];		
+					this.faces[currentFace].edgepoints=[];	
+					for (var i=0; i< faceVertices.length; i++) {  this.faces[currentFace].vertices.push(faceVertices[i]);	this.vertices[faceVertices[i]].faces.push(currentFace);	}
+					this.faces[currentFace].vnum = faceVertices.length;		
+					return currentFace;
+				},
+				
+				getNeighbourFaces: function ( edgeStartIndex, edgeEndIndex )  
+				{
+					var neighbourFaces = [];
+					var tmpFaces = this.vertices[edgeStartIndex].faces;
+					for (var i=0; i<tmpFaces.length; i++) { if (this.faces[tmpFaces[i]].vertices.indexOf(edgeEndIndex) >=0 ) neighbourFaces.push(tmpFaces[i]);}				
+					return neighbourFaces;
+				},
+				
+				calculateFacePoints: function () 
+				{
+					for (var f in this.faces)
+					{
+						var tempV = new Vector3();
+						for (var v in this.faces[f].vertices) tempV.add(this.vertices[this.faces[f].vertices[v]]);
+						this.faces[f].facepoint = this.addVertex ( tempV.divideScalar(this.faces[f].vnum) , false );
+					}
+				},
+				
+				calculateEdgePoints: function ( isPlanar )  
+				{
+					var edges = [];  
+					for (var f in this.faces)
+					{
+						for (var v in this.faces[f].vertices)
+						{
+							var p1=this.faces[f].vertices[v]; 
+							var p2=(v==this.faces[f].vnum-1)?this.faces[f].vertices[0]:this.faces[f].vertices[+v+1]; 	
+							var edgeLabel=(p1<p2)?p1+"-"+p2:p2+"-"+p1;  
+							if ( typeof edges[edgeLabel] == 'undefined' )	
+							{ 
+								this.vertices[p1].edges.push(p2);	
+								this.vertices[p2].edges.push(p1);	
+								var edgepoint = new Vector3();
+								edgepoint.add(this.vertices[p1]);
+								edgepoint.add(this.vertices[p2]);
+								
+								if ( !isPlanar ) 	
+								{
+									var neighbourFaces = this.getNeighbourFaces(p1,p2);  
+									if (neighbourFaces.length >1 )	
+									{ 
+										edgepoint.add(this.vertices[this.faces[neighbourFaces[0]].facepoint]);
+										edgepoint.add(this.vertices[this.faces[neighbourFaces[1]].facepoint]);
+										edgepoint.divideScalar(2);
+									}
+								}
+								edgepoint.divideScalar(2);	
+								edges[edgeLabel] = this.addVertex( edgepoint, false );	
+							}
+							this.faces[f].edgepoints.push(edges[edgeLabel]);	
+						}
+					}
+					return edges;
+				},
+				
+				calculateCornerPoints: function ()	
+				{	
+					var newVertices=[];	
+					for (var v in this.vertices)
+					{
+						if ( this.vertices[v].edges.length > 1 )	
+						{
+							var N = 0;
+							var vF = new Vector3();
+							var vR = new Vector3();
+							newVertices[v]= new Vector3();
+							newVertices[v].copy(this.vertices[v]);	
+							
+							if (this.vertices[v].faces.length === this.vertices[v].edges.length) 
+							{
+								for ( var f in this.vertices[v].faces) { var facepoint=this.faces[this.vertices[v].faces[f]].facepoint; vF.add(this.vertices[facepoint]); N++;}	
+								vF.divideScalar(N);					
+								for ( var f in this.vertices[v].edges) { vR.add(this.vertices[v]); vR.add(this.vertices[this.vertices[v].edges[f]]);} 
+								vR.divideScalar(N);					
+								newVertices[v].multiplyScalar(N-3)		
+								newVertices[v].add(vF);				
+								newVertices[v].add(vR);				
+							}
+							else 
+							{
+								for ( var f in this.vertices[v].edges) 
+								{ 
+									var neighbourFaces = this.getNeighbourFaces(v,this.vertices[v].edges[f]);
+									if (neighbourFaces.length === 1) { vR.add(this.vertices[v]); vR.add(this.vertices[this.vertices[v].edges[f]]); N++; }	
+								}
+								newVertices[v].add(vR.divideScalar(N*2));	
+							}
+							newVertices[v].divideScalar(N); 
+						}
+					}	
+					for ( f in newVertices) this.vertices[f].copy(newVertices[f]);	
+				},
+				
+				smoothCornerPoints: function ()	
+				{	
+					var newVertices=[];	
+					for (var v in this.vertices)
+					{
+						if ( this.vertices[v].edges.length > 1 )	
+						{
+							var Ne=this.vertices[v].edges.length;
+							var Nq=0;
+							for (var f in this.vertices[v].faces) { if (this.faces[this.vertices[v].faces[f]].vnum === 4) Nq++;}
+							var alpha=1/(1+Ne/2+Nq/4);
+							var vB = new Vector3();
+							var vG = new Vector3();
+							for (var b in this.vertices[v].edges) { vB.add(this.vertices[this.vertices[v].edges[b]]); }
+							var cnt=0;
+							for (var g in this.vertices[v].faces) 
+							{
+								var cFace = this.vertices[v].faces[g];
+								for (var i in this.faces[cFace].vertices)
+								{
+									if ((this.faces[cFace].vertices[i] != v) && (this.vertices[v].edges.indexOf(this.faces[cFace].vertices[i])) < 0) { vG.add(this.vertices[this.faces[cFace].vertices[i]]);}
+								}
+							}
+							newVertices[v]= new Vector3();
+							newVertices[v].copy(this.vertices[v]);
+							newVertices[v].multiplyScalar(alpha);
+							vB.multiplyScalar(alpha/2);
+							vG.multiplyScalar(alpha/4);
+							newVertices[v].add(vB);
+							newVertices[v].add(vG);
+						}
+					}
+					for ( f in newVertices) this.vertices[f].copy(newVertices[f]);	
+				},
+				
+				clearLinkData: function () 
+				{
+					for ( f in this.vertices) { this.vertices[f].edges=[]; this.vertices[f].faces=[]; }
+				},
+				
+				generateNewMesh: function (splitTrianglesToQuads)	
+				{
+					var temp = new Mesh();			
+					temp.vertices = this.vertices;
+					for (var f in this.faces)
+					{
+						var v0 = this.faces[f].vertices[0], v1 = this.faces[f].vertices[1], v2 = this.faces[f].vertices[2], v3 = this.faces[f].vertices[3];
+						var e0 = this.faces[f].edgepoints[0], e1 = this.faces[f].edgepoints[1], e2 = this.faces[f].edgepoints[2], e3 = this.faces[f].edgepoints[3]; 
+						var c = this.faces[f].facepoint;
+						if (this.faces[f].vnum === 4) { temp.addFace([v0,e0,c,e3]);	temp.addFace([e0,v1,e1,c]);	temp.addFace([e3,c,e2,v3]);	temp.addFace([c,e1,v2,e2]); }
+						if (this.faces[f].vnum === 3)
+						{
+							if (splitTrianglesToQuads) {	temp.addFace([v0,e0,c,e2]);	temp.addFace([e0,v1,e1,c]);	temp.addFace([e2,c,e1,v2]); }
+							  else { temp.addFace([v0,e0,e2]);	temp.addFace([e2,e0,e1]);	temp.addFace([e2,e1,v2]);	temp.addFace([e0,v1,e1]); }
+						}
+					}
+					return temp;
+				},
+				
+				subdivPlanar: function (splitTrianglesToQuads)	
+				{
+					this.calculateFacePoints();		
+					this.calculateEdgePoints(true);	
+					this.clearLinkData();
+					return this.generateNewMesh(splitTrianglesToQuads);
+				},
+				
+				subdivSmooth: function (splitTrianglesToQuads)	
+				{
+					this.calculateFacePoints();			
+					this.calculateEdgePoints(false);	
+					this.calculateCornerPoints();	
+					this.clearLinkData();
+					return this.generateNewMesh(splitTrianglesToQuads);
+				}
+				
+			};
+		
+			function loadMesh(sourceFaces, mesh)
+			{
+				var tlr=moi.GeometryDatabase.tolerance, bbox = sourceFaces.getBoundingBox();
+				if ( bbox.xLength<bbox.yLength) { tlr=(bbox.xLength<bbox.zLength)?tlr*bbox.xLength:tlr*bbox.zLength;} else { tlr=(bbox.yLength<bbox.zLength)?tlr*bbox.yLength:tlr*bbox.zLength; }
+				tolerance=tlr;
+				var errorFaces=[];
+				for ( var f = 0; f < sourceFaces.length; f++ )
+				{
+					var faceVertices = [];
+					var sourceEdges = sourceFaces.item(f).getEdges();
+					if (sourceEdges.length >4 ) errorFaces.push(f);
+					var SVertices = [], EVertices = [];
+					for ( var e = 0; e < sourceEdges.length; e++ ) { SVertices[e] = sourceEdges.item(e).getStartPt(); EVertices[e] = sourceEdges.item(e).getEndPt(); }
+					if ( moi.VectorMath.distance(SVertices[0], SVertices[1])<tlr || moi.VectorMath.distance(SVertices[0], EVertices[1])<tlr ) 
+						{ SVertices[0]=sourceEdges.item(0).getEndPt(); EVertices[0] = sourceEdges.item(0).getStartPt(); }
+					for ( var e = 1; e < sourceEdges.length; e++ ) if  ( moi.VectorMath.distance(EVertices[e-1], EVertices[e])<moi.VectorMath.distance(EVertices[e-1], SVertices[e])) { SVertices[e]=sourceEdges.item(e).getEndPt(); EVertices[e] = sourceEdges.item(e).getStartPt(); }
+					var errorFaces=[];	
+					for ( var e = 0; e < sourceEdges.length; e++ ) { faceVertices.push( mesh.addVertex( SVertices[e], true) );}
+					mesh.addFace(faceVertices);
+				}
+			}
+			
+			function init()
+			{
+				m = new Mesh();
+				sourceObject = moi.geometryDatabase.getSelectedObjects().getOpenBReps();
+				if (sourceObject.length === 0) sourceObject = moi.geometryDatabase.getSelectedObjects().getBReps();
+				var sourceFaces = sourceObject.item(0).getFaces();
+				if ( sourceFaces.length === 0 ) return 0;
+				loadMesh(sourceFaces, m);
+				showFaces(m,0);
+				sourceObject.setProperty( 'hidden',1); sourceObject.setProperty( 'selected', 0);
+				return 1;
+			}
+			
+			function subdivCC() { m=m.subdivSmooth(tri2quad.value); showFaces(m,0); /* showPoints(m.vertices, true, 5)*/ }
+			function subdivPlanar() { m=m.subdivPlanar(tri2quad.value); showFaces(m,0); }
+			function done()
+			{
+				var joinF = moi.command.createFactory( 'join' ); 
+				joinF.setInput( 0, faces ); 
+				joinF.commit();
+				sourceObject.setProperty( 'hidden',0); 
+				moi.geometryDatabase.removeObjects(sourceObject);
+			}
+			
+			function cancel()
+			{
+				sourceObject.setProperty( 'hidden',0); 
+				sourceObject.setProperty( 'selected', 1);
+				moi.geometryDatabase.removeObjects(faces);
+			}
+			
+			function concat( list ) { for ( var i = 1; i < arguments.length; i++ ) { var arglist = arguments[i];	for ( var j = 0; j < arglist.length; j++ ) list.addObject( arglist.item(j) ); } return list;}
+			function showFaces (mesh, displayMode)
+			{
+				moi.geometryDatabase.removeObjects(faces);
+				var loftF = moi.command.createFactory( 'loft' );
+				var lineF = moi.command.createFactory( 'line' );
+				faces = moi.geometryDatabase.createObjectList();
+				for ( f in mesh.faces )
+				{
+					var vn = mesh.faces[f].vertices.length;
+					lineF.setInput(0, moi.VectorMath.createPoint(mesh.vertices[mesh.faces[f].vertices[1]].x, mesh.vertices[mesh.faces[f].vertices[1]].y, mesh.vertices[mesh.faces[f].vertices[1]].z));
+					lineF.setInput(1, moi.VectorMath.createPoint(mesh.vertices[mesh.faces[f].vertices[0]].x, mesh.vertices[mesh.faces[f].vertices[0]].y, mesh.vertices[mesh.faces[f].vertices[0]].z));
+					var line1 = lineF.calculate();
+					lineF.setInput(0, moi.VectorMath.createPoint(mesh.vertices[mesh.faces[f].vertices[2]].x, mesh.vertices[mesh.faces[f].vertices[2]].y, mesh.vertices[mesh.faces[f].vertices[2]].z));
+					if (vn > 3) { lineF.setInput(1, moi.VectorMath.createPoint(mesh.vertices[mesh.faces[f].vertices[3]].x, mesh.vertices[mesh.faces[f].vertices[3]].y, mesh.vertices[mesh.faces[f].vertices[3]].z)); }
+						else { lineF.setInput(1, moi.VectorMath.createPoint(mesh.vertices[mesh.faces[f].vertices[0]].x, mesh.vertices[mesh.faces[f].vertices[0]].y, mesh.vertices[mesh.faces[f].vertices[0]].z)); }
+					var line2 = lineF.calculate();
+					
+					loftF.setInput( 0, concat (line1, line2) );
+					var loftV=loftF.calculate();
+					if (loftV.length >0 ) faces.addObject(loftV.item(0));
+				}
+				moi.geometryDatabase.addObjects(faces);
+			}
+		</script>
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"><strong>Subdiv Classic</strong></div>
+		<table style="width:100%; padding-top:0.5em;">
+			<tr><td><moi:PushButton id="smooth" onclick="subdivCC();" style="align:center; padding:0em; width:100%;">Catmull-Clark</moi:PushButton></td></tr>
+			<tr><td><moi:PushButton id="planar" onclick="subdivPlanar()" style="align:center; padding:0em; width:100%;">Planar</moi:PushButton></td></tr>
+			<tr><td><moi:CheckButton id="tri2quad" default="true" ><nobr>Triangles to quads<nobr></moi:CheckButton></td></tr>
+		</table>
+		<moi:CommandDoneCancel />
+	</body>
+</html>

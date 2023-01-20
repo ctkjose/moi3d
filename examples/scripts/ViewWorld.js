@@ -1,0 +1,1 @@
+script: /* Set world axis rotation style */ moi.view.rotationStyle = 'World';

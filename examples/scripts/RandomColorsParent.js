@@ -1,0 +1,1 @@
+script: /* Assign random styles to solids */ var styles = moi.geometryDatabase.getObjectStyles(); var breps = moi.geometryDatabase.getObjects().getBReps(); for ( var i = 0; i < breps.length; ++i ) { var brep = breps.item(i); var style_index = Math.floor(Math.random() * styles.length); brep.styleIndex = style_index; }

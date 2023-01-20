@@ -1,0 +1,95 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var vcurves, vbreps, vpoints, vcircles, circleF, pointF, gemF;
+			
+			function prepareToRun()
+			{
+				vcurves = moi.geometryDatabase.getSelectedObjects().getCurves(); 
+				vbreps = moi.geometryDatabase.getSelectedObjects().getBReps();
+				vpoints = moi.geometryDatabase.createObjectList();
+				vcircles = moi.geometryDatabase.createObjectList();
+				circleF=moi.command.createFactory( 'circle' );
+				pointF = moi.command.createFactory( 'point' );
+				gemF = moi.command.createFactory( 'arraygem' );
+			}
+			
+			function buildPerp( spt, ept )
+			{
+				var bx = (ept.x-spt.x), by = (ept.y-spt.y), bz = (ept.z-spt.z);
+				var absx = Math.abs( bx ), absy = Math.abs( by ), absz = Math.abs( bz );
+				if (absx < absy) { if (absx < absz) { return { x:0, y:bz, z:-by };} else { return { x:by, y:-bx, z:0 };} } else 	{ if (absy < absz) { return { x:-bz, y:0, z:bx}; } else { return { x:by, y:-bx, z:0}; } }
+			}
+			
+			function createCircles( vFrom, vTo )
+			{
+				var circleV;
+				for ( var icount = vFrom; icount < vTo; icount++)
+				{
+					var spt = vcurves.item(icount).getStartPt();
+					var ept = vcurves.item(icount).getEndPt(); 
+					var xvect = buildPerp( spt, ept );
+					var cframe = moi.vectorMath.createFrame ( spt, moi.vectorMath.createPoint(ept.x-spt.x, ept.y-spt.y, ept.z-spt.z), moi.vectorMath.createPoint(xvect.x, xvect.y, xvect.z)  );
+					
+					circleF.setInput( 1, cframe);
+					circleF.setInput( 2,cframe.evaluate (0, -0.2, 0));
+					circleF.setInput( 4, 1);
+					var circleV = circleF.calculate();
+					vcircles.addObject( circleV.item(0) );
+				}
+				if ( vTo === vcurves.length ) 
+				{
+					vcircles.setProperty( 'hidden', 1);
+					moi.geometryDatabase.addObjects(vcircles);
+				}
+			}
+			
+			function createPoints ( vFrom, vTo )
+			{
+				var pointV;
+				for ( var icount = vFrom; icount < vTo; icount++)
+				{
+					pointF.setInput( 0, vcurves.item(icount).getStartPt() );
+					pointV = pointF.calculate();
+					vpoints.addObject( pointV.item(0) );
+				}
+				if ( vTo === vcurves.length ) 
+				{
+					vpoints.setProperty( 'hidden', 1);
+					moi.geometryDatabase.addObjects(vpoints);
+				}
+			}
+			
+			function rotateVectors( vFrom, vTo )
+			{	
+				var vvectors = moi.geometryDatabase.createObjectList();
+				for ( var icount = vFrom; icount < vTo; icount++)
+				{
+					var gemV;
+					var robject = moi.geometryDatabase.createObjectList();
+					var bobject = moi.geometryDatabase.createObjectList();
+					robject.addObject( vcurves.item(icount) );
+					robject.addObject( vcircles.item(icount) );
+					bobject.addObject( vpoints.item(icount) );
+					bobject.addObject( vbreps.item(0) );
+					gemF.setInput( 0, robject );	
+					gemF.setInput( 1, bobject );
+					gemV = gemF.calculate();
+					vvectors.addObject(gemV.item(0));
+				}
+				moi.geometryDatabase.addObjects(vvectors);
+				vvectors.callMethod( 'deleteHistoryData' );
+			}
+			
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vOrient</strong>
+		</div>
+		<div id="progress" class="commandoptions"><moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" /></div>
+		<div id="progressinfo" class="commandoptions" style="text-align:center; font-size:75%;">-</div>
+	</body>
+</html>

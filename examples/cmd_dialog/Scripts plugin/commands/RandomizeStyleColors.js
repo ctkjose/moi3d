@@ -1,0 +1,1 @@
+script: /* Randomize style colors */ var styles = moi.geometryDatabase.getObjectStyles(); for ( var i = 0; i < styles.length; ++i ) { var style = styles.item(i); var red = Math.random() * 255; var green = Math.random() * 255; var blue = Math.random() * 255; style.color = (red << 16) | (green << 8) | blue; }

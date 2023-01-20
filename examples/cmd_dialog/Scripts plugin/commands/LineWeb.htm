@@ -1,0 +1,39 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Select curves to connect</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">LineWeb options</div>
+		</div>
+
+		<div id="Options" class="hiddencommandoptions">
+			<table>
+				<tr>
+					<td>Point count:</td>
+					<td><input id="NumItems" default="10" class="unsignedintegerinput"></td>
+				</tr>
+			</table>
+			
+			<table>
+				<tr>
+					<td>Build:</td>
+					<td>
+						<select id="Build">
+							<option value="lines">Lines</option>
+							<option value="polylines">Polylines</option>
+							<option value="curves">Curves</option>
+							<option value="points">Points</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+			
+			<moi:CheckButton id="ClosedCheckbox">Closed</moi:CheckButton>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

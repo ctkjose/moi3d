@@ -1,0 +1,58 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var vcurves, vbreps, pointF, projectF, lineF, ptV;
+			
+			function prepareToRun()
+			{
+				vcurves = moi.geometryDatabase.getSelectedObjects().getCurves(); 
+				vbreps = moi.geometryDatabase.getSelectedObjects().getBReps();
+				lineF = moi.command.createFactory( 'line' );
+				pointF = moi.command.createFactory( 'point' );
+				projectF = moi.command.createFactory( 'project' );
+			}
+			
+			function projectPoint (pt, srfList)
+			{
+				pointF.setInput( 0, pt);
+				ptV = pointF.calculate();
+				projectF.setInput( 0, ptV );
+				projectF.setInput( 1, srfList );
+				projectF.setInput( 2, "closestpt" );
+				return projectF.calculate();
+			}
+			function orientVectors( vFrom, vTo )
+			{	
+				var pointV;
+				var objList = moi.geometryDatabase.createObjectList();
+				for ( var i = vFrom; i < vTo; i++)
+				{
+					var spt = vcurves.item(i).getStartPt();
+					var ept = vcurves.item(i).getEndPt(); 
+					var ppt = projectPoint( spt, vbreps );	
+					for ( var p = 0; p< ppt.length; p++)
+					{
+						ppts = ppt.item(p).pt;
+						var  l1 = moi.vectorMath.distance( spt, ppts);
+						var  l2 = moi.vectorMath.distance( spt, ept);
+						lineF.setInput( 0, spt);
+						lineF.setInput( 1, moi.vectorMath.createPoint( (l1+l2)*(spt.x-ppts.x)/l1+ppts.x , (l1+l2)*(spt.y-ppts.y)/l1+ppts.y, (l1+l2)*(spt.z-ppts.z)/l1+ppts.z));
+						pointV = lineF.calculate();
+						objList.addObject( pointV.item(0) );
+					}
+				}
+				moi.geometryDatabase.addObjects( objList );
+			}	
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vOrientFast</strong>
+		</div>
+		<div id="progress" class="commandoptions">
+			<moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" />
+		</div>
+	</body>
+</html>

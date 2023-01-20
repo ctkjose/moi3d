@@ -1,0 +1,141 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		
+<script>		
+var updating=false;
+function alert( msg )
+{
+	moi.ui.commandUI.alert( msg );
+}
+
+function Polar2Cartesian( centerPt, theta, radius )
+{
+	var z = 0.0;
+	var x = centerPt.x + radius * Math.cos(theta);
+	var y = centerPt.y + radius * Math.sin(theta);
+	return moi.vectorMath.createPoint( x, y, z );	
+}
+
+function Update(centerPt)
+{
+	var factory = moi.command.createFactory( 'curve' );
+
+	var UI = moi.ui.commandUI;
+	var scale = UI.scale.numericValue;
+	var Whorls = UI.Whorls.numericValue;
+	Whorls = Math.abs(Whorls);
+	var tight = UI.tight.numericValue;
+	if (tight < -1.0 )
+	tight = -1.0;
+	if (tight > 3.0 )
+	tight = 3.0;
+	var numpoints = UI.numpoints.integerValue;
+	var startAngle = UI.startAngle.integerValue;
+	startAngle *= Math.PI / 180;
+	var clockwise = UI.clockwise.value;
+	var clw = 1.0;
+	if ( clockwise )
+	clw = -1.0;
+	var spinit = UI.spinit.value;
+	var spin = 1.0;
+	if ( spinit )
+	spin = -1.0;
+		
+	var theta;
+	
+	for ( var i = 0; i < numpoints; ++i )
+	{
+		var t = i / (numpoints - 1);
+		
+		theta = Math.PI * 2 * Whorls * t;
+		if (theta===0) { theta=0.0000001 }
+		var radius = scale * Math.pow( theta, tight ) * spin;
+		theta = theta * clw + startAngle;		
+		
+		var pt = Polar2Cartesian( centerPt, theta, radius );		
+		factory.createInput( 'point' );
+		factory.setInput( factory.numInputs - 1, pt );
+	}
+	
+	factory.update();
+	
+	return factory;
+}		
+</script>		
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Pick center point</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Spiral options</div>		
+		</div>
+
+		<div id="Options" class="hiddencommandoptions">
+			<table>		
+				<tr>
+					<td>Scale:</td>
+					<td><input id="scale" default="1.0" class="numericinput" style="persist:true;"></td>
+				</tr>
+				
+				<tr>
+					<td>Whorls:</td>
+					<td><input id="Whorls" default="2.0" class="numericinput" ></td>
+				</tr>
+
+				<tr>
+					<td>Point count:</td>
+					<td><input id="numpoints" default="250" class="unsignedintegerinput" ></td>
+				</tr>				
+			</table>
+
+			<table style="width:100%">
+				<tr>
+					<td>Coil Tightness:</td>
+					<td><moi:NumericInput id="tight" style="width:3em; decimalPlaces:3;" default="1" binding="value = tightslider.value"/></td>
+				</tr>
+			</table>
+				
+			<table style="width:100%">
+				<tr>				
+					<td><moi:Slider id="tightslider" onmousemovevaluechange="if (!updating) { updating=true; moi.ui.fireUIEvent(id);}"
+					value="1.0" min="-1.00" max="3.00" style="width:100%"/></td>
+				</tr>
+			</table>
+
+			<table style="width:100%">				
+				<tr>
+					<td onclick='tightslider.value=1; moi.ui.fireUIEvent("tightslider");'>Archimedes 1 </td>
+					<td onclick='tightslider.value=0.5; moi.ui.fireUIEvent("tightslider");'>Fermat 1/2</td>
+				</tr>				
+
+				<tr>
+					<td onclick='tightslider.value=-1; moi.ui.fireUIEvent("tightslider");'>hyperbolic -1 </td>
+					<td onclick='tightslider.value=-0.5; moi.ui.fireUIEvent("tightslider");'>lituus -1/2</td>	
+				</tr>				
+			</table>			
+			
+			<table style="width:100%">
+				<col width="5">
+				<col>
+				<col width="5">			
+				<tr>
+					<td>Angle:</td>
+					<td><moi:integerinput id="startAngle" style="width:3em;" default="0" binding="value = angleslider.value"/></td>
+				</tr>
+			</table>					
+
+			<table style="width:100%">				
+				<tr>			
+					<td><moi:Slider id="angleslider" value="0" min="-180" max="180" onmousemovevaluechange="if (!updating) { updating=true; moi.ui.fireUIEvent(id);}" style="width:100%"/></td>
+				</tr>
+			</table>
+
+			<table style="width:100%">			
+				<td><moi:CheckButton id="clockwise" default="false" >Clockwise</moi:CheckButton></td>			
+				<td><moi:CheckButton id="spinit" default="false" >Spin180</moi:CheckButton></td>
+			</table>
+			
+		<moi:CommandDoneCancel />
+	</body>
+</html>

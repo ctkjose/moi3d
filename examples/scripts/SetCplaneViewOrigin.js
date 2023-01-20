@@ -1,0 +1,1 @@
+script:/* Orient cplane to 3D view direction, keep same origin */ var frame = moi.ui.mainWindow.viewpanel.getViewport('3D').targetFrame; frame.origin = moi.view.getCPlane().origin; moi.view.setCPlane( frame );

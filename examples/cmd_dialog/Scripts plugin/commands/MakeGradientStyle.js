@@ -1,0 +1,1 @@
+/* Make gradient styles */ var red = 12, green = 15, blue = 20; for ( var i = 1; i <= 100; ++i ) { var style = moi.geometryDatabase.addStyle(); style.name = 'Gradient ' + i; style.color = (Math.abs(red%256)<<16) | (Math.abs(green%256)<<8) | Math.abs(blue%256); red += 2; green += 3; blue -= 7; }

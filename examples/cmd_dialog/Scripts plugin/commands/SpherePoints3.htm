@@ -1,0 +1,69 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			function calcPoints( numpoints, rd )
+			{
+				var inc = Math.PI * (3.0 - Math.sqrt(5.0));
+				var off = 2.0 / numpoints;
+				var off2=off/2;
+				var pointV, pointF = moi.command.createFactory( 'point' );
+				var objList = moi.geometryDatabase.createObjectList();
+				
+				for ( var i = 0; i < numpoints; i++ )
+				{
+					var y = (i * off) - 1.0 + off2;
+					var radius = Math.sqrt(1 - y*y);
+					var phi = i * inc;
+					var x = Math.cos(phi) * radius;
+					var z = Math.sin(phi) * radius;
+					pointF.setInput( 0, moi.vectorMath.createPoint( x*rd, y*rd, z*rd ));
+					pointV = pointF.calculate();
+					objList.addObject( pointV.item(0) );
+				}
+				return objList;	
+			}
+			
+			function getLines( points )
+			{
+				var objList = moi.geometryDatabase.createObjectList();
+				var lineV, lineF = moi.command.createFactory( 'line' );
+				lineF.setInput( 1, moi.vectorMath.createPoint( 0, 0, 0) );
+				for ( var i = 0; i < points.length; ++i ) 
+				{
+					lineF.setInput( 0, points.item(i).pt);
+					lineV = lineF.calculate();
+					objList.addObject( lineV.item(0) );
+				}
+				return objList;
+			}			
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Golden Section Spiral<br>on Sphere</strong>
+		</div>
+		<div id="Options" class="commandprompt">
+			<table style="width:100%; padding-top:0.5em;">
+				<col width="5">
+				<col>
+				<col width="5">
+				<tr>
+					<td>Points:</td>
+					<td><moi:Slider id="numpointsSlider" min="1" max="2000" style="width:90%"  /></td>
+					<td style="width:3em;"><moi:UnsignedIntegerInput id="numpoints" value="200"  style="width:3em;" binding="numpointsSlider.value = this.value" /></td>
+				</tr>
+				<tr>
+					<td>Radius:</td>
+					<td><moi:Slider id="radiusSlider" min="1" max="20" style="width:90%"  /></td>
+					<td style="width:3em;"><moi:UnsignedIntegerInput id="radius" value="10"  style="width:3em;" binding="radiusSlider.value = this.value" /></td>
+				</tr>
+				<tr>
+					<td colspan = "3"><moi:CheckButton id="LinesCheckbox" default="false" >Create Lines</moi:CheckButton></td>
+				</tr>
+			</table>
+			<moi:CommandDoneCancel />
+		</div>
+	</body>
+</html>

@@ -1,0 +1,54 @@
+<html>
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectObjectsPrompt" class="commandprompt">Sélection d'Objets à Coloriser</div>
+			<div id="SelectPathPrompt" class="hiddencommandprompt">Sélection d'un Chemin</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Options de Dégradé</div>
+		</div>
+
+		<div id="Options" class="hiddencommandoptions">
+
+			<div>HSV Valeurs 0 à 100</div>
+
+			<fieldset>
+				<legend>Couleur de Début</legend>
+
+				<table>
+					<tr>
+						<td>H:</td>
+						<td><moi:IntegerInput id="start_h" default="0"/></td>
+					</tr>
+					<tr>
+						<td>S:</td>
+						<td><moi:IntegerInput id="start_s" default="100"/></td>
+					</tr>
+					<tr>
+						<td>V:</td>
+						<td><moi:IntegerInput id="start_v" default="100"/></td>
+					</tr>
+				</table>
+			</fieldset>
+
+			<fieldset>
+				<legend>Couleur de Fin</legend>
+
+				<table>
+					<tr>
+						<td>H:</td>
+						<td><moi:IntegerInput id="end_h" default="100"/></td>
+					</tr>
+					<tr>
+						<td>S:</td>
+						<td><moi:IntegerInput id="end_s" default="100"/></td>
+					</tr>
+					<tr>
+						<td>V:</td>
+						<td><moi:IntegerInput id="end_v" default="100"/></td>
+					</tr>
+				</table>
+			</fieldset>
+		</div>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,43 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+		function delCorners()
+		{
+			var g = moi.geometryDatabase;
+			var clist = g.createObjectList();
+			var obj = g.getObjects();
+			var curves = g.getSelectedObjects().getCurves();
+			obj.setProperty('selected', 0);
+			obj.setProperty('showPoints', 0);
+			for ( var i = 0; i < curves.length; ++i )
+			{
+				curves.item(i).showPoints = true;
+				g.selectAll();
+				obj.setProperty('selected', 0);
+				var crvlist = g.createObjectList();
+				crvlist.addObject( curves.item(i) );
+				g.copyToClipboardCommand( crvlist );
+				g.pasteFromClipboard();
+				var points = g.getSelectedObjects();
+				g.removeObjects(points);
+				curves.item(i).showPoints = false;
+				var f=moi.command.createFactory( 'curve' );
+				for ( var p = 0; p < points.length; ++p ) { f.createInput('point'); f.setInput(p, points.item(p).pt); }
+				if (curves.item(i).isClosed) { f.createInput('point'); f.setInput(p, points.item(0).pt); }
+				var c = f.calculate(); 
+				f.cancel();
+				if ( c.length>0 ) clist.addObject( c.item(0));
+			}
+			g.addObjects (clist);
+			g.removeObjects( curves );
+		}
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="Title" class="commandprompt">DelCorners</div>
+		</div>
+	</body>
+</html>

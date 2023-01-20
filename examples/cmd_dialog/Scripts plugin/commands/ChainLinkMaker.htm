@@ -1,0 +1,42 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Chain Link options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>LinkLength:</td>
+				<td><input id="linkLength" class="numericinput" default="10.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>LinkHeight:</td>
+				<td><input id="linkHeight" class="numericinput" default="5.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>CornerRadius:</td>
+				<td><input id="cornerRadius" class="numericinput" default="2.5" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>ProfileRadus:</td>
+				<td><input id="profileRadius" class="numericinput" default="1.0" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>Num links:</td>
+				<td><input id="numLinks" class="unsignedintegerinput" default="1"></td>
+			</tr>
+		</table>
+		
+			<moi:CheckButton id="twistLink" default="false">Twist Link</moi:CheckButton>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

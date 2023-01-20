@@ -1,0 +1,31 @@
+<script type="text/javascript" >
+	function ftime()
+	{
+		var d = new Date(), a=d.getDate(), o=d.getMonth()+1, y=d.getYear(), h=d.getHours(), m=d.getMinutes(), s=d.getSeconds(); 
+		a=(a>9)?a:'0'+a; o=(o>9)?o:'0'+o; y=(y>999)?y:1900+y; h=(h>9)?h:'0'+h; m=(m>9)?m:'0'+m; s=(s>9)?s:'0'+s; 
+		return y+'.'+o+'.'+a+'-'+h+'.'+m+'.'+s; 
+	} 
+	function snapshot(w, h, button, shiftkey,  ctrlkey)
+	{
+		var st = [], settings  = ["view.meshAngle", "view.viewportBackgroundColor", "view.lineWidth", "grid.display", "grid.accentedLineColor", "grid.lineColor", "grid.showXYAxes", "view.showAxisIcon",  "view.showViewTitles"];
+		var time = ftime();
+		var vp = moi.ui.getLastClickedViewport();
+		if (!vp) { vp = moi.ui.mainWindow.viewpanel.getViewport('3D'); }
+
+		for (var sv in settings) { st.push(moi[settings[sv].split('.')[0]][settings[sv].split('.')[1]] ); } 
+		if ( moi.view.meshAngle > 10 )  { moi.view.meshAngle = 10; }
+		moi.view.viewportBackgroundColor = 0xEEEEEE;
+		moi.grid.display = (button === 2 )?false:true;
+		var m = (ctrlkey)?1.5:1;
+		if ( !shiftkey ) { moi.grid.accentedLineColor = 0xBBBBBB;  moi.view.lineWidth = 1;  }  else {  w = w*m*2; h = h*m*2; moi.grid.accentedLineColor = 0x999999; moi.view.lineWidth = 2; }
+		
+		moi.grid.lineColor = moi.grid.accentedLineColor; 
+		moi.grid.showXYAxes = false;
+		moi.view.showAxisIcon = false;
+		moi.view.showViewTitles = false;
+
+		vp.render(w, h).save(moi.filesystem.getProcessDir()+"\\snapshots\\"+time+"-["+vp.name+"].png"); 
+		for (var sv in settings) { moi[settings[sv].split('.')[0]][settings[sv].split('.')[1]] = st.shift(); }
+	}
+</script>
+<moi:CommandButton  onbuttonclick="snapshot(1600,1200, event.button, event.shiftKey, event.ctrlKey);" icon="data:image/png;base64,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">Snapshot</moi:CommandButton>

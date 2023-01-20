@@ -1,0 +1,109 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<title>Assign name</title>
+		
+		<style>
+			table {
+				width:100%;
+				height:100%;
+			}
+			
+			select {
+				width:100%;
+				height:100%;
+				allowdblclick:true;
+			}
+		</style>
+		
+		<script>
+			function EndDialog()
+			{
+				var val = namelist.value;
+				
+				if ( !val )
+					moiWindow.endDialog(-1);
+				else
+					moiWindow.endDialog(val);
+			}
+		</script>
+	</head>
+	
+	<body class="DialogBody">
+		<table>
+			<tr style="height:5px">
+				<td>
+					<div>Select name to assign:</div>
+				</td>
+			</tr>
+		
+			<tr>
+				<td>
+					<script>
+						function escape( text )
+						{
+							return text.
+								replace(/&/gmi, '&amp;').
+								replace(/"/gmi, '&quot;').
+								replace(/>/gmi, '&gt;').
+								replace(/</gmi, '&lt;')
+						}						
+					
+						var names = new Object();
+												
+						var objects = moi.geometryDatabase.getObjects();
+						for ( var i = 0; i < objects.length; ++i )
+						{
+							var obj = objects.item(i);
+							if ( obj.name != '' )
+								names[obj.name] = 1;
+								
+							var subobjs = obj.getSubObjects();
+							for ( var j = 0; j < subobjs.length; ++j )
+							{
+								var subobj = subobjs.item(j);
+								if ( subobj.name != '' )
+									names[subobj.name] = 1;								
+							}
+						}
+						
+						var namearray = new Array();
+						for ( var name in names )
+							namearray.push( name );
+							
+						namearray.sort();
+						
+						if ( namearray.length > 0 )
+						{
+							document.write( '<select id="namelist" size="5" ondblclick="EndDialog();">' );
+						
+							for ( var i = 0; i < namearray.length; ++i )
+							{
+								var name = escape(namearray[i]);
+								var html = '<option value="' + name + '">' + name + '</option>';
+								document.write( html );
+							}
+						
+							document.write( '</select>' );
+						}
+						else
+						{
+							document.write( '<div>No named objects found</div>' );
+						}
+					</script>
+					
+				</td>
+			</tr>
+			
+			<tr style="height:5px">
+				<td>
+					<div style="text-align:right">
+						<moi:PushButton id="DialogOK" class="dialogokcancelbtn" onbuttonclick="EndDialog();"><moi:Text textid="Dialog ok button"/></moi:PushButton>
+						<moi:Spacer />
+						<moi:PushButton id="DialogCancel" class="dialogokcancelbtn" onbuttonclick="moiWindow.endDialog(-1);"><moi:Text textid="Dialog cancel button"/></moi:PushButton>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

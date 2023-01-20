@@ -1,0 +1,1 @@
+script: /* Toggle thin anti-aliasing */ moi.view.useThinAntiAliasing = !moi.view.useThinAntiAliasing;

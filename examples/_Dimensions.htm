@@ -1,0 +1,291 @@
+﻿<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var dimStyle, obj, hobj, objDim, from, center, centerViewport, centerFrame, centerFlag = false, sysUnits = moi.geometryDatabase.unitsShortLabel, langle = 0;
+/* defaults */	var font = "Arial", lScale = 10, textSizeDefault = 0.8, arrowLengthDefault = 0.8, arrowWidthDefault = 0.3, lineWidthDefault = 0.03;
+
+			function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) if (arguments[i] !==null) f.setInput( i - 1, arguments[i] ); var obj = f.calculate(); f.cancel(); return obj; }
+			function arcfactory( cframe, spt, ept ) 
+			{ 
+				var f = moi.command.createFactory('arccenter'); f.setInput( 0, cframe ); f.setInput( 1, spt ); f.setInput( 2, ept ); 
+				var obj = f.calculate();
+				if ( Math.abs(f.angle-langle) >=180 ) { langle = (langle/Math.abs(langle)*360+f.angle) % 360; f.setInput( 3, langle); obj = f.calculate(); }
+				var a = Math.abs(f.angle);
+				langle = f.angle;
+				f.cancel();
+				return { obj:obj, angle:a };
+			}
+			function createPolyline (points) { var f = moi.command.createFactory( "polyline" ); for (var i=0; i<points.length; i++) { f.createInput( 'point' ); f.setInput( i, points[i]); } var obj = f.calculate(); f.cancel(); return obj; }
+			function concat( list ) { for ( var i = 1; i < arguments.length; i++ ) { var arglist = arguments[i];	for ( var j = 0; j < arglist.length; j++ ) list.addObject( arglist.item(j) ); } return list;}
+			function round(val, p) { return Math.round(val*Math.pow(10, p))/Math.pow(10,p) }
+			function getAngle(x1, y1, x2, y2) { return (Math.atan2(x2-x1,y2-y1)/Math.PI*180+360) % 360; }
+			function getAngle(viewportName, fromPt, toPt)
+			{
+				var a1, a2, b1, b2;
+				if ( viewportName == "Top" || viewportName == "3D" ) { a1=fromPt.x; b1=fromPt.y; a2=toPt.x; b2=toPt.y; }
+				else if ( viewportName == "Bottom" ) { a1=fromPt.x; b1=-fromPt.y; a2=toPt.x; b2=-toPt.y; }
+				else if ( viewportName == "Front" ) { a1=fromPt.x; b1=fromPt.z; a2=toPt.x; b2=toPt.z; }
+				else if ( viewportName == "Back" ) { a1=-fromPt.x; b1=fromPt.z; a2=-toPt.x; b2=toPt.z; }
+				else if ( viewportName == "Right" ) { a1=fromPt.y; b1=fromPt.z; a2=toPt.y; b2=toPt.z; }
+				else if ( viewportName == "Left" ) { a1=-fromPt.y; b1=fromPt.z; a2=-toPt.y; b2=toPt.z; }
+				return (Math.atan2(a2-a1,b2-b1)/Math.PI*180+360) % 360;
+			}
+			
+			function drawCircle( to )
+			{
+				var cframe = to.ptframe;
+				moi.geometryDatabase.removeObjects(hobj);
+				cframe.origin = center.pt;
+				hobj = factory ("circle", false, cframe, to.pt);
+				hobj.setProperty( 'displayMode',1);
+				moi.geometryDatabase.addObjects(hobj);
+				to.clearCurrentSnaps();
+			}
+		
+			function drawArrow( arrowType, viewportName, fromPt, toPt, arrowLength, arrowWidth, lineWidth, fontName, textSize, units, fixedDist, isImperial )
+			{
+				var frame, angle=getAngle(viewportName, fromPt, toPt), dist = moi.VectorMath.distance(fromPt, toPt), aX  = moi.VectorMath.createPoint( toPt.x - fromPt.x, toPt.y - fromPt.y, toPt.z - fromPt.z);
+				if ( viewportName == "Top" || viewportName == "3D" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (-aX.y, aX.x, aX.z)); }
+				else if ( viewportName == "Bottom" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (aX.y, -aX.x, -aX.z)); }
+				else if ( viewportName == "Front" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (-aX.z, -aX.y, aX.x)); }
+				else if ( viewportName == "Back" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (aX.z, aX.y, -aX.x)); }
+				else if ( viewportName == "Right" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (-aX.x, -aX.z, aX.y)); }
+				else if ( viewportName == "Left" ) { frame = moi.VectorMath.createFrame (fromPt, aX, moi.VectorMath.createPoint (aX.x, aX.z, -aX.y)); }
+				else { frame = moi.VectorMath.createFrame(); }
+				
+				var tx = ( fixedDist !== 0 )?fixedDist:round(dist, decimals.value);
+				if ( isImperial ) tx = moi.ui.formatFeetInches(tx, 3);
+				tx = ( units.split('|').length > 1 )?units.split('|')[0]+" "+tx+" "+units.split('|')[1]:tx+" "+units;
+				if ( units[0] == "*" ) tx = units.split("*")[1];
+				var text = factory ('text', moi.VectorMath.createTopFrame(), tx, fontName, false, false, 'surfaces', textSize, 0, false);
+				var textframe = moi.VectorMath.createFrame( frame.origin, frame.xaxis, frame.yaxis );
+				var sTail, eTail, textBBox=text.getBoundingBox();
+				var textWidth = textBBox.xLength, textShift=-textBBox.min.x;
+				if ( angle >=180 ) text = factory('rotateaxis', text, moi.VectorMath.createPoint(textBBox.min.x+textBBox.xLength/2,0,0), moi.VectorMath.createPoint(textBBox.min.x+textBBox.xLength/2,0,1), 180);
+				
+				var pts = [];
+				if ( arrowType == 1 || arrowType == 6 )
+				{
+					pts.push(frame.evaluate(0, 0, 0));
+					pts.push(frame.evaluate(arrowLength, arrowWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist-arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist-arrowLength, arrowWidth/2 ,0));
+					pts.push(frame.evaluate(dist ,0 , 0));
+					pts.push(frame.evaluate(dist-arrowLength, -arrowWidth/2, 0));
+					pts.push(frame.evaluate(dist-arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, -arrowWidth/2 ,0));
+					pts.push(frame.evaluate(0, 0, 0));
+					textShift += dist/2-textWidth/2;
+				}
+
+				if ( arrowType == 2 || arrowType == 3 )
+				{
+					if ( arrowType == 2) { sTail = 2*arrowLength + textWidth; eTail = arrowLength; textShift += -2*arrowLength - textWidth; }
+					if ( arrowType == 3) { sTail = arrowLength; eTail = 2*arrowLength + textWidth; textShift += dist + 2*arrowLength; }
+
+					pts.push(frame.evaluate(-arrowLength-sTail, lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, arrowWidth/2, 0));
+					pts.push(frame.evaluate(0, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength, arrowWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength+eTail, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength+eTail, -lineWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(dist+arrowLength, -arrowWidth/2, 0));
+					pts.push(frame.evaluate(dist, -lineWidth/2, 0));
+					pts.push(frame.evaluate(0, -lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, -arrowWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength-sTail, -lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength-sTail, lineWidth/2, 0));
+				}
+
+				if ( arrowType == 4 )
+				{
+					pts.push(frame.evaluate(0, 0, 0));
+					pts.push(frame.evaluate(arrowLength, arrowWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(dist, lineWidth/2 ,0));
+					pts.push(frame.evaluate(dist, -lineWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(arrowLength, -arrowWidth/2 ,0));
+					pts.push(frame.evaluate(0, 0, 0));
+					textShift += dist-textWidth;
+				}
+
+				if ( arrowType == 5 )
+				{
+					pts.push(frame.evaluate(0, 0, 0));
+					pts.push(frame.evaluate(-arrowLength, -arrowWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, -lineWidth/2, 0));
+					pts.push(frame.evaluate(-dist, -lineWidth/2 ,0));
+					pts.push(frame.evaluate(-dist, +lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, lineWidth/2, 0));
+					pts.push(frame.evaluate(-arrowLength, arrowWidth/2 ,0));
+					pts.push(frame.evaluate(0, 0, 0));
+					textShift += -dist;
+				}
+
+				var arrow = createPolyline(pts);
+				textframe.origin = frame.evaluate(textShift, (1-2*(angle>=180))*(lineWidth+textSize/3)/2, 0);
+				text = factory('orient', text, moi.VectorMath.createTopFrame(), textframe, true);
+				arrow = factory ('planarsrf', arrow);
+				return { frame: frame, line: arrow, text: text, dist: dist, angle: angle };
+			}
+			
+			function updateArrow( to )
+			{
+				moi.geometryDatabase.removeObjects(obj);
+				var f = from.pt, t = to.pt, fixedDist = 0, unt = units.value, imperial = false;
+				if ( centerFlag )
+				{
+					var c = center.pt, vp = centerViewport, angle=0;
+					var R = moi.VectorMath.distance( f, c ), L = moi.VectorMath.distance( t, c ), D = moi.VectorMath.distance( f, t );
+					if ( L == 0 || R ==0 ) { obj = moi.geometryDatabase.createObjectList(); return; }
+					var dx = (t.x -c.x)/L*R, dy = (t.y -c.y)/L*R, dz = (t.z -c.z)/L*R;
+					if ( arrowType.value == 1 || arrowType.value == 2 || arrowType.value == 3 ) { f = moi.VectorMath.createPoint (c.x-dx, c.y-dy, c.z-dz ); t = moi.VectorMath.createPoint (c.x+dx, c.y+dy, c.z+dz ); }
+					if ( arrowType.value == 4 || arrowType.value == 5  ) { f = moi.VectorMath.createPoint (c.x+dx, c.y+dy, c.z+dz ); fixedDist = round(R, decimals.value); }
+					if ( centerFlag && arrowType.value == 6 )
+					{
+						var arc = arcfactory ( centerFrame, from.pt, to.pt );
+						angle = round (arc.angle, decimals.value);
+						f = arc.obj.item(0).getStartPt();
+						t = arc.obj.item(0).getEndPt();
+						var arc2d = arc.obj.item(0).getLength()/moi.VectorMath.distance(f, t)/2;
+						var fn = f;
+						f  = moi.VectorMath.createPoint((fn.x+t.x)/2+arc2d*(fn.x-t.x), (fn.y+t.y)/2+arc2d*(fn.y-t.y), (fn.z+t.z)/2+arc2d*(fn.z-t.z));
+						t = moi.VectorMath.createPoint((fn.x+t.x)/2+arc2d*(t.x-fn.x), (fn.y+t.y)/2+arc2d*(t.y-fn.y), (fn.z+t.z)/2+arc2d*(t.z-fn.z));
+						if (!unitsFlag.value) { unt = ''; fixedDist = angle+"°";}				
+					}
+				} else { var vp = moi.ui.getViewportUnderMouse(); }
+				
+				if (!unitsFlag.value) if (unt=="in" || unt == "ft" || unt == "mi") { imperial = true; unt = ""; }
+				obj = drawArrow( arrowType.value, vp.name, f, t, arrowLength.value, arrowWidth.value, lineWidth.value, font, textSize.value, unt, fixedDist, imperial );
+				if ( centerFlag && arrowType.value == 6 )
+				{
+					var ln = factory ('line', f, t);
+					obj.line = factory ('flow', obj.line, ln.item(0), arc.obj.item(0), 0, 0, 0, 0);
+					obj.text = factory ('flow', obj.text, ln.item(0), arc.obj.item(0), 0, 0, 1, 0);					
+				}				
+				obj = concat (obj.line, obj.text);
+				setHitTest (obj, false );
+				moi.geometryDatabase.addObjects(obj);
+				obj.setProperty('styleIndex', dimStyle.s.index);
+				if ( units.value !== sysUnits) unitsFlag.value=true;
+				to.clearCurrentSnaps();
+			}
+			
+			function filletCurve ( curve, radius, shape )
+			{
+				var obj = moi.geometryDatabase.createObjectList(); obj.addObject( curve );
+				var f = moi.command.createFactory('fillet'); f.setInput( 0, obj );
+				if ( f.generateVertices() !== 0 ) { f.finishedPickingVertices(); f.setInput( 3, radius ); f.setInput( 4, shape ); obj = f.calculate(); }
+				f.cancel(); 
+				return obj;
+			}
+			
+			function updateCurvedArrows( curves )
+			{
+				moi.geometryDatabase.removeObjects(obj);
+				var fixedDist = 0, unt = units.value, imperial = false;
+				if (!unitsFlag.value) if (unt=="in" || unt == "ft" || unt == "mi") { imperial = true; unt = ""; }
+				var vp = moi.ui.getViewportUnderMouse(); if ( !vp ) vp = moi.ui.getLastClickedViewport();
+				obj = moi.geometryDatabase.createObjectList();
+				for ( var i = 0; i < curves.length; i++ )
+				{
+					var f = vp.targetFrame.evaluate(0,0,0);
+					var t = vp.targetFrame.evaluate(curves.item(i).getLength(),0,0);
+					if (getAngle(vp.name, curves.item(i).getStartPt(), curves.item(i).getEndPt())>=180) { var fn = t; t = f; f=fn;  }
+					var atype = arrowType.value;
+					if ( atype == 5 ) { var fn = t; t = f; f=fn; atype = 4; }
+
+					var curve = filletCurve (curves.item(i), lineWidth.value, 'circular');
+					var nextobj = drawArrow( atype, vp.name, f, t, arrowLength.value, arrowWidth.value, lineWidth.value, font, textSize.value, unt, fixedDist, imperial );
+					var ln = factory ('line', f, t);
+				
+					nextobj.line = factory ('flow', nextobj.line, ln.item(0), curve.item(0), 0, 0, 0, 0);
+					nextobj.text = factory ('flow', nextobj.text, ln.item(0), curve.item(0), 0, 0, 1, 0);			
+					obj = concat ( obj, nextobj.line, nextobj.text );
+				}
+				moi.geometryDatabase.addObjects(obj);
+				obj.setProperty('styleIndex', dimStyle.s.index);
+				if ( units.value !== sysUnits) unitsFlag.value=true;
+			}
+			
+			function init() { lScale = scale.value; obj = moi.geometryDatabase.createObjectList(); hobj = moi.geometryDatabase.createObjectList(); }
+			function getStyle(styleName)
+			{
+				var stNum = moi.geometryDatabase.getObjectStyles().length;
+				var style = moi.geometryDatabase.findstyle(styleName,1);
+				var isNew = (stNum !== moi.geometryDatabase.getObjectStyles().length);
+				if ( isNew ) style.color = parseInt("0F0F0F", 16);
+				return { s: style, isNew: isNew }
+			}
+			function getObjectsByStyle(styleIndex)
+			{
+				var objects = moi.geometryDatabase.createObjectList();
+				var objAll = moi.geometryDatabase.getObjects();
+				for ( var i = objAll.length-1; i>=0; i-- ) if ( objAll.item(i).styleIndex == styleIndex ) if (objAll.item(i).type !==2 ) objects.addObject(objAll.item(i));
+				return objects;
+			}
+			function initStyle() { dimStyle = getStyle("Dimensions"); objDim = getObjectsByStyle(dimStyle.s.index); setHitTest(objDim, false); }
+			function setHitTest (objects, f) { for ( var i=objects.length; i>0; i-- ) objects.item(i-1).setHitTest(f);	}
+			function done() { moi.geometryDatabase.removeObjects(hobj); setHitTest(obj, true); setHitTest(objDim, true); obj.setProperty("hidden", true); obj.setProperty("hidden", false);}
+			function cancel() { moi.geometryDatabase.removeObjects(hobj); moi.geometryDatabase.removeObjects(obj); if (dimStyle.isNew) { dimStyle.s.remove()} else {setHitTest(objDim, true)}}
+			function loadDefaultValues()	{ textSize.value = textSizeDefault*lScale/10, arrowLength.value = arrowLengthDefault*lScale/10, arrowWidth.value = arrowWidthDefault*lScale/10, lineWidth.value = lineWidthDefault*lScale/10;}
+			function scaleValues() { textSize.value=textSize.value/lScale*scale.value; arrowLength.value=arrowLength.value/lScale*scale.value; arrowWidth.value=arrowWidth.value/lScale*scale.value; lineWidth.value=lineWidth.value/lScale*scale.value; lScale=scale.value; }
+			function changeLabels()	{ var newLabels = ["1. Int. Diameter", "2. Ext. Diameter (a)", "3. Ext. Diameter (b)", "4. Radius", "5. Radius (mirrored)"]; for (var i in newLabels) arrowType[i].label = newLabels[i];	}
+		</script>
+	</head>
+
+	<body class="commandbody" onload='if (!unitsFlag.value) units.value = sysUnits; if (typeof(textSize.value) == "undefined") loadDefaultValues();'>
+		<div id="Options" class="commandoptions">
+			<table style="width:100%; text-align:center;">
+				<col><col width="5">
+				<tr>
+					<td ondblclick='loadDefaultValues(); moi.ui.fireUIEvent("scale");'><strong>Dimensions</strong></td>
+				</tr>
+			</table>
+			<table style="width:100%">
+				<col width="5"><col>
+				<tr><td style="width:20%">Type</td><td><select id="arrowType" onchange="" style="width:100%" >
+					<option value="1">1. Internal</option>
+					<option value="2">2. External (a)</option>
+					<option value="3">3. External (b)</option>
+					<option value="4">4. Arrow</option>
+					<option value="5">5. Arrow (mirrored)</option>
+					<option value="6">6. Angle</option>
+				</select></td></tr>
+			</table>
+			<table style="width:100%">
+				<col width="5"><col>
+				<tr><td style="width:70%">Text size</td><td style="width:2em;"><moi:NumericInput id="textSize" value=""  /></td></tr>
+				<tr><td style="width:70%">Arrow length</td><td style="width:2em;"><moi:NumericInput id="arrowLength" value=""  /></td></tr>
+				<tr><td style="width:70%">Arrow width</td><td style="width:2em;"><moi:NumericInput id="arrowWidth" value=""  /></td></tr>
+				<tr><td style="width:70%">Line width</td><td style="width:2em;"><moi:NumericInput id="lineWidth" value=""  /></td></tr>
+				<tr><td style="width:70%"><moi:CheckButton id="unitsFlag" default="false" onclick='if (unitsFlag) units.value = sysUnits;'><u>Units</u></moi:CheckButton></td><td style="width:2em;"><moi:TextInput id="units" value="" /></td></tr>
+			</table>
+			<table style="width:100%; text-align:left;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td ondblclick='scale.value = 10; moi.ui.fireUIEvent("scale");'><nobr>Scale (x10)</nobr></td>
+					<td><moi:Slider id="scaleSlider" min="1" mid="11" max="100" style="width:90%" /></td>
+					<td><moi:UnsignedIntegerInput id="scale" style="width:3em;" default="10" binding="scaleSlider.value = this.value"/></td>
+				</tr>
+				<tr>
+					<td ondblclick='decimals.value = 1; '><nobr>Decimals	</nobr></td>
+					<td><moi:Slider id="decimalsSlider" min="0" max="4" style="width:90%" /></td>
+					<td><moi:UnsignedIntegerInput id="decimals" style="width:3em;" default="1" binding="decimalsSlider.value = this.value"/></td>
+				</tr>
+			</table>
+
+		</div>
+		<div id="CancelContainer" class="hiddencommandprompt"><moi:CommandCancel /></div>
+		<div id="DoneCancelContainer"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

@@ -1,0 +1,139 @@
+<html>
+<head>
+	<style>
+		.libwindow{ width:726px; }
+		.folder{ display: inline-block; font-size:140%; text-align:left; margin-left:10px; }
+		.previewbox { display: inline-block; padding: 3px; }
+		.preview{ width:80px; height:80px; overflow:hidden; position:relative;	border: 2px solid;	border-color:#fff; }
+		.preview:hover{ border-color:#ccc; }
+		.preview.x{ background-size: cover; background-position: center; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF8PDw////fhnAPgAAAAJ0Uk5T/wDltzBKAAABNklEQVR42uyYyw7CQAwDzf//NGegXSVOhEGanq3MqNpHsnqEPyGAAAIIIIAAAggggAACCCCAAAIIIIAAAp2stJrrCki1ytVcV0CqVa7mugJSrXI11xWQapWruYmA5rGhgIap4Ro41Db4/V1wqO7w2+fAob7F756EB4LH790FJ4bJb15G9xSX370N7zg2v30dX5N8fr8fuGIN+EZD8kmb8J2O6J034lst2Stxxvd6Qt19X2tK9/huV7zGt9vyLb4/FyzxB4PJDn8yGa3w//gPpNdAehekz4H0SZi+C9K3YbofSHdE6Z4w3RWn54L0ZJSeDdPTcfp9IP1Ckn4jir+S/dI74UpusAaWcvYuWMuZ58BizjoJV3PTyWjnQwABBBBAAAEEEEAAAQQQQAABBBBAAIG4wFOAAQAVqDukoLHV9AAAAABJRU5ErkJggg==); }
+		.icon{ height:100%; margin-left:-10px; border: 0px solid;}
+		.objname{ padding: 3px; text-align:center; font-size:80%; }
+		.emptylib{ padding: 20px; margin-bottom:30px;  text-align:center; font-size:150%; color:#eee;}
+		.add{ display: inline-block;	visibility: hidden;	}
+	</style>
+</head>
+<body class="MenuBody">
+	<moi:FlyoutHeader/>
+	<script>
+		function CutExt( str ) { return str.substring( 0, str.lastIndexOf(".") ); }
+		function StripFileName( str ) { return CutExt(str.substring(str.lastIndexOf("\\")+1)); }
+		function doAction( file )
+		{ 
+			if ( window.event.button === 1 ) { renameObject( file ); }
+			else if ( window.event.button === 2 ) { moi.command.execCommand( 'import '+file); }
+			else { moi.command.execCommand( 'importpart '+file); }
+			moiWindow.Close();
+		}
+		
+		function renameObject( file )
+		{
+			var newName = askName();
+			if ( newName == "-1" ) return;
+			if ( newName == "" )
+			{		
+				if (moi.filesystem.fileExists (CutExt(file)+'.png') ) moi.filesystem.deleteFile(CutExt(file)+'.png');
+				if (moi.filesystem.fileExists (CutExt(file)+'.3dm') ) moi.filesystem.deleteFile(CutExt(file)+'.3dm');
+			}
+			else
+			{
+				newName = file.substring(0,file.lastIndexOf('/')+1) + newName;
+				if (moi.filesystem.fileExists(newName+'.png') || moi.filesystem.fileExists(newName+'.3dm')) { moi.ui.alert("An object with the same name already exists. Please choose a different name."); return; }
+				if (moi.filesystem.fileExists(CutExt(file)+'.png') ) { moi.filesystem.copyFile(CutExt(file)+'.png', newName+'.png'); moi.filesystem.deleteFile(CutExt(file)+'.png');}
+				if (moi.filesystem.fileExists(CutExt(file)+'.3dm') ) { moi.filesystem.copyFile(CutExt(file)+'.3dm', newName+'.3dm'); moi.filesystem.deleteFile(CutExt(file)+'.3dm');}
+			}
+		}
+		
+		function askName ()
+		{
+			var dialog = moi.ui.createDialog( 'EditNameDialog.htm', '', moi.ui.mainWindow  );
+			return dialog.window.doModal();
+		}
+				
+		function addObject( savepath )
+		{
+			moiWindow.Close();	
+			var objects = moi.geometryDatabase.getSelectedObjects(); 
+			if (objects.length === 0) objects = moi.geometryDatabase.getObjects();
+			if (objects.length === 0 ) return;
+			var fileName = askName();
+			if ( fileName == "-1" || fileName == "") return;
+			
+			objects.setProperty( 'selected', 1);
+			moi.geometryDatabase.fileExport(savepath+fileName+".3dm");
+	
+			var st = [], settings  = ["view.viewportBackgroundColor", "view.lineWidth", "grid.display", "grid.showXYAxes", "view.showAxisIcon", "view.showHiddenLines"];
+			for (var sv in settings) { st.push(moi[settings[sv].split('.')[0]][settings[sv].split('.')[1]] ); }
+			var vp = moi.ui.mainWindow.viewpanel.getViewport('3D');
+			var camera = vp.cameraPt, target = vp.targetPt;
+			vp.reset();
+			vp.zoom(1.2);
+			
+			moi.geometryDatabase.isolate();
+			objects.setProperty( 'selected', 0);
+			
+			moi.view.viewportBackgroundColor = 0xFFFFFF;
+			moi.view.lineWidth = 2; 
+			moi.grid.display = false; 
+			moi.grid.showXYAxes = false;
+			moi.view.showAxisIcon = false;
+			moi.view.showHiddenLines = false;
+						
+			moi.ui.mainWindow.viewpanel.getViewport('3D').render(400, 320).save(savepath+fileName+".png"); 
+			moi.geometryDatabase.isolate();
+
+			vp.setCameraAndTarget(camera, target);
+			for (var sv in settings) { moi[settings[sv].split('.')[0]][settings[sv].split('.')[1]] = st.shift(); }
+		}
+		
+		function ObjLibrary()
+		{
+			function showLibraryFolder( path, name )
+			{
+				if (!moi.filesystem.dirExists(path)) return;
+				var files = moi.filesystem.getFiles( path, '*.3dm' );
+				lcount++;
+				if (lcount>1) document.write('<moi:MenuSeparator/><br>');
+				document.write( '<table><tr><td><div class="folder" onmouseover="document.getElementById(\'add'+ lcount +'\').style.visibility=\'visible\';" onmouseout="document.getElementById(\'add'+ lcount +'\').style.visibility=\'hidden\';" onclick="addObject(\''+path.split("\\").join('/')+'\');"><div class="add" id="add'+lcount+'">+</div>'+name+'</div></td></tr></table>');
+				if (files.length === 0 ) { document.write ('<div class="emptylib">EMPTY</div>'); return;}
+				document.write ('<table><tr><td>' );
+				for ( var i = 0; i < files.length; ++i )
+				{
+					var filename = files.item(i);
+					var iconname = CutExt(files.item(i)) + '.png'; 
+					document.write ('<div class="previewbox" onclick="doAction(\''+filename.split("\\").join('/') +'\');">');
+					var randomID=Math.round(Math.random()*100000000);
+					if ( moi.filesystem.fileExists (iconname) ) { document.write ('<div class="preview"><img class="icon" src="'+ iconname.split("\\").join('/') +'?'+randomID+'"></div>'); }
+						else	{ document.write ('<div class="preview x"></div>'); }
+					
+					document.write ('<div class="objname">'+StripFileName(filename)+'</div>' );
+					document.write ('</div>' );	
+				} 
+				document.write ('</td></tr></table>' );
+			}
+	
+			var scom = [], lcount = 0;
+			var cfgfile = moi.filesystem.getFiles(moi.filesystem.getUIDir()+"\\customui\\mods", 'ObjLibrary.cfg.htm' );
+			if (cfgfile.length === 0) { moi.ui.alert("ObjLibrary.cfg.htm not found!"); return; }
+			
+			document.write( '<div class="libwindow">' );
+			var config = moi.filesystem.openFileStream( cfgfile.item(0), 'r' );
+			while ( !config.AtEOF ) 
+			{ 
+				var confst = config.readLine().replace(",",";");
+				var libname = confst.split(';')[0];
+				var libpath = confst.split(';')[1];
+				libpath = libpath.replace(/^\s+|\s+$/g, '');
+				libname = libname.replace(/^\s+|\s+$/g, '');
+				if (libpath.substring(0,4) === "MOI\\") libpath=moi.filesystem.getProcessDir()+libpath.substring(3);
+				while (libpath.indexOf("\"") !== -1) libpath = libpath.replace("\"", "");
+				if (libpath.substring(libpath.length-1) !== "\\") libpath = libpath + "\\";
+				showLibraryFolder(libpath, libname);
+			}
+			config.close();
+			document.write ('</div>' );
+		}
+		ObjLibrary();
+	</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<style>
+			body {
+				white-space:nowrap;
+			}
+			
+			body > hbox {
+				height:100%;
+				-webkit-box-align:end;
+			}
+			
+			body > hbox > flex, body > hbox > div {
+				height:100%;
+			}
+			
+			body > hbox > flex > *, body > hbox > div > * {
+				vertical-align:bottom;
+			}
+			
+			moi\:ViewTabs, moi\:CoordinateControls {
+				display:-webkit-inline-box;
+				-webkit-box-orient:horizontal;
+				-webkit-box-align:center;
+				height:100%;
+			}
+			
+			.vspacer {
+				display:inline-block;
+				width:0;
+				height:100%;
+			}
+		</style>
+	</head>
+	
+	<body class="CommandBarBody">
+		<hbox>
+	
+			<flex>
+			
+				<!-- Include vertical spacer to make vertical-align:bottom work well with command buttons !-->
+				<span class="vspacer"></span>
+
+				<moi:CommandMenuButton menu="FileMenu.htm" icon="res://fileicon"><moi:Text textid="File"/></moi:CommandMenuButton>
+				<moi:CommandButton icon="res://saveicon" command="save" rcommand="saveas"><moi:Text textid="Save"/></moi:CommandButton>
+
+				<moi:Spacer/>
+				
+				<moi:CommandButton icon="res://undoicon" onclick="moi.command.undo();"><moi:Text textid="Undo"/></moi:CommandButton>
+				<moi:CommandButton icon="res://redoicon" onclick="moi.command.redo();"><moi:Text textid="Redo"/></moi:CommandButton>
+				
+				<moi:Spacer/>
+				
+				<moi:CommandButton icon="res://deleteicon" command="delete"><moi:Text textid="Delete"/></moi:CommandButton>
+
+				<moi:SmallSpacer/>
+
+				<moi:ViewTabs/>
+			
+				<moi:Spacer/>
+
+				<moi:CoordinateControls/>
+
+				<moi:Spacer/>
+				
+				<vcenter>
+					<moi:StateButton
+						binding="value = moi.drawingAids.gridSnap"
+						menu="GridSnapMenu.htm">
+						<moi:Text textid="Grid Snap"/>
+					</moi:StateButton>
+				</vcenter>
+
+				<vcenter>
+					<moi:StateButton
+						binding="value = moi.drawingAids.straightSnap">
+						<moi:Text textid="Straight Snap"/>
+					</moi:StateButton>
+				</vcenter>
+
+				<vcenter>
+					<moi:StateButton
+						binding="value = moi.drawingAids.objectSnap"
+						menu="ObjectSnapMenu.htm">
+						<moi:Text textid="Object Snap"/>
+					</moi:StateButton>
+				</vcenter>
+				
+				<moi:Spacer/>
+			<script type="text/javascript" src="customui/CustomInit.js" />
+			</flex>
+			
+			<div>
+
+				<span class="vspacer"></span>
+				
+				<script>
+					var g_InLlamaMode = false;
+					
+					function LlamaMode()
+					{
+						g_InLlamaMode = !g_InLlamaMode;					
+					
+						var panels = moi.ui.getUIPanels();
+						for ( var i = 0; i < panels.length; ++i )
+						{
+							var images = panels.item(i).document.images;
+							for ( var j = 0; j < images.length; ++j )
+							{
+								var img = images[j];
+								if ( img.parentElement.tagName.indexOf('COMMAND') == -1 )
+									continue;
+															
+								if ( !img.savedSrc )
+									img.savedSrc = img.src;
+								
+								if ( g_InLlamaMode )
+								{
+									img.src = 'res://llamaicon';								
+									img.style.webkitTransition = '-webkit-transform 10s linear';
+									img.style.webkitTransform = 'rotate(360deg)';
+								}
+								else
+								{
+									img.src = img.savedSrc;
+									img.style.webkitTransform = '';
+								}
+							}
+						}						
+					}
+				</script>
+			
+				<moi:CommandButton icon="res://optionsicon" onclick="if ( event.ctrlKey && event.shiftKey ) { LlamaMode(); } else { moi.ui.createDialog( 'Options.htm', 'resizeable,defaultWidth:43em,defaultHeight:32em' ); }"><moi:Text textid="Options"/></moi:CommandButton>
+				<moi:CommandSplitButton icon="res://helpicon" menu="HelpMenu.htm" onclick="moi.launchHelp();"><moi:Text textid="Help"/></moi:CommandSplitButton>
+
+				<moi:WindowControlButton
+					style="vertical-align:bottom;"
+					icon="Expand.png"
+					binding="style.display < return (moiWindow.IsMaximized && moiWindow.canChangeMaximizedSize()) ? 'inline' : 'none';
+						;; firstChild.firstChild.src < return moi.ui.maximizeToFullScreen ? 'Contract.png' : 'Expand.png';"
+					onclick="moi.ui.maximizeToFullScreen = !moi.ui.maximizeToFullScreen;">
+				</moi:WindowControlButton>
+				
+			</div>
+		
+		</hbox>
+	</body>
+</html>

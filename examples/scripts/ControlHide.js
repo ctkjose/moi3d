@@ -1,0 +1,1 @@
+script: /* Show subset of hidden objects */ moi.geometryDatabase.showSubset();

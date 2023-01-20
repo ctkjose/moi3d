@@ -1,0 +1,1 @@
+script: /* Set lighting options for Clay */ var v = moi.view; v.lightingStyle = 'CustomLevels'; v.specularHighlights = true; v.specularBrightness = 0.11;  v.specularFocusSize = 0.4; v.metallicLighting = false; v.fixedLightPositions = false; v.customKeyLightLevel = 0.52; v.customFillLightLevel = 0.41;

@@ -1,0 +1,42 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<script>
+			function ConstraintPoint( pointpicker )
+			{
+
+				if ( typeof(distanceinput.numericValue) == "number")
+					pointpicker.setDistanceConstraint( distanceinput.numericValue );
+
+				if ( typeof(angleinput.numericValue) == "number")
+					pointpicker.setAngleConstraint( angleinput.numericValue );
+			}	
+		</script>
+
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="ConstraintPrompt" class="commandprompt">Choose constraint options</div>
+			<div id="StartPrompt" class="hiddencommandprompt"><moi:Text textid="Pick start point prompt"/></div>
+			<div id="NextPrompt" class="hiddencommandprompt"><moi:Text textid="Pick next point prompt"/></div>
+		</div>
+		
+		<div id="ConstraintOptions" class="commandoptions">
+			<table>
+				<tr>
+					<td>Distance:</td>
+					<td><input id="distanceinput" default="10.0" class="numericinput" style="persist:true;"></td>
+				</tr>
+
+				<tr>
+					<td>Angle:</td>
+					<td><input id="angleinput" class="numericinput" style="persist:true;"></td>
+				</tr>
+			</table>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

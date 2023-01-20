@@ -1,0 +1,46 @@
+﻿<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Dupin Ciclide</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>Rayon Maj a:</td>
+				<td><input id="aValue" class="numericinput" default="6.00" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Valeur c:</td>
+				<td><input id="cValue" class="numericinput" default="2.00" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Rayon min mu:</td>
+				<td><input id="muValue" class="numericinput" default="3.00" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>Densité U:</td>
+				<td><input id="uDensity" class="unsigned integerinput" default="25" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Densité V:</td>
+				<td><input id="vDensity" class="unsigned integerinput" default="11" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Pts / Courbes:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="50"></td>
+			</tr>
+			
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

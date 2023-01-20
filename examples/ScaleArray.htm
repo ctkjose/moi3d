@@ -1,0 +1,25 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Choisir Options de Taille</div>
+		</div>
+		
+		<table>
+			<tr>
+				<td>Taille Départ:</td>
+				<td><input id="startscale" default="1.0" class="numericinput" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Taille Fin:</td>
+				<td><input id="endscale" default="0.1" class="numericinput" style="persist:true;"></td>
+			</tr>
+		</table>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

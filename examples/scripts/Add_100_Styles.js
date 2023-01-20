@@ -1,0 +1,1 @@
+script: /* Add 100 styles */ for ( var i = 0; i < 100; ++i ) { var style = moi.geometryDatabase.addStyle(); style.name = 'Style ' + (i+1); }

@@ -1,0 +1,31 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<script src="RadiusDiameter.js"></script>
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="CenterPrompt" class="commandprompt"><moi:Text textid="Pick center point prompt"/></div>
+			<div id="RadiusPrompt" class="hiddencommandprompt"><moi:Text id="_RadiusPrompt" textid="Pick radius prompt"/><moi:Text id="_DiameterPrompt" style="display:none" textid="Pick diameter prompt"/></div>
+			<div id="PointPrompt" class="hiddencommandprompt">Pick near which point to keep</div>
+		</div>
+		
+		<div class="commandoptions">
+			<table id="RadiusOptions" style="display:none">
+				<tr>
+					<td>
+						<moi:LabelToggleButton onbuttonclick="ToggleRadiusDiameter();"><moi:Text id="_RadiusButton" textid="Radius button"/><moi:Text id="_DiameterButton" style="display:none" textid="Diameter button"/><moi:Cycler/></moi:LabelToggleButton>
+					</td>
+					
+					<td>
+						<input id="distanceinput" class="coordinatenumericinput">
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<moi:CommandCancel />
+	</body>
+</html>

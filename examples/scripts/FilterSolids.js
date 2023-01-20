@@ -1,0 +1,1 @@
+script: /* Turn on selection filter for Types > Solids */ moi.selection.setFilter( 'Types', 'Solids', true );

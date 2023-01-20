@@ -1,0 +1,1 @@
+script:/*Loop selection*/moi.geometryDatabase.SelectLoop();

@@ -1,0 +1,1 @@
+script: /* Place a point at each selected object's bounding center */ var objs = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); var pt = obj.getBoundingBox().center; var ptfactory = moi.command.createFactory( 'point' ); ptfactory.setInput( 0, pt ); ptfactory.commit(); }

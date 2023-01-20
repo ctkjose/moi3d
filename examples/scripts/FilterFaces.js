@@ -1,0 +1,1 @@
+script: /* Turn on selection filter for Types > Faces */ moi.selection.setFilter( 'Types', 'Faces', true );

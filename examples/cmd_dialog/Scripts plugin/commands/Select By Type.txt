@@ -1,0 +1,17 @@
+This custom command helps you select all visible objects of a given type. The command doesn't deselect the selected objects, it means the command adds to the current selection only.
+
+You can select the object which will define the object type to select before the command starts. In this case, when one and only one object is selected, command will run without any user intervention and in accordance with the state of a subtype checkbox the objects of the given type will become selected. The object you can pre-select:
+
+    point
+    curve (with subtype button checked either open or closed curves will be selected )
+    surface (with subtype button checked either open or closed surfaces will be selected )
+    edge
+    face
+
+Without pre-selected object the command prompt will stay accessible in order to enable user to check/uncheck the subtype button and pick the object. If you pick the curve or point, command will do its work and finishes. If you pick a surface, the "Done" button appears – then you will be able to finish command by pushing it (or clicking the right mouse button in the viewport) immediately to select all closed or open surfaces _or_ select edge or face in drill-in mode first to select all edges or faces.
+
+If there is more than one object selected before command starts, it will work as described above except the pre-selected objects become deselected temporarily.
+
+It sounds somewhat complicated, but I believe it's quite intuitive.
+
+Unzip the file SelectByType.zip into the \commands subfolder under your MoI main program files folder. Then go to Options / Shortcut keys, and add some new entries, like:

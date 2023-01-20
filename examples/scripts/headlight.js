@@ -1,0 +1,1 @@
+script:/* Toggle between headlight and regular light directions */ var dir = moi.view.lightDirection; if ( dir.x == 1 && dir.y == 1 && dir.z == -1 ) { dir.set(0,1,0); } else { dir.set(1,1,-1); } moi.view.lightDirection = dir;

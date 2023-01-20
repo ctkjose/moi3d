@@ -1,0 +1,1018 @@
+
+html, body {
+	color:#000000;
+	width:100%;
+	height:100%;
+	margin:0;
+	-webkit-box-sizing:border-box;
+}
+
+img {
+	-webkit-user-drag:none;
+	vertical-align:bottom;
+}
+
+.CommandBarBody, .SidePaneBody {
+	background-color:#D2DFE1;
+}
+
+.MenuBody {
+	background-color:white;
+    border-color:#878787;
+    border-radius:6px;
+}
+
+.MenuBodyDark {
+	background-color:#E5E5E5;
+    border-color:#878787;
+    border-radius:6px;
+}
+
+.DialogBody {
+	padding:5px 10px;
+	background-color:#F3F6FF;
+}
+
+.OptionsBody {
+	background-color:#F3F6FF;
+}
+
+.ViewControlsBody {
+	background-color:#D0D5DA;
+	opacity:64;
+}
+
+/*** Command buttons ***/
+
+moi\:CommandButton, moi\:CommandMenuButton, moi\:CommandSplitButton {
+	display:inline-block;
+	text-align:center;
+	border:1px solid transparent;
+	border-radius:4px;
+	padding:1px 0.1em 2px 0.1em;
+	font-size:75%;
+	white-space:nowrap;
+}
+
+moi\:CommandButton > img, moi\:CommandMenuButton > img, moi\:CommandSplitButton > img {
+	width:3.25em;
+	height:3.25em;
+}
+
+moi\:CommandMenuButton {
+	border-radius:0 0 4px 4px;
+}
+
+moi\:CommandButton:hover, moi\:CommandSplitButton:hover {
+	border-color:rgb(153,158,161);
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(237, 246, 249)), color-stop(30%, rgb(178, 223, 249)), color-stop(100%, rgb(237, 246, 249)));
+}
+
+moi\:CommandButton:active, moi\:CommandSplitButton:active, moi\:CommandButton.active, moi\:CommandSplitButton.active {
+	border-color:rgb(153,158,161);
+	background:rgb(149,211,255);
+}
+
+moi\:CommandMenuButton:hover {
+	border-color:rgb(153,158,161);
+	background:rgb(255,255,255);
+}
+
+.CommandSetContainer {
+	border:1px solid rgb(153,158,161);
+	background-color:white;
+	border-radius:5px;
+
+	width:100%;
+	height:5px;
+	-webkit-box-sizing:border-box;
+	text-align:left;
+	padding:0.25em;
+}
+
+.CommandSetBody {
+	background-color:transparent;
+	text-align:left;
+}
+
+moi\:CommandButton.CommandSetOpen {
+	background:white;
+	border-color:rgb(153,158,161);
+	border-top-color:white;
+	border-radius:0 0 5px 5px;
+	position:relative;
+	top:-2px;
+	z-index:1;
+}
+
+body.CommandSetBody moi\:CommandButton {
+	vertical-align:top;
+}
+
+/*** Menu launcher - this is the small arrow that appears above a button that has a menu ***/
+
+.MenuLauncher {
+    background-color:white;
+    border-color:rgb(135,135,135);
+    arrow-color:black;
+}
+
+.MenuLauncherHovered {
+    background-color:rgb(192,192,192);
+}
+
+/*******/
+
+moi\:WindowControlButton {
+	display:inline-block;
+	vertical-align:top;
+}
+
+moi\:WindowControlButton span {
+	display:inline-block;
+	vertical-align:bottom;
+	padding:0.05em;
+}
+
+moi\:WindowControlButton img {
+	width:1.85em;
+	height:1.85em;
+	border:1px solid transparent;
+	border-radius:6px;
+}
+
+moi\:WindowControlButton:hover img {
+	border-color:rgb(160,160,160);
+	background:rgb(188,188,188);
+}
+
+moi\:WindowControlButton:active img {
+	background:rgb(165,165,165);
+}
+
+/* The one with class="CloseWindow" gets a red colored background */
+moi\:WindowControlButton#CloseWindow:hover img {
+	background-color:rgb(250,96,96);
+}
+
+moi\:WindowControlButton#CloseWindow:active img {
+	background-color:rgb(235,9,9);
+}
+
+moi\:WindowControlButton:focus {
+	outline:dotted 1px;
+}
+
+/*******/
+
+moi\:FlyoutHeader {
+	display:flex;
+    flex-direction:row;
+	align-items:center;
+}
+
+moi\:SmallCloseWindowButton {
+	display:inline-block;
+	vertical-align:top;
+	border:1px solid transparent;
+	border-radius:5px;
+	margin:0.1em;
+}
+
+moi\:SmallCloseWindowButton > img {
+	width:1.5em;
+	height:1.5em;
+}
+
+moi\:SmallCloseWindowButton:hover {
+	background-color:rgb(250,96,96);
+	border-color:rgb(124,124,124);
+}
+
+moi\:SmallCloseWindowButton:active {
+	background-color:rgb(235,9,9);	
+}
+
+moi\:SmallCloseWindowButton:focus {
+	outline:dotted 1px;
+}
+
+/*******/
+
+moi\:MenuItem {
+	display:block;
+	padding:0.15em 0.6em 0.15em 0.05em;
+	white-space:nowrap;
+	border:1px solid transparent;
+	text-overflow:ellipsis;
+}
+
+moi\:MenuItem > img {
+	width:0.95em;
+	height:0.95em;
+	vertical-align:baseline;
+	padding-right:0.1em;
+	visibility:hidden;
+}
+
+/* When the menu item has class="checked", show the check img */
+moi\:MenuItem.checked > img {
+	visibility:inherit;
+}
+
+moi\:MenuItem:hover {
+	border-color:rgb(153,158,161);
+	border-radius:4px;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(237, 246, 249)), color-stop(30%, rgb(178, 223, 249)), color-stop(100%, rgb(237, 246, 249)));
+}
+
+moi\:MenuItem:active {
+	background:rgb(149,211,255);
+}
+
+moi\:MenuItem:disabled {
+	color:gray;
+}
+
+
+moi\:MenuSeparator {
+	display:block;
+	height:1px;
+	overflow:hidden;
+	background-color:gray;
+	margin:2px 0;
+}
+
+/*******/
+
+moi\:TabContainer {
+	display:inline-block;
+	white-space:nowrap;
+}
+
+moi\:TabButton {
+	display:inline-block;
+	padding:0.3em 0.5em 0.35em 0.5em;
+	white-space:nowrap;
+	font-size:90%;
+	text-align:center;
+	border:1px solid rgb(153,153,153);
+	border-left-color:rgb(204,204,204);
+	border-right-color:rgb(226,226,226);
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(255, 255, 255)), color-stop(50%, rgb(235, 235, 235)), color-stop(100%, rgb(255, 255, 255)));
+}
+
+moi\:TabButton:first-child:not([no_end_styles]) {
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+	border-left-color:rgb(153,153,153);
+}
+
+moi\:TabButton:last-child:not([no_end_styles]) {
+	border-top-right-radius:5px;
+	border-bottom-right-radius:5px;
+	border-right-color:rgb(153,153,153);
+}
+
+moi\:TabButton:hover {
+	color:#0066EE;
+}
+
+moi\:TabButton.active {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(202, 228, 244)), color-stop(50%, rgb(180, 215, 239)), color-stop(100%, rgb(202, 228, 244)));
+}
+
+/*******/
+
+input, moi\:TextInput, moi\:NumericInput, moi\:DistanceInput, moi\:IntegerInput, moi\:UnsignedIntegerInput,
+moi\:PointInput, moi\:CoordinateXYZInput, moi\:CoordinateDistanceInput, moi\:CoordinateAngleInput {
+	border:1px solid #999;
+	padding:1px 1px 1px 0.35em;
+	color:inherit;
+	background-color:#FFFFFF;
+	
+	display:inline-block;
+	-webkit-box-sizing:border-box;
+	-webkit-user-select:text;
+	-webkit-user-drag:none;
+	
+	width:5em;
+	/*allowdblclick:false;*/
+	cursor:auto;
+}
+
+moi\:IntegerInput, moi\:UnsignedIntegerInput, .unsignedintegerdisplay {
+	width:3em;
+}
+
+moi\:UnitsLabel {
+	font-size:80%;
+	padding-left:0.2em;
+	display:inline;
+}
+
+
+/* Background and text colors for selected text in input fields */
+::selection {
+    background-color:#5599FF;
+    color:white;
+}
+
+/*******/
+
+moi\:PushButton {
+	display:inline-block;
+	text-align:-webkit-center;
+	padding:0.3em 0.2em;
+}
+
+moi\:PushButton > div {
+	padding:0.35em 0.55em;
+
+	border:1px solid rgb(60,100,155);
+	border-radius:4px;
+
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0%,rgb(248,248,255)), color-stop(50%,rgb(242,242,253)), color-stop(52%,rgb(235,235,237)), color-stop(100%,rgb(230,230,232)) );
+
+	/* Inset box-shadow gives a top/left highlight and right/bottom shadow line inside of border */
+	-webkit-box-shadow:inset 1px 1px rgb(255,255,255), inset -1px -1px rgb(200,200,200);
+}
+
+moi\:PushButton:hover > div {
+	-webkit-box-shadow:inset 0 0 0 2px rgb(251,202,106);
+}
+
+moi\:PushButton:active > div {
+	background:rgb(205,215,227);
+	-webkit-box-shadow:inset 0px -1px rgb(255,255,255), inset 2px 2px rgb(180,180,180);
+}
+
+moi\:PushButton:focus > div {
+	outline:dotted 1px;
+	outline-offset:-5px;
+}
+
+moi\:PushButton:disabled > div {
+	color:gray;
+	border-color:rgb(180,180,180);
+	opacity:0.9;
+}
+
+
+/* use class="SlimBtn" for buttons in a dense grid to reduce padding a bit */
+
+moi\:PushButton.SlimBtn {
+	display:block;
+	padding-top:0.15em;
+	padding-bottom:0.15em;
+}
+
+moi\:PushButton.SlimBtn > div {
+	padding-top:0.2em;
+	padding-bottom:0.2em;
+}
+
+/*******/
+
+moi\:StateButton {
+	display:inline-block;
+	padding:0.3em 0.15em;
+	margin:0.15em;
+	text-align:-webkit-center;
+	font-size:90%;
+
+	border:1px solid transparent;
+	border-radius:4px;
+}
+
+moi\:StateButton:hover {
+	border-color:rgb(153,158,161);
+}
+
+moi\:StateButton.on {
+	border-color:rgb(153,158,161);
+	background-color:rgb(255,211,125);
+}
+
+moi\:StateButton:hover.on  {
+	background-color:rgb(255,255,177);
+}
+
+moi\:StateButton:focus {
+	outline:dotted 1px;
+	outline-offset:-5px;
+}
+
+/*******/
+
+moi\:ShowHideStateButton {
+	display:inline-block;
+	padding:0.3em;
+	text-align:-webkit-center;
+}
+
+moi\:ShowHideStateButton > div {
+	padding:0.3em 0.6em;
+	border:1px solid rgb(153,153,153);
+	border-radius:5px;
+	background:rgb(228,236,236);
+	
+}
+
+moi\:ShowHideStateButton:hover {
+	color:blue;
+}
+
+moi\:ShowHideStateButton:hover:not(.on) > div {
+	background:rgb(203,231,241);
+}
+
+moi\:ShowHideStateButton.on > div {
+	background:rgb(205,215,227);
+}
+
+/*******/
+
+moi\:ListItem {
+	display:block;
+	white-space:nowrap;
+	word-wrap:break-word;
+	padding:0.1em 0.25em;
+	border:1px solid transparent;
+	border-radius:4px;
+	noautotoggle:true;
+}
+
+moi\:ListItem:hover {
+	border-color:rgb(153,158,161);
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(237, 246, 249)), color-stop(30%, rgb(178, 223, 249)), color-stop(100%, rgb(237, 246, 249)));
+}
+
+moi\:ListItem.on {
+	border-color:rgb(153,158,161);
+	background:rgb(149,211,255);
+}
+
+moi\:ListItem:disabled {
+	color:#C0C0C0;
+}
+
+/*******/
+
+moi\:CheckButton {
+	display:flex;
+	flex-direction:row;
+    align-items:center;
+	
+	padding:0.1em 0.2em;
+}
+
+moi\:CheckButton .checkbutton_box {
+	border:1px solid rgb(85,85,85);
+	border-radius:4px;
+	background:rgb(255,255,255);
+	width:1em;
+	height:1em;
+	position:relative;
+    flex-shrink:0;
+}
+
+moi\:CheckButton .checkbutton_box img {
+	visibility:hidden;
+	width:1.15em;
+	height:1.15em;
+	position:absolute;
+	left:0.05em;
+	bottom:0.2em;
+}
+
+/* When the button has class="on", show the check img */
+moi\:CheckButton.on .checkbutton_box img {
+	visibility:inherit;
+}
+
+moi\:CheckButton:hover {
+	color:rgb(0,0,255);
+}
+
+moi\:CheckButton:hover .checkbutton_box {
+	background:-webkit-gradient( radial, 50% 50%, 0, 50% 50%, 0.5em, from(rgb(240,240,225)), to(rgb(230,230,108)) );
+}
+
+moi\:CheckButton:focus .checkbutton_content {
+	outline:dotted 1px;
+	outline-offset:1px;
+}
+
+/*******/
+
+moi\:LabelButton {
+	display:inline-block;
+}
+
+moi\:LabelButton:hover, .label_button:hover {
+	background-color:#BBBBBB;
+}
+
+moi\:LabelButton:active, .label_button:active, .label_button_active {
+	background-color:#999999;
+}
+
+/*******/
+
+moi\:Spacer {
+	display:inline-block;
+	width:0.5em;
+}
+
+moi\:SmallSpacer {
+	display:inline-block;
+	width:0.2em;
+}
+
+moi\:SmallBr {
+	display:block;
+	height:0.25em;
+}
+
+/*******/
+
+hbox, flex_hbox, .hbox {
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+}
+
+vbox, flex_vbox, .vbox {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+}
+
+flex_hbox, flex_vbox, flex, .flex {
+	flex-grow:1;
+    flex-shrink:0;
+}
+
+flex, .flex {
+	display:block;
+}
+
+vcenter {
+    height:100%;
+    display:inline-flex;
+    flex-direction:row;
+    align-items:center;
+}
+
+/*******/
+
+.dialogokcancelbtn {
+	min-width:6em;
+	font-size:120%;
+}
+
+moi\:DialogOKCancel, moi\:DialogClose, moi\:DialogOK, moi\:DialogCancel {
+	display:block;
+	text-align:right;
+	white-space:nowrap;
+}
+
+moi\:LogoDialog {
+	display:block;
+}
+
+moi\:LogoDialogOKCancel {
+	display:block;
+}
+
+/*******/
+
+moi\:Text {
+	display:inline;
+}
+
+moi\:Title {
+	display:none;
+}
+
+/*******/
+
+/*
+::-webkit-scrollbar {
+    width: 18pt;
+    height: 18pt;
+}
+*/
+
+/*******/
+
+moi\:Select, select {
+    -webkit-appearance:none;
+    box-sizing:border-box;
+    align-items:center;
+    
+    white-space:pre;
+    color:inherit;
+	background-color:white;
+
+    margin:0px;
+    display:inline-block;
+
+	border:1px solid rgb(127,157,185);
+	border-radius:2px;
+    
+    font-size:90%;
+    cursor: inherit;
+}
+
+moi\:Select:focus, select:focus {
+	outline: dotted 1px;
+	outline-offset:-2px;
+}
+
+.select_text {
+    flex-grow:1;
+	padding:0 0.4em;
+	display:block;
+    overflow-x:hidden;
+}
+
+.select_button {
+	-webkit-box-sizing:border-box;
+	width:1.35em;
+	line-height:1.65em;
+	display:block;
+	text-align:center;
+	border-left:1px solid rgb(204,214,228);
+	
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0%,rgb(248,248,255)), color-stop(50%,rgb(242,242,253)), color-stop(52%,rgb(235,235,237)), color-stop(100%,rgb(230,230,232)) );
+}
+
+.select_button_hover {
+	-webkit-box-shadow:inset 0 0 0 2px rgb(251,202,106);
+}
+
+.select_button_active {
+	background:rgb(205,215,227);
+	-webkit-box-shadow:inset 0px -1px rgb(255,255,255), inset 2px 2px rgb(180,180,180);
+}
+
+.select_button_img {
+	width:0.75em;
+	height:0.75em;
+	display:inline;
+}
+
+.select_listitem_highlight {
+	color:rgb(255,255,255);
+	background-color:rgb(49,106,197);
+}
+
+/*******/
+
+moi\:Binder {
+	display:none;
+}
+
+/*******/
+
+fieldset {
+    display:block;
+    margin-left:0.3em;
+    margin-right:0.3em;
+    padding:0.1em 0.5em 0.5em 0.5em;
+    border:1px solid #D0D0BF;
+    border-radius:4px;
+}
+
+legend {
+	color:#2636FF;
+	padding:0 0.3em;
+}
+
+/*******/
+
+moi\:Slider {
+	width:7em;
+	height:1.5em;
+	display:flex;
+	flex-direction:row;
+	align-items:center;
+	position:relative;
+	margin:0 0.2em;
+}
+
+moi\:Slider div {
+	width:100%;
+	border-color:#AAA;
+	-webkit-box-sizing:border-box;
+}
+
+/* Outer div has border on the left/right sides, making the vertical end posts */
+moi\:Slider > div {
+	border-width:2px;
+	border-left-style:solid;
+	border-right-style:solid;
+	padding:2px 0;
+}
+
+/* Inner div makes the track line */
+moi\:Slider > div > div {
+	border-width:1px;
+	border-top-style:solid;
+	border-bottom-style:solid;
+	background:#DDD;
+	height:3px;
+}
+
+/* Slider control uses images SliderKnob.png and SliderKnob_highlighted.png */
+moi\:Slider .SliderKnob, moi\:Slider .SliderKnob_highlighted {
+	width:0.75em;
+	height:1.5em;
+	position:absolute;
+	left:0;
+	top:45%;
+	margin-top:-0.75em;
+}
+
+/* Highlighted knob is hidden normally, and when hovered the regular knob is hidden */
+moi\:Slider .SliderKnob_highlighted, moi\:Slider:hover .SliderKnob {
+	visibility:hidden;
+}
+
+/* When hovered SliderKnob_highlighted is shown */
+moi\:Slider:hover .SliderKnob_highlighted {
+	visibility:inherit;
+}
+
+/*******/
+
+moi\:ProgressBar {
+	display:block;
+	position:relative;
+	padding:0.15em 0.2em;
+	margin:0.1em;
+	text-align:center;
+
+	border:1px solid rgb(129,129,129);
+	border-radius:3px;
+
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(186, 203, 212)), color-stop(45%, rgb(221, 238, 245)), color-stop(100%, rgb(218, 234, 242)));
+}
+
+moi\:ProgressBar .progressbar_bar {
+	position:absolute;
+	z-index:1;
+	left:0;
+	top:0;
+	width:0%;
+	height:100%;
+	-webkit-box-sizing:border-box;
+
+	border-right:2px solid rgba(167,167,167,0.2);
+	border-radius:2px 0px 0px 2px;
+
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(10%, rgb(255, 255, 255)), color-stop(53%, rgb(52, 248, 42)), color-stop(83%, rgb(146, 251, 141)));
+}
+
+moi\:ProgressBar .progressbar_text {
+	position:relative;
+	z-index:2;
+}
+
+/*******/
+
+moi\:ColorButton {
+	display:inline-block;
+	width:4em;
+	border:2px solid gray;
+	margin-bottom:-0.25em;
+}
+
+moi\:ColorButton:hover {
+	border-color:yellow;
+}
+
+moi\:Colorbutton:focus {
+	outline:dotted 1px;
+	outline-offset:-5px;
+}
+
+/*******/
+
+.Palette {
+	border:1px solid rgb(153,153,153);
+	border-radius:4px;
+	background-color:rgb(229,229,229);
+}
+
+moi\:PaletteHeader {
+	margin:0.35em 0 0 0;
+	padding:0 0.35em;
+	text-align:-webkit-center;
+	white-space:nowrap;
+	display:block;
+	min-height:8px;
+	position:relative;
+	z-index:5;
+}
+
+moi\:PaletteHeader > .PaletteHeaderBackground {
+	width:100%;
+	height:50%;
+	left:0;
+	bottom:0;
+	position:absolute;
+	z-index:-1;
+	-webkit-box-sizing:border-box;
+	
+	background-color:rgb(229,229,229);
+	border:1px solid rgb(153,153,153);
+	border-bottom-style:none;
+	border-top-left-radius:4px;
+	border-top-right-radius:4px;
+}
+
+moi\:PaletteBody {
+	text-align:center;
+	display:block;
+	min-height:4px;
+	padding:2px 2px 0 2px;
+	
+	background-color:rgb(229,229,229);
+	border:1px solid rgb(153,153,153);
+	border-top-style:none;
+	border-bottom-left-radius:4px;
+	border-bottom-right-radius:4px;
+}
+
+/*******/
+
+.commandbody {
+	background-color:transparent;
+	text-align:left;
+}
+
+.commandheader {
+	padding:0.1em 0.5em 0 0.5em;
+	text-align:center;
+}
+
+.commandoptions {
+	padding:0.15em 0 0 0;
+}
+
+.hiddencommandoptions {
+	padding:0.15em 0 0 0;
+	display:none;
+}
+
+.commandprompt {
+}
+
+.hiddencommandprompt {
+	display:none;
+}
+
+.commanddonecancelbtn {
+	display:block;
+}
+
+.hiddencommanddonecancelbtn {
+	display:none;
+}
+
+moi\:CommandCancel, moi\:CommandDoneCancel, moi\:CommandHiddenDoneCancel {
+	display:block;
+}
+
+moi\:CommandOptionsSeparatorLine {
+	display:block;
+	width:100%;
+	text-align:-webkit-center;
+}
+
+moi\:CommandOptionsSeparatorLine > div {
+	width:90%;
+	margin:0.35em 0;
+	border-bottom:1px solid #AAA;
+}
+
+/*******/
+
+moi\:SceneBrowser {
+	padding:0.1em 0;
+	display:block;
+	text-align:left;
+}
+
+.SceneBrowserSection {
+	display:block;
+	padding:0.28em 0;
+	margin:0.4em 0 0.15em 0;
+	
+	border:1px solid rgb(153,153,153);
+	border-radius:6px 6px 0 0;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgb(230, 240, 250)), color-stop(40%, rgb(224, 232, 238)), color-stop(60%, rgb(224, 232, 238)), color-stop(100%, rgb(230, 240, 250)));
+}
+
+.SceneBrowserItem {
+	padding:0.15em 0;
+	display:block;
+	highlightcolor:#0000FF;
+	noobjectscolor:#9A9A9A;
+	oddrowbackgroundcolor:#EBEBEB;
+	evenrowbackgroundcolor:#E3E3E3;
+	highlightrowbackgroundcolor:#CAD5F0;
+	connectorlinecolor:rgb(132,132,132);
+	
+	border:1px solid rgb(153,153,153);
+	border-radius:4px;
+	background:rgba(255,255,149,0.14);
+}
+
+.SceneBrowserContent {
+	padding-left:1.5em;
+}
+
+.SceneBrowserSwatchActive {
+	border:1px solid rgb(80,80,80);
+	border-radius:2px;
+}
+
+.SceneBrowserSwatchHover {
+	-webkit-box-shadow:inset 0 0 0 4px rgb(255,255,161);
+}
+
+.SceneBrowserLabelActive {
+	background:rgb(255,255,161);
+}
+
+.SceneBrowserSectionHeaderMenuButton {
+	border:1px solid rgb(153,153,153);
+	border-radius:6px;
+	background:rgb(235,242,247);
+}
+
+.SceneBrowserSectionHeaderMenuButtonHover {
+	border:2px solid rgb(134,134,203);
+	border-radius:6px;
+	background:rgb(255,255,161);
+}
+
+.SceneBrowserExpanderBox {
+	border:1px solid rgb(153,153,153);
+	border-radius:2px;
+	background:rgba(255,255,255,0.36);
+}
+
+.SceneBrowserExpanderBoxHover {
+	border:1px solid rgb(153,153,153);
+	border-radius:2px;
+	background:rgb(255,255,161);
+}
+
+/*******/
+
+.warning {
+	display:block;
+	text-align:center;
+	font-size:110%;
+	font-weight:bold;
+	color:Red;
+	background-color:Yellow;
+	border:1px solid #AAA;
+	padding:0.1em;
+}
+
+/* For a square color swatch before a style name */
+moi\:StyleSwatch {
+	display:inline-block;
+	width:1.1em;
+	height:1.1em;
+	border:1px solid #ABA;
+	vertical-align:bottom;
+	margin-right:0.3em;
+	margin-bottom:0.1em;
+}
+
+
+/*******/
+
+/* The <moi:MacOnly> tag only shows up when running on Mac OSX, it gets display:none otherwise */
+moi\:MacOnly {
+	display:inline-block;
+}
+
+
+
+/*	
+body * {
+	-webkit-transition: -webkit-transform 1s linear;
+}
+
+body *:hover {
+	-webkit-transform:rotate(45deg);
+}
+*/

@@ -1,0 +1,1 @@
+script: /* 3D window pixel dims to clipboard */ var px = moi.ui.mainWindow.viewpanel.getViewport('3D'); moi.copyTextToClipboard( 'Height=' + px.pixelHeight.toString() + '\r\Width=' + px.pixelWidth.toString() );

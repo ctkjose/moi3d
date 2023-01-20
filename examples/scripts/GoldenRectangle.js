@@ -1,0 +1,1 @@
+script: /* Activate golden rectangle snap */ var pp = moi.ui.getActivePointPicker(); if ( pp ) { pp.clearStraightSnapAngles(); pp.addStraightSnapAngle( Math.atan2( 1, (1 + Math.sqrt(5))/2 ) * 180/Math.PI, 'Golden' ); }

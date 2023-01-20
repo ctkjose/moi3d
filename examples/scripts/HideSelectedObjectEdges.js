@@ -1,0 +1,1 @@
+script: /* Hide edges of selected objects */ var breps = moi.geometryDatabase.getSelectedObjects().getBreps(); for ( var i = 0; i < breps.length; ++i ) breps.item(i).getEdges().setProperty( 'hidden', true ); moi.ui.redrawViewports();

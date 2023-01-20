@@ -1,0 +1,1 @@
+script: /* Toggle projecting snaps to CPlane in ortho and 3D views */ moi.drawingAids.projectToCPlaneAll = !moi.drawingAids.projectToCPlaneAll;

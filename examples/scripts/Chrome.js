@@ -1,0 +1,1 @@
+script: /* Set lighting options for Chrome */ var v = moi.view; v.lightingStyle = 'Headlight'; v.specularHighlights = true; v.specularBrightness = 50.0; v.specularFocusSize = 2.0; v.metallicLighting = true; v.fixedLightPositions = false; v.customKeyLightLevel = 0.0; v.customFillLightLevel = 0.0;

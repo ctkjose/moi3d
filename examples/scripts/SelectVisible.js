@@ -1,0 +1,1 @@
+script: /* select displayed objects */ moi.geometryDatabase.selectVisible();

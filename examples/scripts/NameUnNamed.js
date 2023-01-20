@@ -1,0 +1,1 @@
+script: /* Assign names to all objects */ var objs = moi.geometryDatabase.getObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); if ( obj.name == '' ) { obj.name = 'Object_' + (i+1); } }

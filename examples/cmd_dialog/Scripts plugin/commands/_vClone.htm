@@ -1,0 +1,65 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var vcurves, sobjects, baseframe, clones = moi.GeometryDatabase.createObjectList();
+			
+			function buildPerp( spt, ept )
+			{
+				var bx = (ept.x-spt.x), by = (ept.y-spt.y), bz = (ept.z-spt.z);
+				var absx = Math.abs( bx ), absy = Math.abs( by ), absz = Math.abs( bz );
+				if (absx < absy) { if (absx < absz) { return { x:0, y:bz, z:-by };} else { return { x:by, y:-bx, z:0 };} } else 	{ if (absy < absz) { return { x:-bz, y:0, z:bx}; } else { return { x:by, y:-bx, z:0}; } }
+			}
+			
+			function cloneObjects( vFrom, vTo )
+			{
+				for ( var icount = vFrom; icount < vTo; icount++)
+				{
+					var orientF=moi.command.createFactory( 'orient' )
+					var spt = vcurves.item(icount).getStartPt();
+					var ept = vcurves.item(icount).getEndPt(); 
+					var xvect = buildPerp( spt, ept );
+					var cframe = moi.vectorMath.createFrame ( spt, moi.vectorMath.createPoint(ept.x-spt.x, ept.y-spt.y, ept.z-spt.z), moi.vectorMath.createPoint(xvect.x, xvect.y, xvect.z)  );
+					var yvect = cframe.evaluate (0,0,-1);
+					var zvect = cframe.evaluate (0,-1,0);
+					var tframe = moi.vectorMath.createFrame ( spt, moi.vectorMath.createPoint(zvect.x-spt.x, zvect.y-spt.y, zvect.z-spt.z), moi.vectorMath.createPoint(yvect.x-spt.x, yvect.y-spt.y, yvect.z-spt.z)  );
+					
+					orientF.setInput( 0, sobjects);
+					orientF.setInput( 1, baseframe);
+					orientF.setInput( 2, tframe);
+					orientF.setInput( 3, true );
+					orientF.update();
+					var nextclone = orientF.getCreatedObjects();
+					orientF.commit();
+					clones.addObject(nextclone.item(0));
+				}
+				if ( vTo === vcurves.length ) 
+				{
+					clones.addObject(sobjects.item(0));
+					clones.setProperty( 'updateWithHistory', HistoryCheckbox.value );
+				}
+			}
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>vClone</strong>
+		</div>
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt"><moi:Text>Select object to clone</moi:Text></div>
+			<div id="BasePrompt1" class="hiddencommandprompt"><moi:Text textid="Orient pick base origin"/></div>
+			<div id="BasePrompt2" class="hiddencommandprompt"><moi:Text textid="Orient adjust base axis orientation prompt"/></div>
+			<div id="VectorPrompt" class="hiddencommandprompt"><moi:Text>Pick target vectors</moi:Text></div>
+		</div>
+		<div id="OrientOptions" class="hiddencommandoptions">
+			<moi:CheckButton id="OrientationPickerAlignToObjects"><moi:Text textid="Align to objects checkbox"/></moi:CheckButton>
+			<moi:CheckButton id="FlipAlignedZAxis" binding="this.style.display < return OrientationPickerAlignToObjects.value ? '' : 'none';"><moi:Text textid="Flip aligned z axis checkbox"/></moi:CheckButton>
+			<moi:CommandOptionsSeparatorLine id="AlignSeparatorLine" />
+		</div>
+		<div id="Checkbox1" class="hiddencommandoptions"><moi:CommandOptionsSeparatorLine id="AlignSeparatorLine" /></br><moi:CheckButton id="HistoryCheckbox" default="false" >History update</moi:CheckButton></div>
+		<div id="progress" class="hiddencommandoptions"><moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" /></div>
+		<div id="progressinfo" class="hiddencommandoptions" style="text-align:center; font-size:75%;">-</div>
+		<moi:CommandDoneCancel />
+	</body>
+</html>

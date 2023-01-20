@@ -1,0 +1,1 @@
+script: /* Reset cplane to default */ moi.view.resetCPlane();

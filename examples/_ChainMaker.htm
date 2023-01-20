@@ -1,0 +1,42 @@
+﻿<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectionPrompt" class="commandprompt">Sélection du Chemin de la Chaîne</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Options de la Chaîne</div>
+		</div>
+
+		<div id="ChainOptions" class="hiddencommandoptions">	
+		<table>			
+			<tr>
+				<td>Longueur du Chaînon:</td>
+				<td><input id="linkLength" class="numericinput" default="2.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Hauteur du Chaînon:</td>
+				<td><input id="linkHeight" class="numericinput" default="1.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>Rayon du Virage :</td>
+				<td><input id="cornerRadius" class="numericinput" default="0.5" style="persist:true;"></td>
+			</tr>			
+			
+			<tr>
+				<td>Rayon du Profil:</td>
+				<td><input id="profileRadius" class="numericinput" default="0.15" style="persist:true;"></td>
+			</tr>			
+		</table>			
+
+			<moi:CheckButton id="TwistedChain">Tordre la Chaîne</moi:CheckButton>
+			<moi:CheckButton id="Rigid"  default= true >Rigide</moi:CheckButton>		
+			<moi:PushButton id="Update">Mise à Jour</moi:PushButton>
+		</div>
+
+		<moi:CommandDoneCancel />
+	</body>
+</html>

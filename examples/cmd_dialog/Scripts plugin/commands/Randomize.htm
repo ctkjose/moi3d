@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<style>
+			fieldset {
+				margin-bottom:4px;
+			}
+
+			fieldset td {
+				padding-left:0.5em;
+				white-space:nowrap;
+			}
+
+			moi\:CheckButton {
+				display:-webkit-inline-box;
+			}
+		</style>
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Select objects to randomize</div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Randomize options</div>
+		</div>
+
+		<div id="options" class="hiddencommandoptions">
+			<fieldset>
+				<legend><moi:CheckButton id="enable_move" default="true" binding="move_options.style.opacity < return (this.value ? '' : '0.3');">Move</moi:CheckButton></legend>
+
+				<table id="move_options" cellspacing="0">
+					<tr><td>Max dist:</td><td><moi:NumericInput id="movedist" default="0"/></td></tr>
+					<tr><td colspan="2"><moi:CheckButton id="move_x" default="true">x</moi:CheckButton><moi:CheckButton id="move_y" default="true">y</moi:CheckButton><moi:CheckButton id="move_z" default="true">z</moi:CheckButton></td></tr>
+				</table>
+			</fieldset>
+
+			<fieldset>
+
+				<legend><moi:CheckButton id="enable_scale" default="true" binding="scale_options.style.opacity < return (this.value ? '' : '0.3');">Scale</moi:CheckButton></legend>
+
+				<table id="scale_options" cellspacing="0">
+					<tr><td>Min factor:</td><td><moi:NumericInput id="scalemin" default="1"/></td></tr>
+					<tr><td>Max factor:</td><td><moi:NumericInput id="scalemax" default="1"/></td></tr>
+					<tr><td colspan="2"><moi:CheckButton id="scale_x" default="true">x</moi:CheckButton><moi:CheckButton id="scale_y" default="true">y</moi:CheckButton><moi:CheckButton id="scale_z" default="true">z</moi:CheckButton></td></tr>
+				</table>
+			</fieldset>
+
+			<fieldset>
+				<legend><moi:CheckButton id="enable_rotate" default="true" binding="rotate_options.style.opacity < return (this.value ? '' : '0.3');">Rotate</moi:CheckButton></legend>
+
+				<table id="rotate_options" cellspacing="0">
+					<tr><td>Max angle:</td><td><moi:NumericInput id="rotateangle" default="0"/></td></tr>
+					<tr><td colspan="2"><moi:CheckButton id="rotate_x" default="true">x</moi:CheckButton><moi:CheckButton id="rotate_y" default="true">y</moi:CheckButton><moi:CheckButton id="rotate_z" default="true">z</moi:CheckButton></td></tr>
+				</table>
+			</fieldset>
+		</div>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

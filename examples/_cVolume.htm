@@ -1,0 +1,355 @@
+	<html>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+		//Dinos, Max Smirnov 2015
+		var lsVolume = lsMass = lsSurface = 0, scaleF, timer, origVolume, initOK = false, unitsLabel = moi.geometryDatabase.unitsShortLabel, com;
+
+		function factory( factoryname ) { var f = moi.command.createFactory( factoryname ); for ( var i = 1; i < arguments.length; i++ ) if (arguments[i] !==null) f.setInput( i - 1, arguments[i] ); var obj = f.calculate(); f.cancel(); return obj; }
+		
+		function getSelectedObjects(objectpicker)
+		{
+			var mode = 1;
+			var breps = objectpicker.objects.getBReps();
+			var faces = objectpicker.objects.getFaces();
+			var sfbreps = objectpicker.objects.getSingleFaceBReps();
+			for (var i=0; i<sfbreps.length; i++) faces.removeObject(sfbreps.item(i).getFaces().item(0));
+			if ( objectpicker.objects.getOpenBReps().length > 0 ) mode = 2;
+			if (faces.length>0) 
+			{
+				mode = 2;
+				var pbreps = [], pbrep;
+				for (var i=0; i<faces.length; i++) { pbrep=faces.item(i).getParentBRep(); pbreps[pbrep.id]=pbrep; }
+				for ( var i in pbreps ) breps.addObject(pbreps[i]);
+				faces = factory ('copy', faces, moi.VectorMath.createPoint(0,0,0), moi.VectorMath.createPoint(0,0,0), true); faces.setProperty('selected', 1);
+				moi.geometryDatabase.addObjects(faces);
+			}
+			return { breps:breps, faces:faces, mode:mode };
+		}
+		
+		function removeCopies(objects) { moi.geometryDatabase.removeObjects(objects); 
+		}
+		
+		function preinit()
+		{
+			volumeBox.value = "";
+			massBox.value = "";
+			surfaceBox.value = "";
+			if ( !Database.options[Database.options.length-1].selected) densityBox.value = Database.value;
+		}
+		
+		function postinit(objects, data)
+		{
+			var bbox = objects.breps.getBoundingBox();
+			if (objects.mode === 1) { com = comDraw(data.center, bbox.xLength, bbox.yLength, bbox.zLength);	updateCom(); }
+			if (objects.mode === 2) { data.center = bbox.center; data.volume = 1000; }
+			if (objects.mode === 3) { surfaceBoxSolo.disabled= 'disabled'; }
+			
+			if ( unitsLabel == 'mm' ) { data.volume /= 1000; data.surface /=100; unitsLabel = 'cm'; }
+			lsVolume = data.volume;
+			volumeBox.value = lsVolume;
+			volumeunits.innerHTML="<nobr>"+unitsLabel+"&sup3;</nobr>";
+			lsSurface = data.surface;
+			surfaceBox.value = lsSurface;
+			surfaceunits.innerHTML="<nobr>"+unitsLabel+"&sup2;</nobr>";
+			surfaceunitsSolo.innerHTML="<nobr>"+unitsLabel+"&sup2;</nobr>";
+			updateMass();
+			origVolume = lsVolume;
+
+			scaleF = moi.command.createFactory( 'scale' );
+			scaleF.setInput(0, objects.breps);
+			scaleF.setInput(1, data.center);
+			
+			initOK = true;
+		}
+		
+		function updateCom(flag)
+		{	
+			if ( flag == "done" ) { moi.geometryDatabase.removeObjects(com.lines); return;}
+			if ( flag == "cancel" || !comCheckbox.value )
+			{
+				moi.geometryDatabase.removeObjects(com.lines);
+				moi.geometryDatabase.removeObjects(com.point);
+			}
+			else
+			{
+				moi.geometryDatabase.addObjects(com.lines);
+				moi.geometryDatabase.addObjects(com.point);
+			}
+		}
+		
+		function comDraw(pt, xsize, ysize, zsize)
+		{
+			var lines =  moi.geometryDatabase.createObjectList();
+			var f = moi.command.createFactory( 'line' ), v;
+			f.setInput(0, moi.VectorMath.createPoint( pt.x-xsize, pt.y, pt.z )); f.setInput(1, moi.VectorMath.createPoint( pt.x+xsize, pt.y, pt.z )); v = f.calculate(); lines.addObject(v.item(0));
+			f.setInput(0, moi.VectorMath.createPoint( pt.x, pt.y-ysize, pt.z )); f.setInput(1, moi.VectorMath.createPoint( pt.x, pt.y+ysize, pt.z )); v = f.calculate(); lines.addObject(v.item(0));
+			f.setInput(0, moi.VectorMath.createPoint( pt.x, pt.y, pt.z-zsize )); f.setInput(1, moi.VectorMath.createPoint( pt.x, pt.y, pt.z+zsize )); v = f.calculate(); lines.addObject(v.item(0));
+			f.cancel();
+			lines.setProperty( 'displayMode',1);
+			var f = moi.command.createFactory( 'point' ); f.setInput(0, moi.VectorMath.createPoint( pt.x, pt.y, pt.z )); v = f.calculate(); f.cancel();
+			return { lines:lines, point:v };
+		}
+		
+		function triangleArea (v1, v2, v3)
+		{
+			var x = (v3.y-v1.y) * (v3.z-v2.z) - (v3.z-v1.z) * (v3.y-v2.y); 
+			var y = (v3.z-v1.z) * (v3.x-v2.x) - (v3.x-v1.x) * (v3.z-v2.z); 
+			var z = (v3.x-v1.x) * (v3.y-v2.y) - (v3.y-v1.y) * (v3.x-v2.x);
+			return Math.sqrt(x*x + y*y + z*z)/2;
+		}
+		
+		function triangleVolume (v1, v2, v3) { return (v1.x*v2.y*v3.z - v1.x*v3.y*v2.z - v2.x*v1.y*v3.z + v2.x*v3.y*v1.z + v3.x*v1.y*v2.z - v3.x*v2.y*v1.z) / 6; }
+
+		function processObjects ( objects, angle )
+		{
+			var	vertex = [], volume = 0, surface = 0, center = moi.VectorMath.createPoint(0,0,0),
+				filePath = moi.filesystem.getTempDir(),
+				options = 'NoUI=true;Angle='+angle+';Output=triangles;';
+				
+			if ( objects.length >0 )
+			{
+				moi.geometryDatabase.fileExport( filePath+'volume_tmp.obj', options );
+				var scaleFactor = moi.settings.objExportScaleFactor;
+				var file = moi.filesystem.openFileStream( filePath+'volume_tmp.obj', 'r' );
+				while ( !file.AtEOF ) 
+				{ 
+					var line = file.readLine().split(' ');
+					if ( line[0] === "v" )	vertex.push({x:line[1]/scaleFactor, y:line[2]/scaleFactor, z:line[3]/scaleFactor});
+					if ( line[0] === "f" )
+					{
+						v1 = line[1].split("/",1)-1;
+						v2 = line[2].split("/",1)-1;
+						v3 = line[3].split("/",1)-1;
+						var tVolume = triangleVolume (vertex[v1], vertex[v2], vertex[v3]);
+						volume += tVolume;
+						var tArea = triangleArea (vertex[v1], vertex[v2], vertex[v3]);
+						center.x += (vertex[v1].x + vertex[v2].x + vertex[v3].x) * tVolume;
+						center.y += (vertex[v1].y + vertex[v2].y + vertex[v3].y) * tVolume;
+						center.z += (vertex[v1].z + vertex[v2].z + vertex[v3].z) * tVolume;
+						surface += tArea;
+					}
+				}
+				if ( moi.settings.objExportOrientation == "Y-Up" ) { center = moi.VectorMath.createPoint(center.x/volume/4, -center.z/volume/4, center.y/volume/4); }
+					else { center = moi.VectorMath.createPoint(center.x/volume/4, center.y/volume/4, center.z/volume/4); }
+				file.close();
+				moi.filesystem.deleteFile( filePath+'volume_tmp.obj' );
+				moi.filesystem.deleteFile( filePath+'volume_tmp.mtl' );
+			}
+			return { volume:volume, surface:surface, center:center };
+		}
+		
+		function calcMass( volume, units, density )
+		{
+			var mass = density * volume, munit;
+			if ( units == 'mm' )	mass *= 0.000000001;
+			if ( units == 'cm' )	mass *= 0.000001;
+			if ( units == 'm' )	mass *= 1;
+			if ( units == 'km' )	mass *= 1000000000;
+			if ( units == 'in' )	mass *= 0.000016387064;
+			if ( units == 'ft' )	mass *= 0.028316846592;
+			if ( units == 'mi' )	mass *= 4168181825.4;
+			if ( mass < 1 ) { mass *= 1000; munit = "g"; } else { munit = "kg"; }
+			return {value:mass, units:munit}
+		}
+		
+		function updateMass ()
+		{
+			var mass = calcMass (lsVolume, unitsLabel, densityBox.value);
+			lsMass = mass.value;
+			massunits.innerHTML = mass.units;
+			massBox.value = lsMass;
+		}
+		
+		function scaleObjects( type )
+		{
+			var ratio;
+			if (volumeBox.value <=0) { volumeBox.value = lsVolume; return; }
+			if (massBox.value <=0) { massBox.value = lsMass; return; }
+			if (surfaceBox.value <=0) { surfaceBox.value = lsSurface; return; }
+			if ( type == 'volume' ) { lsSurface = lsSurface * Math.pow (volumeBox.value / lsVolume, 2/3); surfaceBox.value = lsSurface; lsVolume = volumeBox.value; } 
+			else if ( type == 'mass' ) { lsVolume = lsVolume * massBox.value / lsMass; volumeBox.value = lsVolume; lsSurface = lsSurface * Math.pow (massBox.value / lsMass, 2/3); surfaceBox.value = lsSurface; lsMass = massBox.value; }
+			else if ( type == 'surface' ) { lsVolume = lsVolume * Math.pow(surfaceBox.value / lsSurface, 3/2); lsSurface = surfaceBox.value; volumeBox.value = lsVolume; }
+			ratio = lsVolume / origVolume;
+			updateMass();
+			scaleF.setInput(2, Math.pow(ratio, 1/3));
+			scaleF.update();
+		}
+		
+		function resetVolume ()
+		{
+			if ( !initOK ) return;
+			volumeBox.value = origVolume;
+			if (lsVolume !== origVolume)	scaleObjects('volume');
+		}
+		
+		function copyToClipboard (clp)
+		{
+			moi.copyTextToClipboard(clp);
+			moi.ui.commandUI.progressinfo.innerHTML="Copied to clipboard ..";
+			timer = setInterval(clearInfo,1000); 
+		}
+		
+		function clearInfo ()
+		{ 
+			clearInterval(timer); 
+			moi.ui.commandUI.progressinfo.innerHTML="&nbsp;";
+		}
+		
+		</script>
+	</head>
+	<body class="commandbody" >
+		<div id="TitleContainer" style="width:100%; text-align:center;" ondblclick="resetVolume()" > 
+			<strong>Volume/Mass Calc.</strong>
+		</div>
+		<div id="InputSurface" class="hiddencommandoptions">
+		<table style="width:100%; padding-top:0.2em;">
+			<tr>
+				<td style="width:10%;" onclick="copyToClipboard(lsSurface);" >Surface</td>
+				<td style="width:50%;"><moi:NumericInput style="width:7em;" id="surfaceBoxSolo" binding="surfaceBox.value = this.value"/></td>
+				<td style="width:2em;"><div id="surfaceunitsSolo" >-</div></td>
+			</tr>
+		</table>
+		</div>
+		<div id="InputAll" class="hiddencommandoptions">
+		<table style="width:100%; padding-top:0.2em;">
+			<tr>
+				<td style="width:10%;" onclick="copyToClipboard(lsVolume);" >Volume</td>
+				<td style="width:50%;"><moi:NumericInput style="width:7em;" id="volumeBox" /></td>
+				<td style="width:2em; "><div id="volumeunits">-</div></td>
+			</tr>
+			<tr>
+				<td style="width:10%;" onclick="copyToClipboard(lsSurface);" >Surface</td>
+				<td style="width:50%;"><moi:NumericInput style="width:7em;" id="surfaceBox" /></td>
+				<td style="width:2em; "><div id="surfaceunits">-</div></td>
+			</tr>
+			<tr>
+				<td style="width:10%;" onclick="copyToClipboard(lsMass);">Mass</td>
+				<td style="width:50%;"><moi:NumericInput style="width:7em;" id="massBox" /></td>
+				<td style="width:2em;"><div id="massunits">-</div></td>
+			</tr>
+			<tr>
+				<td style="width:10%;">Density</td>
+				<td style="width:50%;"><moi:NumericInput style="width:7em;" id="densityBox" /></td>
+				<td style="width:2em;"><nobr>kg/m&sup3;</nobr></td>
+			</tr>
+			<tr>
+				<td  colspan="3">
+					<select id="Database" onchange="if ( Database.value != '' ) { densityBox.value = Database.value; updateMass(); } " style="width:100%" >
+					<optgroup label="Metals" value="">
+						<option value="2768">Aluminum</option>
+						<option value="1868">Beryllium</option>
+						<option value="8500">Brass</option>
+						<option value="6975">Cast Iron</option>
+						<option value="7197">Chromium</option>
+						<option value="8940">Copper</option>
+						<option value="18878">Gold</option>
+						<option value="11349">Lead</option>
+						<option value="1743">Magnesium</option>
+						<option value="10214">Molybdenum</option>
+						<option value="8553">Nickel</option>
+						<option value="8858">Phosphor Bronze</option>
+						<option value="21452">Platinum</option>
+						<option value="10491">Silver</option>
+						<option selected value="7861">Stainless Steel</option>
+						<option value="7308">Tin</option>
+						<option value="4512">Titanium</option>
+						<option value="19293">Tungsten</option>
+						<option value="7141">Zinc</option>
+					</optgroup>
+					<optgroup label="Plastics" value="">
+						<option value="1052">ABS</option>
+						<option value="1356">Acetal (Delrin)</option>
+						<option value="1163">Acrylic</option>
+						<option value="1384">Neoprene</option>
+						<option value="1100">Polyamide (Nylon)</option>
+						<option value="1190">Polycarbonate</option>
+						<option value="913">Low-Density Polyethylene</option>
+						<option value="941">High-Density Polyethylene</option>
+						<option value="913">Polypropylene</option>
+						<option value="1467">PVC</option>
+						<option value="2159">Teflon</option>
+					</optgroup>
+					<optgroup label="Woods" value="">
+						<option value="660">Acacia Blackwood</option>
+						<option value="660">Ash, White</option>
+						<option value="160">Balsa</option>
+						<option value="420">Basswood</option>
+						<option value="720">Beech, European</option>
+						<option value="700">Birch</option>
+						<option value="960">Bloodwood</option>
+						<option value="800">Bocote</option>
+						<option value="1280">Brazilwood</option>
+						<option value="880">Bubinga</option>
+						<option value="450">Butternut</option>
+						<option value="370">Cedar, Western Red</option>
+						<option value="640">Chakte Kok</option>
+						<option value="850">Chechen</option>
+						<option value="580">Cherry, Black</option>
+						<option value="1040">Cocobolo</option>
+						<option value="520">Douglas Fir</option>
+						<option value="1002">Ebony, African</option>
+						<option value="1193">Ebony, Gaboon</option>
+						<option value="1090">Ebony, Macassar</option>
+						<option value="560">Elm, American</option>
+						<option value="940">Goncalo Alves</option>
+						<option value="820">Hickory</option>
+						<option value="800">Holly</option>
+						<option value="800">Jarrah</option>
+						<option value="900">Jatoba</option>
+						<option value="700">Kiaat</option>
+						<option value="1200">Kingwood</option>
+						<option value="660">Koa</option>
+						<option value="963">Kwila</option>
+						<option value="820">Lemonwood</option>
+						<option value="1310">Lignum Vitae (Ironwood)</option>
+						<option value="640">Mahogany, Honduran</option>
+						<option value="382">Mahogany, Philippine</option>
+						<option value="620">Makore</option>
+						<option value="570">Mango</option>
+						<option value="720">Maple, Hard</option>
+						<option value="620">Maple, Soft</option>
+						<option value="770">Oak, Red</option>
+						<option value="770">Oak, White</option>
+						<option value="720">Padauk</option>
+						<option value="930">Panga Panga</option>
+						<option value="990">Pink Ivory</option>
+						<option value="450">Poplar</option>
+						<option value="930">Purpleheart</option>
+						<option value="420">Redwood</option>
+						<option value="850">Rosewood, Brazilian</option>
+						<option value="830">Rosewood, East Indian</option>
+						<option value="940">Rosewood, Honduran</option>
+						<option value="620">Sapele</option>
+						<option value="748">Shedua</option>
+						<option value="1295">Snakewood</option>
+						<option value="420">Spruce, Sitka</option>
+						<option value="640">Teak</option>
+						<option value="960">Tulipwood</option>
+						<option value="1218">Verawood</option>
+						<option value="640">Walnut, Black</option>
+						<option value="880">Wenge</option>
+						<option value="860">Yellowheart</option>
+						<option value="740">Zebrawood</option>
+						<option value="880">Ziricote</option>
+					</optgroup>
+					<optgroup label="Other" value="">
+						<option value="2600">Glass</option>
+						<option value="3500">Diamond</option>
+						<option value="1743">Carbon Fiber</option>
+						<option value="1000">Water</option>
+						<option value="">Manual</option>
+					</optgroup>
+
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan = "3"><moi:CheckButton id="comCheckbox" default="false" >Show center of mass</moi:CheckButton></td>
+			</tr>
+		</table>
+		</div>
+		<div id="progressinfo" class="commandoptions" style="text-align:center; font-size:100%;">&nbsp;</div>
+		<moi:CommandDoneCancel />
+	</body>
+</html>

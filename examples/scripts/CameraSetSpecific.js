@@ -1,0 +1,1 @@
+script:var v = moi.ui.mainWindow.viewpanel.getViewport('3D'); v.cameraPt = moi.vectorMath.createPoint(50.2, 30.5, 10.1);

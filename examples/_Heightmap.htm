@@ -1,0 +1,133 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<script>
+			var g_imageData, g_objects, g_heightMap=[], g_points=[], g_width, g_height, g_cx=0, g_cy=0, g_scale, g_cf, g_flip = false;
+			var pointV, pointF = moi.command.createFactory( 'point' ), curveFX = moi.command.createFactory( 'curve' ), curveFY = moi.command.createFactory( 'curve' );
+			
+		function init()
+			{
+				var dX = Math.ceil(g_width/600);	if (dX < 1) dX = 1;
+				var dY = Math.ceil(g_height/600);	if (dY < 1) dY = 1;
+				var zmin=255;
+				
+				var len = g_imageData.length/4;
+				for ( var i=0; i<len; i++ )
+				{
+					g_heightMap[i]=(g_imageData[i*4]+g_imageData[i*4+1]+g_imageData[i*4+2])/3;
+					if (g_heightMap[i]<zmin) zmin = g_heightMap[i];
+				}
+				
+				for ( var x = 0; x<g_width; x+=dX )
+				{
+					g_points[g_cx]=[];
+					g_cy = 0;
+					for ( var y = 0; y<g_height; y+=dY )
+					{
+						g_points[g_cx][g_cy] = moi.VectorMath.createPoint(x-g_width/2, g_height/2-y-1, g_heightMap[y*g_width+x]-zmin);
+						g_cy++;
+					}
+					g_cx++;
+				}
+				for ( var x = 0; x<g_cx; x++ ) { curveFX.createInput('point'); }
+				for ( var y = 0; y<g_cy; y++ ) { curveFY.createInput('point'); }
+				
+				g_mirror = moi.command.createFactory( 'mirror' );
+				g_mirror.setInput(1, moi.VectorMath.createFrontFrame());
+				g_mirror.setInput(2, moi.VectorMath.createPoint(1,0,0));
+				g_mirror.setInput(3, false);
+				
+				g_scale = moi.command.createFactory( 'scale1d' );
+				g_scale.setInput( 1, moi.VectorMath.createPoint(0,0,0) );
+				g_scale.setInput( 3, moi.VectorMath.createPoint(0,0,256) );
+				g_cf = (g_height+g_width)/2/100;
+				buildBaseObjects();
+				
+				info.innerHTML = Math.floor(g_width/dX)+" x "+Math.floor(g_height/dY);
+				if (dX > 1 || dY> 1) info.innerHTML += " (orig: "+g_width+" x "+g_height+")";
+				//setInterval(updategeometry, 20); /* update time (20 ms) */
+				updategeometry();
+				return true;
+			}
+			
+			function buildBaseObjects()
+			{
+				g_objects = moi.geometryDatabase.createObjectList();
+				if ( type.value == 1 )
+					for ( var y = 0; y<g_cy; y++ )
+					{
+						for ( var x = 0; x<g_cx; x++ )
+						{
+							pointF.setInput( 0, g_points[x][y]);
+							pointV = pointF.calculate();
+							g_objects.addObject(pointV.item(0));
+						}
+					}
+					
+				if ( type.value == 2 || type.value == 4 )
+					for ( var y = 0; y<g_cy; y++ )
+					{
+						for ( var x = 0; x<g_cx; x++ ) curveFX.setInput( x, g_points[x][y]);
+						pointV = curveFX.calculate();
+						g_objects.addObject(pointV.item(0));
+					}
+					
+				if ( type.value > 2 )
+					for ( var x = 0; x<g_cx; x++ )
+					{
+						for ( var y = 0; y<g_cy; y++ ) curveFY.setInput( y, g_points[x][y]);
+						pointV = curveFY.calculate();
+						g_objects.addObject(pointV.item(0));
+					}
+				g_scale.setInput( 0, g_objects );
+				if ( g_flip ) flipObject();
+			}
+			
+			function flipObject()
+			{
+				g_mirror.setInput(0, g_objects);
+				g_objects = g_mirror.calculate();
+				g_scale.setInput( 0, g_objects );
+				updategeometry();
+			}
+			
+			function updategeometry()
+			{
+				g_scale.setInput( 4, moi.VectorMath.createPoint(0,0,parameter.value*g_cf));
+				g_scale.update();
+			}
+			
+			function done() { if (g_scale) g_scale.commit(); }
+			function cancel() { if (g_scale) g_scale.cancel(); }
+			
+		</script>
+	</head>
+	
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;">
+			<strong>Heightmap</strong>
+		</div>
+		<div id="Options" class="hiddencommandprompt">
+			<table style="width:100%">
+				<col width="5"><col>
+				<tr><td style="width:20%">Type</td><td><select id="type" style="width:100%" >
+					<option value="2">Curves (X)</option>
+					<option value="3">Curves (Y)</option>
+					<option value="4">Curves (X+Y)</option>
+					<option value="1">Points</option>
+				</select></td></tr>
+			</table>
+			<table style="width:100%; text-align:center;">
+				<col width="5"><col><col width="5">
+				<tr>
+					<td>Scale</td>
+					<td><moi:Slider id="parameterSlider" onmousemovevaluechange="updategeometry()" min="0" mid="25" max="100" style="width:90%"   /></td>
+					<td><moi:NumericInput id="parameter" onchange="updategeometry()" style="width:3em;" default="25" binding="parameterSlider.value = this.value"/></td>
+				</tr>
+			</table>
+		</div>
+		<img id="map" style="width:100%" src="" onload="moi.ui.fireUIEvent('load');" onclick="g_flip=!g_flip; flipObject()" >
+		<div id="info" class="commandoptions" style="text-align:center; font-size:75%;">--</div>
+		<div id="DoneCancelContainer" class="commandprompt"><moi:CommandDoneCancel /></div>
+	</body>
+</html>

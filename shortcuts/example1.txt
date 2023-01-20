@@ -1,0 +1,109 @@
+[Shortcut Keys]
+\'=AddPoint
+,=Offset
+-=Rectangle
+.=shell
+/=inset
+0=circle
+1=moi.ui.mainWindow.viewpanel.mode = 'top'
+2=moi.ui.mainWindow.viewpanel.mode = '3d'
+3=moi.ui.mainWindow.viewpanel.mode = 'front'
+4=moi.ui.mainWindow.viewpanel.mode = 'right'
+5=Line
+6=Polyline
+7=Curve
+8=rectangle
+9=RectCenter
+\;=ShowPoints
+\==RectCenter
+\\=spherer4
+`=script: /*Hide selected ---`*/ moi.geometryDatabase.getSelectedObjects().setProperty( 'hidden', true );
+A=mirror
+Alt+`=script: /*! Assign Hidden style and hide --- Alt+`*/ var st = moi.geometryDatabase.findstyle('Hidden',1).index; var obj = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < obj.length; ++i) { obj.item(i).styleIndex = st;}; moi.geometryDatabase.getSelectedObjects().setProperty( 'hidden', true )
+Alt+A=ArrayGem
+Alt+B=script: /*! Extend selection to the same object name --- Alt+B*/ var names = new Array(); var objs = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); if ( obj.name != '' ) names[obj.name] = true; } objs = moi.geometryDatabase.getObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); if ( obj.name != '' && names[obj.name] ) obj.selected = true; }
+Alt+C=intersect
+Alt+F=chamfer
+Alt+F2=script: /* Toggle background image transparency between 85 and 100 */ moi.view.backgroundImageTransparency = (moi.view.backgroundImageTransparency == 85? 100 : 85);
+Alt+F5=export C:\Users\samardac\AppData\Roaming\DigitalFossils\NVil\Media\Clipboard\ClipboardObj.obj
+Alt+G=scale 2d
+Alt+H=script: /*! Show edges on selected objects, hide edges on all others --- Alt+H*/ var breps = moi.geometryDatabase.getObjects().getBreps(); for ( var i = 0; i < breps.length; ++i ) { var brep = breps.item(i); brep.getEdges().setProperty( 'hidden', !brep.selected ); }
+Alt+M=merge
+Alt+O=loft
+Alt+Q=script:moi.view.resetCPlane();
+Alt+R=RotateAxis
+Alt+S=script: /*! Save screenshot --- Alt+S*/ var img = moi.view.screenshot( 'viewpanel', false ); var name = img.getSaveFileName(); if ( name != '' ) img.save( name );
+Alt+T=script: /*! Open Add new style dialog --- Alt+T*/ var gd = moi.geometryDatabase; gd.styleEditorOpened(); var dialog = moi.ui.createDialog( 'EditStyleDialog.htm?titleid=Add style dialog title&index=-1', '', moi.ui.mainWindow ); if ( dialog.window.doModal() != -1 ) { var styles = gd.getObjectStyles(); if ( styles.length> 0 ) moi.ui.propertiesPanel.editStyleIndex( styles.length - 1 ); } gd.styleEditorClosed();
+Alt+V=script: /*! Change light position --- Alt+V*/ var dir = moi.view.lightDirection; if ( dir.x == 1 && dir.y == 1 && dir.z == -1 ) { dir.set(-0.5,1,0); } else { dir.set(1,1,-1); } moi.view.lightDirection = dir;
+Alt+W=script: /* Show curves with same style as any current selected object */ var styles = new Array(); var objs = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); styles[obj.styleIndex] = true; } objs = moi.geometryDatabase.getObjects().getCurves(); for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); if ( styles[obj.styleIndex] ) obj.hidden = false; }
+B=script: /*! Assign unique object name to selection and hide --- B*/ var all_objects = moi.geometryDatabase.getObjects(); var used_names = new Array(); for ( var i = 0; i < all_objects.length; ++i ) { var obj = all_objects.item(i); if ( obj.name != '' ) { used_names[obj.name] = true; } } var counter = 1; var name; while ( 1 ) { var numtag = counter.toString(); while ( numtag.length < 4 ) { numtag = '0' + numtag; } name = 'object_' + numtag; if ( used_names[name] ) { ++counter; continue; } used_names[name] = true; break; } moi.geometryDatabase.getSelectedObjects().setProperty( 'name', name ); var st = moi.geometryDatabase.findstyle('Hidden',1).index; var obj = moi.geometryDatabase.getSelectedObjects(); for ( var i = 0; i < obj.length; ++i) { obj.item(i).styleIndex = st;}; moi.geometryDatabase.getSelectedObjects().setProperty( 'hidden', true )
+Backspace=cylinder
+C=chamfer
+Ctrl+1=ArrayCircular
+Ctrl+2=ArrayDir
+Ctrl+3=ArrayCurve
+Ctrl+`=script: /*! Show all except curves, points and Hidden style --- Ctrl+`*/ var obj = moi.geometryDatabase.getObjects().getBReps(), st = moi.geometryDatabase.findstyle('Hidden',0), sti; if (st) {sti = st.index;} else { sti = 'nf';} for ( var o = 0; o < obj.length; ++o ) { if ( obj.item(o).hidden && obj.item(o).styleIndex !== sti) { obj.item(o).hidden = false; obj.item(o).selected = false; }};
+Ctrl+A=script /* select all*/:moi.geometryDatabase.selectAll();
+Ctrl+B=script: /*! Assign unique object name to selection --- Ctrl+B*/ var all_objects = moi.geometryDatabase.getObjects(); var used_names = new Array(); for ( var i = 0; i < all_objects.length; ++i ) { var obj = all_objects.item(i); if ( obj.name != '' ) { used_names[obj.name] = true; } } var counter = 1; var name; while ( 1 ) { var numtag = counter.toString(); while ( numtag.length < 4 ) { numtag = '0' + numtag; } name = 'object_' + numtag; if ( used_names[name] ) { ++counter; continue; } used_names[name] = true; break; } moi.geometryDatabase.getSelectedObjects().setProperty( 'name', name );
+Ctrl+C=CopyClipboard
+Ctrl+D=ShrinkTrimmedSrf /*! Shrink trimmed surface --- Ctrl+D*/
+Ctrl+E=script:var a = moi.command.lastCommandRevisionStart; var b = moi.command.lastCommandRevisionEnd; var objects = moi.geometryDatabase.getObjects(); for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( obj.databaseRevision> a && obj.databaseRevision <= b ) obj.selected = true; }
+Ctrl+F=flip /*! Flip normal of surface --- Ctrl+F*/
+Ctrl+F3=script:moi.ui.createDialog( 'Plugins.htm', 'resizeable,defaultWidth:43em,defaultHeight:32em' )
+Ctrl+M=script: /*! Show naked edges --- Ctrl+M*/ var gd = moi.geometryDatabase; gd.deselectAll(); var breps = gd.getObjects().getBreps(); for ( var i = 0; i < breps.length; ++i ) breps.item(i).getNakedEdges().setProperty( 'selected', true );
+Ctrl+N=New
+Ctrl+O=Open
+Ctrl+P=pipe2 /*! Pipe --- Ctrl+P*/
+Ctrl+Q=SelectOuterLoopsAndDelete /*! SeparateSelectOuterLoopsDeleteTrim - Ctrl+Q*/
+Ctrl+R=Rebuild /*! Rebuild curves --- Ctrl+R*/
+Ctrl+S=Save
+Ctrl+Shift+C=CopyClipboardWithOrigin
+Ctrl+Shift+V=PastePart
+Ctrl+Shift+Z=script: moi.command.redo();
+Ctrl+Space=script: /*! Show subset of hidden objects --- Ctrl+Space*/ moi.geometryDatabase.showSubset();
+Ctrl+V=Paste
+Ctrl+W=script: /*! Select all curves --- Ctrl+W*/ moi.geometryDatabase.getObjects().getCurves().setProperty( 'selected', true );
+Ctrl+X=Cut
+Ctrl+Y=script:moi.command.redo();
+Ctrl+Z=script:moi.command.undo();
+D=BooleanDifference
+Delete=Delete
+E=extrude
+F=fillet
+F1=flow
+F10=PlanarSrf
+F11=script: /*! Toggle 3D view between parallel and perspective --- F11 */ var vp = moi.ui.mainWindow.viewpanel.getViewport('3D'); vp.projection = (vp.projection == 'Perspective' ? 'Parallel' : 'Perspective');
+F12=script: /*! Set Cplane from view --- F12*/ moi.view.setCPlane( moi.ui.mainWindow.viewpanel.getViewport('3D').targetFrame );
+F2=script: /*! Stright snap on/off --- F2*/ moi.drawingAids.straightSnap = !moi.drawingAids.straightSnap;
+F3=script: /*! Object snap on/off ---F3*/ moi.drawingAids.objectSnap = !moi.drawingAids.objectSnap;
+F4=image /*! Image ---F4*/
+F5=paste
+F6=blend
+F7=Revolve
+F8=RailRevolve
+F9=align
+G=Scale1D
+H=script: /*! Show/Hide edges --- H*/ var breps = moi.geometryDatabase.getObjects().getBReps(); var hide = true; for ( var i = 0; i < breps.length; ++i ) { var edges = breps.item(i).getEdges(); if ( i == 0 ) hide = !edges.item(0).hidden; edges.setProperty( 'hidden', hide ); }
+I=script: /*! Expand selection over same styles --- I*/ var objects = moi.geometryDatabase.getObjects();var styles = new Array();for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( obj.selected ) styles[obj.styleIndex] = true; } for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( styles[obj.styleIndex] ) obj.selected = true; }
+J=join
+K=separate
+L=script:/*! Select edge loop --- L*/ var gd = moi.geometryDatabase; function sl(o) { for ( var i = 0; i < o.length; ++i ) { o.Item(i).selected = 0; var e=o.Item(i).getEdges(); for ( var j = 0; j < e.length; ++j ) e.Item(j).selected = !e.Item(j).selected;}} gd.selectLoop(); var so = gd.getSelectedObjects(); var e = so.getEdges(); sl(so.getFaces()); sl(so.getSolids()); so.getBReps().setProperty('selected',0); e.setProperty('selected',1);
+M=BooleanMerge
+N=Copy
+O=script: /*! Expand selection over same styles and loft --- O*/ var objects = moi.geometryDatabase.getObjects().getCurves(), points = moi.geometryDatabase.getObjects().getPoints(), styles = new Array(); for (var i = 0; i < points.length; i++) { objects.addObject(points.item(i))} for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( obj.selected ) styles[obj.styleIndex] = true; } for ( var i = 0; i < objects.length; ++i ) { var obj = objects.item(i); if ( styles[obj.styleIndex] ) obj.selected = true; }; moi.command.execCommand( 'loft' );
+P=project
+Q=script: /* Set Cplane*/ moi.view.setCPlaneInteractive();
+R=Rotate
+S=sweep
+Shift+1=script:moi.ui.createDialog( 'moi://ui/ScriptPalette.htm' );
+Shift+2=script: /* Opens Lighting Options Dialog */ moi.ui.createDialog( 'moi://ui/LightingOptions.htm' );
+Shift+C=Silhouette
+Shift+Space=script: /*! Invert view --- Shift+Space*/ moi.ui.mainWindow.viewpanel.reverseView( moi.ui.getActiveViewport().name );
+Space=;script: /*! Reset view ---Z */ moi.view.resetAll();
+T=script: /*! Asign style --- T*/ moi.ui.propertiesPanel.editStyleIndex( moi.geometryDatabase.addStyle().index );
+U=BooleanUnion
+V=Move
+W=script: /*! Hide unlocked curves and points --- W*/ function hide( objs ) { for ( var i = 0; i < objs.length; ++i ) { var obj = objs.item(i); if ( !obj.locked ) { obj.hidden = true; } } } hide( moi.geometryDatabase.getObjects().getCurves() ); hide( moi.geometryDatabase.getObjects().getPoints() );
+X=script: /*Show/Hide hidden linesf --- X */ moi.view.showHiddenLines =! moi.view.showHiddenLines;
+Y=trim
+Z=script: /* Solo */ var mgd=moi.geometryDatabase; if (mgd.getSelectedObjects().length> 0) { mgd.invertSelection(); var obj=mgd.getSelectedObjects(); for (var o=0; o<obj.length; ++o) { obj.item(o).hidden=true; obj.item(o).selected=false; }}

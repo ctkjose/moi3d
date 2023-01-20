@@ -1,0 +1,32 @@
+<html>
+	<body class="MenuBody" onmouseout="if ( LightingOptions && nselect ) selectLight( selected );">
+		<moi:FlyoutHeader/>
+		<script>
+				function selectLight(themeName)
+				{	
+					for ( var s in settings ) { moi.view[settings[s]] = themeData.themes[themeName][settings[s]];}
+					themeData.selected = themeName;
+					moi.command.setOption('LightingOptions', JSON.stringify(themeData), true);
+				}
+				var LightingOptions = false, selected, nselect = true;
+				var settings  = ["lightingStyle", "specularHighlights", "specularBrightness", "specularFocusSize", "metallicLighting", "fixedLightPositions", "customKeyLightLevel", "customFillLightLevel"];
+				try  { LightingOptions = moi.command.getOption('LightingOptions', true); } catch (e) {};
+				if (LightingOptions) 
+				{
+					var themeData = JSON.parse(LightingOptions), iw;
+					selected = themeData.selected;
+					for (var i in themeData.themes) 
+					{ 
+						if ( i === themeData.selected ) { iw = '<font color="#07B"><b>'+ i +'</b></font>' } else { iw = i }
+						document.write ('<moi:MenuItem command="" onclick="nselect=false;"onmouseover="selectLight(\'' + i + '\')">'+ iw +'</moi:MenuItem>'); 
+					}
+				}
+				else
+				{
+					document.write ('<moi:MenuItem command="">Lighting Options add-on not found!</moi:MenuItem>');
+				}
+		</script>
+	</body>
+</html>
+
+

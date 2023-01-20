@@ -1,0 +1,358 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		
+		<script>
+	
+/*	Clothoid2pt is an unofficial Moment of Inspiration script which draws 
+a Clothoid curve segment between a pair of points, based upon a tangent
+angle at each point.  By Brian McMillin April 16 - May 8, 2013.  This script is based upon 
+"Fast and accurate clothoid fitting," by Enrico Bertolazzi and Marco Frego:
+http://arxiv.org/pdf/1209.0910.pdf
+The paper did not show the equation for gprime, so the script work was set aside.
+
+Much study and script drafting for the related paper, "G1 interpolation with a single Cornu spiral segment"
+by D.J. Walton, D.S. Meek, was then done.  Their paper provided the needed information to figure out
+the derivative gprime of A, which is found by using the (poorly understood) Leibniz Rule for differentiation of a definite integral.
+
+It turns out that the negative of the function f(L,A), in the prior paper, was equal to the gprime equation.
+At that point, work resumed on the Bertolazzi, Frego script, which quickly
+produced curves oriented to the tangent angles. 
+
+The paper uses the Venkata Sivakanth Telasula function for fresnel integrals:
+http://www.mathworks.com/matlabcentral/fileexchange/9017-fresnel-cosine-and-sine-integral-function/content/fresnelCS.m 
+(Did not understand, nor translate nor incorporate this function.)
+The adaptive Simpsons method of integration is not used in the paper.
+
+The paper also uses some "cheaper methods" based upon (poorly understood) "recurrence" mathematics". 
+Did not finish incorporating all of the many subroutines of the paper. 
+The unused subroutines are included below.  The are (mostly) corrected 
+for syntax errors, and may be incomplete due to difficulty translating them.
+*/
+
+function alert( msg )
+{
+	moi.ui.commandUI.alert( msg );
+}
+
+/*
+Function findA() uses the Newton-Raphson method, with g(A), where A = Aguess.
+The derivative of g, gprime is also needed.
+g(A) = Integral of (sin(A*t*t + (deltatheta-A)*t + deltaphi ) dt.
+gprime = minus Integral of (cos(A*t*t + (deltatheta-A)*t + deltaphi + pi/2 ) dt.
+
+The function "adaptiveSimpsons" is used to calculate the value of g(A) [eqn(8), page 4 of the paper],
+where A is Aguess, using the Adaptive Simpson's method for integration.
+This enables the actual value of "A" to be found.
+adaptiveSimpsons is also used to calculate the value of h(A), [eqn(9)], which is done by adding PI/2 to deltaphi.
+By Lemma 3.3, on page5 of the paper, h(A) is used to calculate L, K, and KPrime.
+It is only necessary to integrate the Clothoid curve equation from t_length = zero to t_length = one, because the clothoid is scalable.
+r = moi.vectorMath.distance( BasePt, OtherPt );
+L = r / h(A); L is the curve Length of the Clothoid between BasePt and OtherPt .
+K = Kappa = (delatheta - A)/L;
+K is the beginning curvature.
+KPrime is calculated from the formula A = 0.5 * KPrime*L*L.
+KPrime = KappaPrime = (2*A)/(L*L).
+KPrime is the initial rate of change in curvature.
+
+Adaptive Simpson's method of Integration is translated from wikipedia: http://en.wikipedia.org/wiki/Adaptive_Simpson's_method
+*/
+
+function LengthSq( vec )
+{
+	return (vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z);
+}
+
+function Length( vec )
+{
+	return Math.sqrt( LengthSq(vec) );
+}
+
+function Normalize( vec )
+{
+	vec.scale( 1.0 / Length(vec) );
+}
+
+function DotProduct( vecA, vecB )
+{
+	return (vecA.x * vecB.x) + (vecA.y * vecB.y) + (vecA.z * vecB.z);
+}
+
+function Clamp( val, low, high )
+{
+	if ( val < low )
+		return low;
+		
+	if ( val > high )
+		return high;
+		
+	return val;
+}
+
+function AngleBetween( vecA, vecB )
+{
+	Normalize( vecA );
+	Normalize( vecB );
+	
+	var costheta = DotProduct( vecA, vecB );
+	costheta = Clamp( costheta, -1.0, 1.0 );
+	
+	return Math.acos( costheta );
+}
+
+function AngleBetweenDegrees( vecA, vecB )
+{
+	return AngleBetween( vecA, vecB ) * 180.0 / Math.PI;
+}
+
+function sgn(x)
+{
+  if(x>0)return 1;
+  else if(x<0)return -1;
+  else return 0;
+}
+
+function normalizeAngle(phi)
+{
+	while (phi > Math.PI)
+	{
+		phi -= 2.0 * Math.PI;
+	}
+	while (phi < ((-1) * Math.PI))
+	{
+	phi += 2.0 * Math.PI;
+	}
+	return phi;
+
+}
+
+// Integration by adaptive Simpsons method.  The Auxillary portion is split
+// off, in order to avoid recalculation, to improve efficiency.
+// The Sine version is g(A) = CapTheta( A,(deltatheta-A), deltaphi ).
+// also g(A) = Y0( 2A, (deltatheta-A), deltaphi ).
+//  Integrate:   sin(A*t*t + (deltatheta-A)*t + deltaphi ),
+// for the interval a=0 to b=1.
+
+function adaptiveSimpsonsAux( A, dtA, deltaphi, a, b, eps, S1, fa, fb, fc, bottom)
+{
+    var h = b - a;
+    var c = (a + b) / 2.0;
+    var d = (a + c) / 2.0;
+    var e = (c + b) / 2.0;	
+    var fd = Math.sin( A*Math.pow(d,2) + dtA*d + deltaphi );
+	var	fe = Math.sin( A*Math.pow(e,2) + dtA*e + deltaphi );
+	var Sleft  = h/12 * (fa + 4*fd + fc);
+	var Sright = h/12 * (fc + 4*fe + fb);
+	var S2 = Sleft + Sright;
+    if (bottom <= 0 || Math.abs(S2 - S1) <= eps)
+        return S2 + (S2 - S1) / 15;
+    return adaptiveSimpsonsAux( A, dtA, deltaphi, a, c, eps/2, Sleft, fa, fc, fd, bottom-1)
+	+ adaptiveSimpsonsAux( A, dtA, deltaphi, c, b, eps/2, Sright, fc, fb, fe, bottom-1);
+}
+	
+function adaptiveSimpsons(A, deltatheta , deltaphi, a, b, maxR )
+{
+//	Integrate:   sin(A*t*t + dtA*t + deltaphi ),
+//	for t in the interval a=0 to b=1, using adaptive Simpson's method.
+//	var numintervals = moi.ui.commandUI.numintervals.integerValue;
+
+	var dtA = deltatheta-A;
+	var eps = 0.000001;
+    var h = b - a;
+    var c = (a + b) / 2.0;
+	var fa = Math.sin( A*Math.pow(a,2) + dtA*a + deltaphi );
+	var fb = Math.sin( A*Math.pow(b,2) + dtA*b + deltaphi );
+	var fc = Math.sin( A*Math.pow(c,2) + dtA*c + deltaphi );
+	var S1 = h/6 * (fa + 4*fc + fb);
+    return adaptiveSimpsonsAux( A, dtA, deltaphi, a, b, eps, S1, fa, fb, fc, maxR);
+}
+
+// maxrecursion may be needed to prevent "maximum call stack size exhaustion." 
+
+function findA(Aguess, deltatheta, deltaphi ) 
+{
+	var tol = .0000000001;
+	var maxR = 50; //maxrecursion
+	var a = 0.0;
+	var b = 1.0;
+	var A = Aguess;
+	//Initialize gA bigger than tolerance.
+	var gA = 1.0;
+//	var iter = 0;
+//	var maxit = 100;
+//	while (Math.abs(gA) > tol && iter < maxit )
+	while (Math.abs(gA) > tol)	
+	{
+	var gA = adaptiveSimpsons(A, deltatheta , deltaphi, a, b, maxR );
+	var deltaphiPlusHalfPI = deltaphi + Math.PI/2;
+	var gprime = -1*adaptiveSimpsons(A, deltatheta , deltaphiPlusHalfPI, a, b, maxR );
+		A -= gA / gprime;
+//		iter += 1;
+	}
+	return A;
+}
+
+
+function buildClothoid(BasePt, theta0, OtherPt, theta1, numintervals, cplane)
+{
+//Convert to cplane frame.  (With M.G. help)
+	var base_x = cplane.distancex( BasePt );
+	var base_y = cplane.distancey( BasePt );
+	
+	var other_x = cplane.distancex( OtherPt );
+	var other_y = cplane.distancey( OtherPt );
+	
+	var deltax = other_x - base_x;
+	var deltay = other_y - base_y;
+	var r = Math.sqrt( (deltax * deltax) + (deltay * deltay) );
+	var phi = Math.atan2(deltay, deltax);
+	var deltaphi = normalizeAngle(theta0 - phi);
+	var deltatheta = normalizeAngle(theta1 - theta0);
+	
+//alert(" deltax = " + deltax);		
+//alert(" deltay = " + deltay);	
+//alert(" r = " + r);
+//alert(" phi = " +phi);
+//alert(" deltaphi = " + deltaphi);	
+	var Aguess = 2.4674 * deltatheta + 5.2478 * deltaphi;
+	var A =	findA(Aguess, deltatheta, deltaphi);
+	var a = 0.0;
+	var b = 1.0;
+	var maxR = 50; //maxrecursion
+	var L = r/ adaptiveSimpsons(A, deltatheta, (deltaphi + Math.PI/2), a, b, maxR );	
+	var K =	(deltatheta - A) / L;
+	var Kprime = (2*A)/(L*L);
+	
+	return 	{ 'K': K, 'Kprime': Kprime, 'L': L, 'other_x': other_x, 'other_y': other_y };
+}	
+
+function Update(BasePt, OtherPt, cplane)
+{
+	var curvefactory = moi.command.createFactory( 'interpcurve' );
+	var ui = moi.ui;
+	var theta0 = ui.commandUI.theta_start.numericValue;
+	theta0 *= Math.PI / 180.0;
+	var theta1 = ui.commandUI.theta_end.numericValue;
+	theta1 *= Math.PI/180.0;	
+	var numintervals = ui.commandUI.numintervals.integerValue;
+	
+	// The BasePt picked point determines the cplane.
+	// Per Michael, cplane has as its origin the picked point.
+	// cplane has x and y axis coordinates.
+	// In other words, the cBasePt is at (0,0,0), in the cplane.
+	
+	var result = buildClothoid(BasePt, theta0, OtherPt, theta1, numintervals, cplane);
+
+	var K = result.K;	
+	var Kprime = result.Kprime;
+	var L = result.L;
+	var other_x = result.other_x;
+	var other_y = result.other_y;
+//	s = L
+//	x(s) = x0 + s * X0(Kprime*s*s, K*s, theta0)
+//	y(s) = x0 + s * Y0(Kprime*s*s, K*s, theta0)
+//	X0(a,b,c) = integral(0...1) of cos(a* t*t/2 + b*t + c) dt
+//	Y0(a,b,c) = integral(0...1) of sin(a* t*t/2 + b*t + c) dt
+
+//	Add the start point = BasePt, to the curve factory.
+	curvefactory.createInput( 'point' );
+	curvefactory.setInput( curvefactory.numInputs - 1,BasePt );
+	
+//Start Composite Simpsons Method of integration.	
+	var s = L;	
+	var a = 0.0; //xleftslice
+	var sum_X = 0.0;
+	var sum_Y = 0.0;
+	var Kp_2ss = Kprime*s*s/2;
+	var Ks = K*s;
+	var t0 = theta0
+	var fa_X = Math.cos(Kp_2ss * Math.pow(a,2) + Ks * a + t0);
+	var fa_Y = Math.sin(Kp_2ss * Math.pow(a,2) + Ks * a + t0);
+
+	var h = 1 / (numintervals * 6); //width
+
+	for ( var i = 1; i < numintervals; ++i )
+// NonCheatMode: for ( var i = 1; i <= numintervals; ++i )	
+	{
+		var b = i / numintervals; //xRightslice
+		var c = (a+b)/2.0;
+		var fb_X = Math.cos(Kp_2ss * Math.pow(b,2) + Ks * b + t0);
+		var fc_X = Math.cos(Kp_2ss * Math.pow(c,2) + Ks * c + t0);
+		sum_X += h * (fa_X + 4.0 * fc_X +fb_X);
+
+		var fb_Y = Math.sin(Kp_2ss * Math.pow(b,2) + Ks * b + t0);
+		var fc_Y = Math.sin(Kp_2ss * Math.pow(c,2) + Ks * c + t0);		
+		sum_Y += h * (fa_Y + 4.0 * fc_Y +fb_Y);
+
+		a = b; //save xRightslice as xleftslice
+		fa_X = fb_X; //save for next slice.
+		fa_Y = fb_Y;
+
+//	The origin of the cplane is (0,0,0), which is the BasePt in cplane coordnates.
+//	The cplane in effect adds BasePt to s*sum_X & s*sum_Y.		
+		var x = s * sum_X;
+		var y = s * sum_Y;
+		var z = 0.0;		
+		
+		var pt = cplane.evaluate( x, y, z );	
+		curvefactory.createInput( 'point' );
+		curvefactory.setInput( curvefactory.numInputs - 1, pt );
+	}
+//end Composite Simpsons method.
+	
+//	Cheat by adding end point to the curve factory.
+//  Otherpt is the world coordinate of the end point, BUT when the two points are both
+//	picked in the 3d view, the end point needs to have its cplane x and y values,
+//	with z value = 0, to avoid some configuration of points for which Otherpt is not
+//	in the same plane as the previously calculated clothoid points.
+
+	var endpt = cplane.evaluate(other_x, other_y, z);
+	curvefactory.createInput( 'point' );
+//	curvefactory.setInput( curvefactory.numInputs - 1,OtherPt );
+	curvefactory.setInput( curvefactory.numInputs - 1,endpt );	
+
+	curvefactory.update();	
+	return curvefactory;
+}
+		
+		</script>
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="FirstPrompt" class="commandprompt">Pick end point</div>
+			<div id="SecondPrompt" class="hiddencommandprompt">Pick start point</div>
+		</div>	
+
+		<div id="ClothoidOptions" class="hiddencommandoptions">
+			<table style="width:100%">
+				<col width="5">
+				<col>
+				<col width="5">
+			<tr>
+				<td>Adjust</td>
+				<td>Angles</td>				
+			<tr>				
+				
+			<tr>
+				<td>Start:</td>
+				<td><moi:Slider id="start_slider" onvaluechange="moi.ui.fireUIEvent(id);" value="180" min="0" max="360" style="width:100%;"/></td>
+				<td><moi:NumericInput id="theta_start" style="width:3em; decimalPlaces:0; persist:false;" binding="this.value = start_slider.value"/></td>
+			</tr>
+
+			<tr>
+				<td>End:</td>
+				<td><moi:Slider id="end_slider" onvaluechange="moi.ui.fireUIEvent(id);" value="180" min="0" max="360" style="width:100%;"/></td>
+				<td><moi:NumericInput id="theta_end" style="width:3em; decimalPlaces:0; persist:false;" binding="this.value = end_slider.value"/></td>
+			</tr>			
+		
+			<tr>
+				<td>Points</td>
+				<td><input id="numintervals" class="unsigned integerinput" default="125"></td>
+			</tr>			
+			</table>
+		</div>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

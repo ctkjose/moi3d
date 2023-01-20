@@ -1,0 +1,24 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectPrompt" class="commandprompt">Select point objects</div>
+			<div id="TolerancePrompt" class="hiddencommandprompt">Choose tolerance</div>
+		</div>
+		
+		<table class="hiddencommandoptions" id="ToleranceOptions">
+			<tr>
+				<td>Tolerance:</td>
+				
+				<td>
+					<input id="tolinput" class="coordinatenumericinput" style="persist:true">
+				</td>
+			</tr>
+		</table>		
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,32 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Create Antiprism</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>n-gon Sides:</td>
+				<td><input id="ngon" class="unsignedintegerinput" default="3" style="persist:true;"></td>
+			</tr>
+		</table>
+
+		<table>
+			<tr>
+				<td>Build:</td>
+				<td
+					<select id="Build">
+						<option value="polyline">Polyline</option>
+						<option value="points">Points</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,383 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+		<style>
+			.tt { position: relative; }
+			.tt:hover .tti { visibility: visible; opacity: .9;  }
+			 .tti {
+				position: absolute;
+				display:inline;
+				text-align: center;
+				left: 20px;
+				bottom: -2px;
+				padding: 3px 10px;
+				color: #fff;
+				background-color: #555;
+				border-radius: 3px;
+				visibility: hidden;
+				opacity: 0;
+				-webkit-transition: opacity .4s ease-in-out;
+				z-index: 10; }
+			moi\:UnitsLabel { padding-left:0;}
+		</style>
+		<script>
+		/* общие переменные */
+		var xMatrix, yMatrix, zMatrix ;
+		var curves, clength, citem;
+		/* ------------------------- */
+		
+		function setFilename()
+		{
+			hfilename.value = "instances";
+			if (moi.geometryDatabase.currentFileName !=='' ) 
+			{
+				hfilename.value = moi.filesystem.getFileNameFromPath(moi.geometryDatabase.currentFileName);
+				hfilename.value = hfilename.value.split('.')[0];
+			}
+		}
+		/* DEBUG */
+		function showvector (title, v) { moi.ui.alert(title+"  x: "+v[0]+" | y:"+ v[1]+ " | z:"+ v[2]); }
+		function showmatrix (m) { moi.ui.alert(m[0][0]+" | "+ m[0][1]+" | "+ m[0][2] + "\r" +m[1][0]+" | "+ m[1][1]+" | "+ m[1][2] + "\r" + m[2][0]+" | "+ m[2][1]+" | "+ m[2][2]); }
+		
+		/* Функции прекалькуляции матриц вращения по Х, Y, Z с шагом 1 градус*/
+		function precalcXRotationMatrix() 
+		{
+			var rMatrix = [];
+			for ( var angle=-180; angle<181; angle++)
+			{
+				rMatrix[angle] = [[],[],[]];
+				rMatrix[angle][0][1] = rMatrix[angle][0][2] = rMatrix[angle][1][0] = rMatrix[angle][2][0] = 0;	
+				rMatrix[angle][0][0] = 1; 
+				rMatrix[angle][2][2] = rMatrix[angle][1][1] = Math.cos(angle*Math.PI/180);
+				rMatrix[angle][2][1] = Math.sin(angle*Math.PI/180);
+				rMatrix[angle][1][2] = - rMatrix[angle][2][1]; 
+			}
+			return rMatrix;
+		}
+		
+		function precalcYRotationMatrix()
+		{
+			var rMatrix = [];
+			for ( var angle=-180; angle<181; angle++)
+			{
+				rMatrix[angle] = [[],[],[]];
+				rMatrix[angle][0][1] = rMatrix[angle][1][0] = rMatrix[angle][1][2] = rMatrix[angle][2][1] = 0;	
+				rMatrix[angle][1][1] = 1;
+				rMatrix[angle][0][0] = rMatrix[angle][2][2] = Math.cos(angle*Math.PI/180);
+				rMatrix[angle][0][2] = Math.sin(angle*Math.PI/180);
+				rMatrix[angle][2][0] = - rMatrix[angle][0][2]; 
+			}
+			return rMatrix;
+		}
+		
+		function precalcZRotationMatrix()
+		{
+			var rMatrix = [];
+			for ( var angle=-180; angle<181; angle++)
+			{
+				rMatrix[angle] = [[],[],[]];
+				rMatrix[angle][0][2] = rMatrix[angle][1][2] = rMatrix[angle][2][0] = rMatrix[angle][2][1] = 0;	
+				rMatrix[angle][2][2] = 1;
+				rMatrix[angle][0][0] = rMatrix[angle][1][1] = Math.cos(angle*Math.PI/180);
+				rMatrix[angle][1][0] = Math.sin(angle*Math.PI/180);
+				rMatrix[angle][0][1] = - rMatrix[angle][1][0]; 
+			}
+			return rMatrix;
+		}
+		
+		/* Генераторы случайных значений в диапазоне от -v до +v */
+		function distortInt(v)
+		{
+			return Math.floor( Math.random()*v*2-v );
+		}
+		
+		function distortReal(v)
+		{
+			return Math.random()*v*2-v;
+		}
+		
+		/* Базовые операции с векторами */
+		function cross(v1, v2)
+		{
+			var r = [];
+			r[0] = v1[1] * v2[2] - v1[2] * v2[1]; 
+			r[1] = v1[2] * v2[0] - v1[0] * v2[2]; 
+			r[2] = v1[0] * v2[1] - v1[1] * v2[0];
+			return r;
+		}
+		
+		function  dot(v1, v2) 
+		{
+			return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+		}
+		
+		function sub(v1, v2)
+		{
+			var r = [];
+			r[0] = v1[0] - v2[0]; 
+			r[1] = v1[1] - v2[1]; 
+			r[2] = v1[2] - v2[2];
+			return r;
+		}
+		
+		function fromToRotation(from, to) 
+		{
+			var epsilon = 0.000001;  /* используется только в одном месте, но лучше вынести как константу */
+			var mtx = [[],[],[]];
+			var v = cross (from, to);
+			var e = dot (from, to);
+			var f = (e < 0 )?-e:e;
+			var h;
+			if (f > 1.0 - epsilon)		/* векторы "from" и "to" почти параллельны */
+			{
+				var u = [], v = [];	/* временные векторы */
+				var x = [];			/* вектор перпендикулярный вектору "from" */
+				var c1, c2, c3;		/* коэффициенты для дальнейшего использования */
+				var i, j;
+				
+				x[0] = (from[0] > 0.0)? from[0] : -from[0];
+				x[1] = (from[1] > 0.0)? from[1] : -from[1];
+				x[2] = (from[2] > 0.0)? from[2] : -from[2];
+				
+				if (x[0] < x[1])
+				{
+					if (x[0] < x[2]) {	x[0] = 1; x[1] = 0; x[2] = 0; } else { x[0] = 0; x[1] = 0; x[2] = 1; }
+				}
+				else 
+				{
+					if (x[1] < x[2]) {	x[0] = 0; x[1] = 1; x[2] = 0; } else { x[0] = 0; x[1] = 0; x[2] = 1; }
+				}
+				
+				u[0] = x[0] - from[0];  u[1] = x[1] - from[1];  u[2] = x[2] - from[2];
+				v[0] = x[0] - to[0];  v[1] = x[1] - to[1];  v[2] = x[2] - to[2];
+				c1 = 2 / dot(u, u);
+				c2 = 2 / dot(v, v);
+				c3 = c1 * c2  * dot(u, v);
+				for (i = 0; i < 3; i++) 
+				{
+					for (j = 0; j < 3; j++) { mtx[i][j] =  - c1 * u[i] * u[j] - c2 * v[i] * v[j] + c3 * v[i] * u[j];	}
+					mtx[i][i] += 1.0;
+				}
+			}
+		else  /* наиболее частый вариант, за исключением случаев, когда "from" = "to", или "from" = -"to" */
+			{
+				h = (1.0 - e)/dot(v, v);
+				mtx[0][0] = e + h * v[0] * v[0];  		mtx[0][1] = h * v[0] * v[1] - v[2]; 	mtx[0][2] = h * v[0] * v[2] + v[1];
+				mtx[1][0] = h * v[0] * v[1] + v[2]; 	mtx[1][1] = e + h * v[1] * v[1];    	mtx[1][2] = h * v[1] * v[2] - v[0];
+				mtx[2][0] = h * v[0] * v[2] - v[1]; 	mtx[2][1] = h * v[1] * v[2] + v[0]; 	mtx[2][2] = e + h * v[2] * v[2]; 	
+			}
+			return mtx;
+		}
+		
+		function multiplyMatrix3x(ma, mb)
+		{
+			var mtx = [[],[],[]];
+			mtx[0][0] = ma[0][0]*mb[0][0] + ma[0][1]*mb[1][0] + ma[0][2]*mb[2][0];
+			mtx[0][1] = ma[0][0]*mb[0][1] + ma[0][1]*mb[1][1] + ma[0][2]*mb[2][1];
+			mtx[0][2] = ma[0][0]*mb[0][2] + ma[0][1]*mb[1][2] + ma[0][2]*mb[2][2];
+			mtx[1][0] = ma[1][0]*mb[0][0] + ma[1][1]*mb[1][0] + ma[1][2]*mb[2][0];
+			mtx[1][1] = ma[1][0]*mb[0][1] + ma[1][1]*mb[1][1] + ma[1][2]*mb[2][1];
+			mtx[1][2] = ma[1][0]*mb[0][2] + ma[1][1]*mb[1][2] + ma[1][2]*mb[2][2];
+			mtx[2][0] = ma[2][0]*mb[0][0] + ma[2][1]*mb[1][0] + ma[2][2]*mb[2][0];
+			mtx[2][1] = ma[2][0]*mb[0][1] + ma[2][1]*mb[1][1] + ma[2][2]*mb[2][1];
+			mtx[2][2] = ma[2][0]*mb[0][2] + ma[2][1]*mb[1][2] + ma[2][2]*mb[2][2];
+			return mtx;
+		}
+		
+		/* Преобразование матрицы с маштабированием и смещением в текстовую строку в формате CSV */
+		function createInstance(matrix, scale, pt, vdist, convert)
+		{
+			var i =  matrix[0][0]*scale;
+			i = i + ";" + matrix[0][1]*scale;
+			i = i + ";" + matrix[0][2]*scale;
+			i = i + ";" + (pt[0]+matrix[0][0]*vdist[0] + matrix[0][1]*vdist[1] + matrix[0][2]*vdist[2])*convert;
+			i = i + ";" + matrix[1][0]*scale;
+			i = i + ";" + matrix[1][1]*scale;
+			i = i + ";" + matrix[1][2]*scale;
+			i = i + ";" + (pt[1]+matrix[1][0]*vdist[0] + matrix[1][1]*vdist[1] + matrix[1][2]*vdist[2])*convert;
+			i = i + ";" + matrix[2][0]*scale;
+			i = i + ";" + matrix[2][1]*scale;
+			i = i + ";" + matrix[2][2]*scale;
+			i = i + ";" + (pt[2]+matrix[2][0]*vdist[0] + matrix[2][1]*vdist[1] + matrix[2][2]*vdist[2])*convert +"\r";
+			return i;
+		}
+		
+		function prepareToRun()
+		{
+			/* Определение количества выделенных кривых */
+			curves = moi.geometryDatabase.getSelectedObjects().getCurves(); 
+			clength = curves.length;
+			citem = curves.item;
+			
+			/* вычисление матриц поворота */
+			xMatrix = precalcXRotationMatrix();	
+			yMatrix = precalcYRotationMatrix();	
+			zMatrix = precalcZRotationMatrix();	
+		}
+		
+		function saveInstances (cstart, cend, file, unitsconvert)
+		{
+			var itm;
+			var scale =hscale.value/100; 
+			var vector = [];
+			var distXYZ=[], flip = [], vlen, pt1, pt2, spt = [], ept = [];
+			var baseMatrix = [[],[],[]];
+			var upv = [];
+
+			/* данные по коррекции осей */
+			var ax, ay, az;
+			var axis = moi.view.axisLabels; 
+			for (var i = 0; i<3; i++) 
+			{
+				var el = axis.split(',')[i];
+				if (el === "x") { ax=i; flip[0]=false; }
+				if (el === "y") { ay=i; flip[1]=false; }
+				if (el === "z") { az=i; flip[2]=false; }
+				if (el === "-x") { ax=i; flip[0]=true; }
+				if (el === "-y") { ay=i; flip[1]=true; }
+				if (el === "-z") { az=i; flip[2]=true; }
+			}
+
+			/* ориентируем наш вектор направления по вертикальной оси */
+			upv[ax]=0; upv[ay]=0; upv[az] = (flip[az])?-1:1;	 
+			
+			var dr = [], dsX = hdsX.value , dsY = hdsY.value, dsZ = hdsZ.value;
+			dr[ax] = hdrX.value , dr[ay] = hdrY.value, dr[az] = hdrZ.value;
+			
+			/* Основной цикл */ 
+			for (var i=cstart; i<cend; i++)
+			{				
+				distXYZ[ax] = distortReal(dsX);	/* дисторсия по смещениям */
+				distXYZ[ay] = distortReal(dsY);
+				distXYZ[az] = distortReal(dsZ);
+				
+				itm = citem(i); /* загрузка точек и длины вектора */
+				pt1 = itm.getStartPt(); 
+				pt2 = itm.getEndPt();
+				vlen = itm.getLength();
+				spt[ax]=(flip[ax])?-pt1.x:pt1.x;	/* коррекция осей */
+				spt[ay]=(flip[ay])?-pt1.y:pt1.y;
+				spt[az]=(flip[az])?-pt1.z:pt1.z;
+				ept[ax]=(flip[ax])?-pt2.x:pt2.x;
+				ept[ay]=(flip[ay])?-pt2.y:pt2.y;
+				ept[az]=(flip[az])?-pt2.z:pt2.z;
+
+				vector[0] = (ept[0] - spt[0])/vlen; /* подготовка вектора поворота */
+				vector[1] = (ept[1] - spt[1])/vlen;
+				vector[2] = (ept[2] - spt[2])/vlen;
+					
+				baseMatrix = fromToRotation (upv, vector); /* главное волшебство */
+
+				/* колбасим дисторсии по вращению и сливаем в файл. такая тупая логическая структура создана затем, чтобы не перемножать матрицы по 3 раза за цикл в случаях когда дисторсия не задана */
+				if ( dr[0] === 0 && dr[1] === 0 && dr[2] === 0 ) file.writeLine( createInstance (baseMatrix, vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] > 0 && dr[1] === 0 && dr[2] === 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, xMatrix[distortInt(dr[0])] ), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] === 0 && dr[1] > 0 && dr[2] === 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, yMatrix[distortInt(dr[1])] ), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] === 0 && dr[1] === 0 && dr[2] > 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, zMatrix[distortInt(dr[2])] ), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] > 0 && dr[1] > 0 && dr[2] === 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, multiplyMatrix3x ( xMatrix[distortInt(dr[0])], yMatrix[distortInt(dr[1])])), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] > 0 && dr[1] === 0 && dr[2] > 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, multiplyMatrix3x ( xMatrix[distortInt(dr[0])], zMatrix[distortInt(dr[2])])), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] === 0 && dr[1] > 0 && dr[2] > 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, multiplyMatrix3x ( yMatrix[distortInt(dr[1])], zMatrix[distortInt(dr[2])])), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+				if ( dr[0] > 0 && dr[1] > 0 && dr[2] > 0 ) file.writeLine( createInstance (multiplyMatrix3x (baseMatrix, multiplyMatrix3x ( multiplyMatrix3x ( xMatrix[distortInt(dr[0])], yMatrix[distortInt(dr[1])]), zMatrix[distortInt(dr[2])])), vlen+distortReal(scale), spt, distXYZ, unitsconvert));
+			}
+		}
+		</script>		
+	</head>
+	<body class="commandbody">
+		<div id="TitleContainer" style="width:100%; text-align:center;"> 
+			<strong>Save instances</strong>
+		</div>
+		<div id="Options" class="commandprompt">
+		<table style="width:100%;">
+			<col width="5">
+			<col>
+			<col width="5">
+			<tr>
+				<td>Filename:</td>
+				<td align="left"><moi:TextInput id="hfilename" style="width:90%" oninit="setFilename();"/>
+				<td>.csv</td>
+				</td>
+			</tr>
+		</table>
+		<table style="width:100%">
+			<col>
+			<col width="4em">
+			<tr>
+				<td>Target units:</td>
+				<td>
+					<select id="hunits">
+							<option value="mm">mm</option>
+							<option value="cm">cm</option>
+							<option selected value="m">m</option>
+							<option value="km">km</option>
+							<option value="in">in</option>
+							<option value="ft">ft</option>
+							<option value="mi">mi</option>
+					</select>
+				</td>
+			</tr>
+		</table>	
+		<table style="width:100%; padding-top:0.5em;">
+			<col width="5">
+			<col>
+			<col width="1">
+			<col width="5">
+			<col width="1">
+			<tr>
+				<td onclick="dsYSlider.value = dsXSlider.value; dsZSlider.value = dsXSlider.value;" ><div class="tt">FB<div class="tti"><nobr>Front / Back</nobr></div></div></td>
+				<td><moi:Slider id="dsXSlider" min="0" max="20" style="width:90%"  /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:NumericInput id="hdsX" value="0"  style="width:3em;" binding="dsXSlider.value = this.value" /></td>
+				<td><moi:UnitsLabel /></td>
+			</tr>
+			<tr>
+				<td onclick="dsXSlider.value = dsYSlider.value; dsZSlider.value = dsYSlider.value;"><div class="tt">LR<div class="tti"><nobr>Left / Right</nobr></div></div></td>
+				<td><moi:Slider id="dsYSlider" min="0" max="20" style="width:90%"   /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:NumericInput id="hdsY" value="0"  style="width:3em;" binding="dsYSlider.value = this.value" /></td>
+				<td><moi:UnitsLabel /></td>
+			</tr>
+			<tr>
+				<td onclick="dsXSlider.value = dsZSlider.value; dsYSlider.value = dsZSlider.value;"><div class="tt">UD<div class="tti"><nobr>Up / Down</nobr></div></div></td>
+				<td><moi:Slider id="dsZSlider" min="0" max="20" style="width:90%"   /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:NumericInput id="hdsZ" value="0"  style="width:3em;" binding="dsZSlider.value = this.value" /></td>
+				<td><moi:UnitsLabel style="padding-left:0;" /></td>
+			</tr>
+			<tr>
+				<td onclick="drYSlider.value = drXSlider.value; drZSlider.value = drXSlider.value;"><div class="tt">Rl<div class="tti">Roll</div></div></td>
+				<td><moi:Slider id="drXSlider" min="0" max="180" style="width:90%"   /></td>
+				<td>&plusmn;</td>
+				<td style="width:2em;"><moi:UnsignedIntegerInput id="hdrX" value="0"  binding="drXSlider.value = this.value" /></td>
+				<td>&deg;</td>
+			</tr>
+			<tr>
+				<td onclick="drXSlider.value = drYSlider.value; drZSlider.value = drYSlider.value;"><div class="tt">Pt<div class="tti">Pitch</div></div></td>
+				<td><moi:Slider id="drYSlider" min="0" max="180" style="width:90%"   /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:UnsignedIntegerInput id="hdrY" value="0"  binding="drYSlider.value = this.value" /></td>
+				<td>&deg;</td>
+			</tr>
+			<tr>
+				<td onclick="drXSlider.value = drZSlider.value; drYSlider.value = drZSlider.value;"><div class="tt">Yw<div class="tti">Yaw</div></div></td>
+				<td><moi:Slider id="drZSlider" min="0" max="180" style="width:90%"   /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:UnsignedIntegerInput id="hdrZ" value="0"  binding="drZSlider.value = this.value" /></td>
+				<td>&deg;</td>
+			</tr>	
+			<tr>
+				<td onclick="scaleSlider.value=0"><div class="tt">S<div class="tti">Scale</div></div></td>
+				<td><moi:Slider id="scaleSlider" min="0" max="100" style="width:90%"  /></td>
+				<td>&plusmn;</td>
+				<td style="width:3em;"><moi:UnsignedIntegerInput id="hscale" value="0"  binding="scaleSlider.value = this.value" /></td>
+				<td>%</td>
+			</tr>			
+		</table>
+		</div>
+		<div id="buttons" class="commandoptions">
+		<moi:CommandDoneCancel />
+		</div>
+		<div id="progress" class="hiddencommandoptions">
+		<moi:ProgressBar id="progressbar" style="display:visible; margin-bottom:0.3em;" oninit="this.value=0" />
+		</div>
+	</body>
+</html>
+	

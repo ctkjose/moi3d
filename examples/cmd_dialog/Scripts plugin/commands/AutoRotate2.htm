@@ -1,0 +1,61 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+
+		<script>
+			var dir_change = 'left';
+			var start_stop = true;
+			var quitnow = false;
+
+			function GetDirection()
+			{
+				return dir_change;
+			}	
+
+			function GetStartStop()
+			{
+				return start_stop;
+			}
+
+			function GetExit()
+			{
+				return quitnow;
+			}
+		</script>
+
+	</head>
+
+	<body class="commandbody">
+
+			<div id="TitleContainer" style="width:100%; display:none;	 text-align:center;"> 
+						<strong>Rotation :</strong>
+			</div>
+
+			<div id="RotationAngleContainer" class="commandoptions" style="width:100%; padding-top:0.75em; padding-left:0.85em;">
+						Rotation angle<moi:Spacer/>
+						<input id="angleinput" class="numericinput" style="width:3.5em; decimalPlaces:3; persist:true;" binding0="numericValue = angleslider.value">
+						<moi:Slider id="angleslider" value="0.5" min="0.0" mid="5.0" max="10.0" style="persist:false; width:100%;"/>					
+						<br></br>
+			</div>
+
+			<div id="DirectionContainer" style="display:none;  width:100%;  padding-left:1.6em;">
+						<moi:PushButton id="leftbutton" onbuttonclick="dir_change = 'right';" style="width:40%;">Left</moi:PushButton>
+						<moi:Spacer/>
+						<moi:PushButton id="rightbutton"  onbuttonclick="dir_change = 'left';" style="width:40%;">Right</moi:PushButton>
+						<moi:PushButton  id="upbutton" onbuttonclick="dir_change = 'down';" style="width:40%;">Up</moi:PushButton>
+						<moi:Spacer/>
+						<moi:PushButton  id="downbutton" onbuttonclick="dir_change = 'up';" style="width:40%;">Down</moi:PushButton>
+			</div>
+
+			<div id="StartStopContainer" style="display:none;  width:100%; padding-top:0.75em;">
+						<moi:PushButton id="startbutton" onbuttonclick="start_stop = true;" style="width:48%;">Start</moi:PushButton>
+						<moi:Spacer/>
+						<moi:PushButton id="stopbutton"  onbuttonclick="start_stop = false;" style="width:48%;">Stop</moi:PushButton>
+			</div>
+
+			<div id="QuitContainer" style="display:none;  width:100%; padding-top:0.75em; padding-left:4.5em;">
+						<moi:PushButton id="startbutton" onbuttonclick="quitnow = true;" style="width:40%;">Quit</moi:PushButton>
+			</div>
+
+	</body>
+</html>

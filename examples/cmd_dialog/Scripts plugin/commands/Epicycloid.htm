@@ -1,0 +1,43 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+
+	<body class="commandbody">
+		<div class="commandheader">
+			<div class="commandprompt">Epicycloid options</div>
+		</div>
+		
+		<table class="commandoptions">
+			<tr>
+				<td>OneCyl radius1:</td>
+				<td><input id="cylradius1" class="numericinput" default="10.0" style="persist:true;"></td>
+			</tr>
+
+			<tr>
+				<td>AllCyl Radius2:</td>
+				<td><input id="cylRadius2" class="numericinput" default="80.0" style="persist:true;"></td>
+			</tr>
+			
+			<tr>
+				<td>Num lobes:</td>
+				<td><input id="numlobes" class="unsignedintegerinput" default="11"></td>
+			</tr>
+			
+			<tr>
+				<td>Pts per lobe:</td>
+				<td><input id="numpoints" class="unsigned integerinput" default="30"></td>
+			</tr>
+			
+			<tr>
+				<td>Eccentricity:</td>
+				<td><input id="eccentricity" class="unsigned integerinput" default="5"></td>
+			</tr>			
+			
+			
+			
+		</table>
+	
+		<moi:CommandDoneCancel />
+	</body>
+</html>

@@ -1,0 +1,35 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+				<div id="TitleContainer"  class="hiddencommandprompt" style="width:100%; text-align:center;"> 
+					<div><strong>Cycle Select by Type</strong></div>
+					<div><hr></hr></div>
+				</div>
+
+				<div id="Notice" class="hiddencommandprompt" style="width:100%; text-align:center; padding-top= 1.0em; padding-bottom= 1.0em;">
+					Select one object<br>in the viewport<br>of the type<br>you want to cycle thru,<br>then rerun the script...
+				</div>
+
+				<div id="AllTypesList" class="hiddencommandprompt" style="width:100%; text-align:center; padding-top= 0.4em; padding-bottom= 1.0em;">
+					Objects that can be selected are :<br><br>Point objects<br>Open curves<br>Closed curves<br>Edges<br>Faces<br>Solids<br>Open BReps<br>Single Face BReps<br>
+				</div>
+
+				<div id="AllofTypeList" class="hiddencommandprompt" style="width:100%; text-align:center; padding-top= 0.4em; padding-bottom= 1.0em;">
+					"All of type" objects that can be cycled thru :<br><br>Points<br>Curves<br>Faces<br>BReps<br><br>
+				</div>
+
+				<div id="TopLevelInfo" class="hiddencommandprompt" style="width:100%; text-align:center; padding-top= 0.4em; padding-bottom= 1.0em;">
+					"Top level" objects that will be cycled thru :<br><br>All objects except faces and edges<br>
+				</div>
+
+				<div id="DoneContainer"  class="hiddencommandprompt" style="width:100%; text-align:center;"> 
+					<div><hr></hr></div>
+					<div><moi:PushButton id="done" class="commanddonecancelbtn"  style="width:100%;  text-align:center;"> Done </moi:PushButton></div>
+				</div>
+		</div>
+	</body>
+</html>

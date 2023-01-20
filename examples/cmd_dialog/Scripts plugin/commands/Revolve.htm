@@ -1,0 +1,32 @@
+<html xmlns:moi>
+	<head>
+		<link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+	</head>
+	
+	<body class="commandbody">
+		<div class="commandheader">
+			<div id="SelectionPrompt" class="commandprompt"><moi:Text textid="Revolve select prompt"/></div>
+			<div id="FirstLinePrompt" class="hiddencommandprompt"><moi:Text textid="Revolve axis start prompt"/></div>
+			<div id="SecondLinePrompt" class="hiddencommandprompt"><moi:Text textid="Revolve axis end prompt"/></div>
+			<div id="OptionsPrompt" class="hiddencommandprompt">Revolve options</div>
+		</div>
+		
+		<div id="RevolveOptions" class="hiddencommandoptions">
+			<table>
+				<tr>
+					<td>Start angle:</td>
+					<td><input id="StartAngle" class="numericinput" default="0.0" style="persist:true;"></td>
+				</tr>
+				
+				<tr>
+					<td>End angle:</td>
+					<td><input id="EndAngle" class="numericinput" default="360.0" style="persist:true;"></td>
+				</tr>
+			</table>
+		
+			<moi:CheckButton id="CapEnds" default="true"><moi:Text textid="Extrude cap ends checkbox"/></moi:CheckButton>
+		</div>
+		
+		<moi:CommandDoneCancel />
+	</body>
+</html>

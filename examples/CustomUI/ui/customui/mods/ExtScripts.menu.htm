@@ -1,0 +1,76 @@
+<html>
+	<body class="MenuBody">
+		<moi:FlyoutHeader/ >
+		<script>
+			var maxlines = 40;
+			function makeList(longlist)
+			{
+				internalcmd=["CopyClipboardWithOrigin", "DoCurve", "DoScale", "EditOrientations", "GetBoxExtrusion", "GetCircle", "GetCylinder", "GetDistance", "GetLine", "GetObject", "GetObjects", "GetOrientation", 
+							"GetPoint", "GetPointOsnappedOnCurve", "GetRect", "GetRect3pt", "GetRectRoundCorner", "OpenTemplate", "RadiusDiameter", "RectWidthHeight", "ScaleInput", "WaitForDialogDone"];
+				
+				allcmd= [	"AddPoint", "Align", "Arc3pt", "ArcCenter", "ArcContinue", "ArcTangent", "ArrayCircular", "ArrayCurve", "ArrayDir", "ArrayGem", "ArrayGrid", "Blend", "BooleanDifference", "BooleanIntersection",
+							"BooleanMerge", "BooleanUnion", "BoundingBox", "BoundingBoxCenter", "Box", "Box3pts", "BoxCenter", "Chamfer", "Circle", "Circle3pt", "CircleDiameter", "CircleTangent", "Cone", "Conic", "Copy",
+							"CopyClipboard",  "Curve", "Cut", "Cylinder", "Delete", "Ellipse", "EllipseCorner", "EllipseDiameter", "ExplodeMove", "Export", "Extend", "Extrude", "Fillet", "Flip",  "Flow",
+							"Helix", "History", "Image", "Import", "ImportPart", "IncrementalSave", "Inset", "InterpCurve", "Intersect", "Isocurve", "Join", "Line", "Loft", "Make2D", "Merge", "Mirror", "Move", "Network", "New",
+							"NSided", "Offset", "Open", "Orient", "OrientLineToLine", "OrientViewToView", "Paste", "PastePart", "PlanarSrf", "Plane", "Plane3pts", "PlaneCenter", "Point", "Polygon", "PolygonEdge", "PolygonStar",
+							"Polyline", "Print3D", "Project", "RailRevolve", "Rebuild", "Rect3pts", "Rectangle", "RectCenter", "RemoveDuplicates", "Revolve", "Rotate", "RotateAxis", "Save", "SaveAs", "Scale", "Scale1D", "Scale2D",
+							"Separate", "Shell", "ShowPoints", "ShrinkTrimmedSrf", "Silhouette", "SketchCurve", "Sphere", "Sweep", "Text", "Trim", "Twist"];
+							
+				addcmd = [	 "ArrayGem", "BoundingBox", "BoundingBoxCenter", "ExplodeMove", "Flip",  "Make2D", "Merge", "Rebuild", "RemoveDuplicates", "ShrinkTrimmedSrf" ];
+				
+				function CutExt( str ) { return str.substring( 0, str.lastIndexOf(".") ); }
+				function StripFileName( str )	{ return CutExt(str.substring(str.lastIndexOf("\\")+1)); }
+				function writeList( fscom, cols)
+				{
+					var lines = Math.ceil(fscom.length/cols), cln=0;
+					document.write ('<tr><td style="vertical-align:top;">');
+					for ( var i = 0; i < fscom.length; ++i )
+					{
+						cln++;
+						var commandname=fscom[i].split(">")[0];
+						var commandpath=fscom[i].split(">")[1];
+						if (!commandpath) commandpath="";
+						var showname=(commandname[0] === "_")?commandname.substring(1):commandname;
+						document.write ('<moi:MenuItem command="'+ commandpath+commandname +'">' + showname + '</moi:MenuItem>');
+						if ( (cln === lines) && (( i + 1 ) !== scom.length) ) { document.write ('</td><td style="vertical-align:top;">'); cln = 0;}
+					} 
+					document.write ('</td></tr>');
+				}
+				var dirList=[], dirListShort=[], scom=[];
+				var cfgfile = moi.filesystem.getFiles(moi.filesystem.getUIDir()+"\\customui\\mods", 'ExtScripts.cfg.htm' );
+				if (cfgfile.length === 1) 
+				{
+					var config = moi.filesystem.openFileStream( cfgfile.item(0), 'r' );
+					while ( !config.AtEOF ) 
+					{ 
+						var dir = config.readLine();
+						dir = dir.replace(/^\s+|\s+$/g, '');
+						if (dir.substring(dir.length-1) !== "\\") dir += "\\";
+						var fullpath=(dir.substring(0,4) === "MOI\\")?moi.filesystem.getProcessDir()+dir.substring(4):dir;
+						dir = dir.replace("MOI\\commands\\", '');
+						if (moi.filesystem.dirExists(fullpath)) { dirList.push(fullpath); dirListShort.push(dir); }
+					}
+					config.close();
+				}
+				else { dirList.push(moi.filesystem.getCommandsDir()); dirListShort.push(""); }
+				for (var d in dirList)
+				{
+					var files = moi.filesystem.getFiles(dirList[d], '*.js' );
+					for ( var i = 0; i < files.length; ++i ) 
+					{	
+						var fln = StripFileName(files.item(i)); 
+						if ( internalcmd.indexOf(fln) === -1 && allcmd.indexOf(fln) === -1 ) scom.push(fln+">"+dirListShort[d]);
+					}
+				}
+				scom.sort(function(a, b) { var x = a.toLowerCase(), y = b.toLowerCase(); return x < y ? -1 : x > y ? 1 : 0; });
+				var cols = (longlist)?Math.ceil((scom.length+allcmd.length+1)/maxlines):Math.ceil((scom.length+addcmd.length+1)/maxlines);
+								
+				document.write ('<table>');
+				if (longlist) { writeList(allcmd, cols);} else { writeList(addcmd, cols);}
+				if (scom.length > 0) { document.write( '<tr><td colspan='+cols+'><moi:MenuSeparator/></td></tr>'); writeList(scom, cols); }
+				document.write ('</table>');
+			}
+			makeList(false);
+		</script>
+	</body>
+</html>
