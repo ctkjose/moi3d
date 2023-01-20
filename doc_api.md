@@ -14,7 +14,7 @@ The `moi.geometryDatabase` is the interface used to obtain and manipulate object
 
 We add and remove objects from the `moi.geometryDatabase` using `moi.geometryDatabase.addObject(GeometryObj)`, `moi.geometryDatabase.addObjects(GeometryObjList)`, `moi.geometryDatabase.removeObject(GeometryObj)` and `moi.geometryDatabase.removeObjects(GeometryObjList)`. 
 
-We use factories to create objects 
+We use [factories](#GeometryFactory) to create objects in the `geometryDatabase`.
 
 Before we look at these we need to learn a bit about the `GeometryObjList`.
 
@@ -23,36 +23,33 @@ Before we look at these we need to learn a bit about the `GeometryObjList`.
 
 Manipulating objects from the `moi.geometryDatabase` is mainly done in a collection known as a `GeometryObjList`. As the name implies it is a native object (MoiObject) that holds objects.
 
-The property `ObjectList.length` indicates the number of items in the list and `ObjectList.item(idx)` to access an object in the list. See [ObjectList](#ObjectList) for more details.
+The property `ObjectList.length` indicates the number of items in the list and we use `ObjectList.item(idx)` to access an object in the list. The first item in the collection is at index 0. See [ObjectList](#GeometryObjList) for more details.
 
-<p>**Property** **Integer** The number of items in the list.</p>
-
-`ObjectList.item(idx)`
-<p>Returns an object at the given integer index. First item is at index 0.</p>
 
 
 # Object Selection
 
-## Obtain an GeometryObjList of all selected objects.
+## Obtain a GeometryObjList of all selected objects.
 
 ```js
 var objects = moi.geometryDatabase.getSelectedObjects();
 ```
 
-## Filter an GeometryObjList
-Filter an `GeometryObjList` by object types use one of the following `getConstructionLines()`, `getCurves()`, `getSolids()`, `getBReps()`, `getFaces()`, `getPoints()`, `getEdges()`, `getOpenBReps()`, `getStandaloneCurves()`, `getTopLevelObjects()`:
+## Filter a GeometryObjList.
+
+Filter a `GeometryObjList` by object types using one of the following `getConstructionLines()`, `getCurves()`, `getSolids()`, `getBReps()`, `getFaces()`, `getPoints()`, `getEdges()`, `getOpenBReps()`, `getStandaloneCurves()`, `getTopLevelObjects()`:
 
 ```js
 var objects = moi.geometryDatabase.getSelectedObjects().getCurves();
 ``` 
 
-## Deselect items
+## Deselect items.
 
 ```js
 moi.geometryDatabase.deselectAll();
 ```
 
-## Select given types of items
+## Select given types of items.
 
 ```js
 moi.selection.setFilter( 'Types', 'Curves', true );
@@ -78,7 +75,7 @@ The coordinates of the `Point` are accessed with the float properties `Point.x`,
 <p>Adds a point?</p>
 
 
-# PointPiker
+# PointPicker
 
 ```js
 var pointpicker = moi.ui.createPointPicker();
@@ -97,7 +94,7 @@ if ( pointpicker.controlDown ){
 ```
 
 
-# ObjectList
+# GeometryObjList
 
 A collection of objects.
 
@@ -105,7 +102,7 @@ A collection of objects.
 <p>**Property** **Integer** The number of items in the list.</p>
 
 `ObjectList.item(idx)`
-<p>Returns an object at the given integer index. First item is at index 0.</p>
+<p>Returns an object at the given integer index. The first item is at index 0.</p>
 
 `ObjectList.clear()`
 <p>Removes objects on the list.</p>
@@ -125,7 +122,7 @@ A collection of objects.
 
 `ObjectList.getBReps()`
 
-<p>Returns a new <a href="#_ObjectList">ObjectList</a> containing only the <a href="#_BRep">BRep</a> objects contained in the list.</p>
+Returns a new <a href="#_ObjectList">ObjectList</a> containing only the [BRep](https://en.wikipedia.org/wiki/Boundary_representation) objects contained in the list.
 
 
 `ObjectList.getBoundingBox()`
@@ -159,9 +156,9 @@ contained in the list.
 | `ObjectList.numPoints` | |
 
 
-# GeometryFactory #
+# GeometryFactory
 
-The `GeometryFactory` is generic object that provides a common and abstracted api to create geometry objects in MoI.
+The `GeometryFactory` is a generic object that provides a common and abstracted api to create geometry objects in MoI.
 
 ## Managing input parameters
 
@@ -445,6 +442,7 @@ sp.UpdatePropertiesPanel();
 # PointPicker
 
 Update PointPicker script properties so a script can tell if there is a straight snap currently active.
+
 Added pointpicker.hasBasePt , pointpicker.hasStraightSnap , pointpicker.straightSnapDir read only properties.
 This makes it possible to do a "direction lock" shortcut key:
 var pp = moi.ui.getActivePointPicker(); if ( pp && pp.hasStraightSnap ) { pp.restrictToLinePtDir( pp.basePt, pp.straightSnapDir, true ); }

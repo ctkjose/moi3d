@@ -1,12 +1,12 @@
 # Scripting in MoI #
 
-[MoI](http://moi3d.com) (Moment of Inspiration) is a superb CAD software that's designed to be simple and easy to use. MoI is the created by Michael Gibson and his company Triple Squid Software Design in Washington state.
+[MoI](http://moi3d.com) (Moment of Inspiration) is a superb CAD software that's designed to be simple and easy to use. MoI is the created by Michael Gibson and his company Triple Squid Software Design based at Washington state (US).
 
 MoI provides a JavaScript API designed to create your own commands and extend the functionality of the application.
 
 ## MoI Application Data ##
 
-When scripting **MoI** we would make reference to folders and files locations used by **MoI**. Specific used files used by **MoI** are stored in your default OS locations, ie "appData" in Windows and "Application Support" in MacOS. 
+When scripting **MoI** we would make reference to folders and files locations used by **MoI**. **MoI** uses the default OS locations for application data, ie "appData" in Windows and "Application Support" in MacOS. 
 
 | Location | MacOS | Windows |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ When scripting **MoI** we would make reference to folders and files locations us
 
 **AppData** is a hidden folder in Windows located in `C:\Users\<username>\AppData`. There are two folders inside AppData: `Local` that includes files tied to your current PC and `Roaming` that includes critical application files that can roam from device to device with a user account. To navigate to this folder open File Explorer/Windows Explorer, then type `%AppData%` into the address bar and hit enter.
 
-**Application Support** is part of your hidden `Library` folder. On MacOS from a Finder window, go to the menu and pick Go > "Go to folder" and type "~/Library/Application Support/" or open the Terminal and type  `open ~/Library/Application\ Support/`.
+**Application Support** is part of your hidden `Library` folder in MacOs. On MacOS from a Finder window, go to the menu and pick Go > "Go to folder" and type "~/Library/Application Support/" or open the Terminal and type  `open ~/Library/Application\ Support/`.
 
 
 
@@ -55,7 +55,9 @@ To install a startup script copy the `.js` and `.htm` files to your user `startu
 
 ## Notes JS Brigde ##
 
-On MacOS Moi uses JavaScriptCore by what I expect is QtWebKit (5.4.1). Objects are instances of `MoiObj` and `CallbackObject`
+On MacOS Moi uses JavaScriptCore by what I expect is QtWebKit (5.4.1). Objects are instances of `MoiObj` and `CallbackObject`.
+
+MoI renders using *AppleMetalOpenGLRenderer*.
 
 
 # Referencing resources #
@@ -69,6 +71,8 @@ When resolving a resource that doesn't use the `moi://` absolute url, **MoI** wi
 
 **MoI** builds dialogs, menus and panels using almost standard HTML by means of QtWebKit. There are some quirks that will try to discuss as we explain how to build a UI.
 
+
+To sort out....
 
 ## Special Hooks ##
 
