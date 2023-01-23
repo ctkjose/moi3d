@@ -99,6 +99,9 @@ function Shutdown(){
 }
 ```
 
+If you include the standard OK/Cancel buttons, then you can add the special functions `OnOKClicked()` and `OnCancelClicked()` which will be called when the respective button is pressed. (See `./ui/DialogClose.htm`)
+
+
 ## MoI UI ##
 
 The UI is made of mainly HTML templates. The UI files can be found in the "ui" folder. On Mac the ui folder is located in the application's resources. You can right-click on the app and select the "Show Package contents" to browser the Resources folder where you will find the "ui" folder.

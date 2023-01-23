@@ -588,6 +588,63 @@ Then in your javascript you can access `g_size` as `moi.ui.commandUI.g_size`.
 
 
 
+# MoiWindow
+
+
+Inside your HTML the global variable `moiWindow` is MoI's object with the API to manipulate the window.
+
+> Do not confuse `moiWindow` with javascript's `window`. `moiWindow` is an exposed QT object meant to handle the window created in QT.
+
+## Manage the window state
+
+```js
+moiWindow.close();
+```
+
+```js
+
+moiWindow.maximize();
+
+//Need more research? Note these only seem to work for content in `commandUI`
+//will revert to the original window size if `isMaximized`.
+moiWindow.minimize(); 
+
+moiWindow.restore(); ???
+```
+
+```js
+var aBool = moiWindow.isMaximized;
+var aBool = moiWindow.isMinimized;
+var aBool = moiWindow.isClosed;
+var aBool = moiWindow.isRestored;
+```
+
+## MoiHTMLWindow
+
+HTML can be presented in a `MoiHTMLWindow` as a dialog (`moi.ui.createDialog()`), as a menu (`moi.ui.showMenu()`), or from the html file of a command (`moi.ui.commandDialog`).
+
+
+The [HTMLDocument](http://developer.mozilla.org/en-US/docs/Web/API/HTMLDocument) is exposed by the property `MoiHTMLWindow.htmlDocument`. The [DOM Window](http://developer.mozilla.org/en-US/docs/Web/API/Window) is exposed by the property `MoiHTMLWindow.htmlWindow`. Both of this properties are homolugus to the javascript `document` and `window`.
+
+The property `MoiHTMLWindow.window` is your instance of the [`moiWindow`](#MoiWindow).
+
+## Modal Dialog
+
+You can present your HTML content in a blocking mode by using `moiWindow.doModal()`.
+
+The function `doModal()` will block the execution of the code until a corresponding call to `moiWindow.endDialog(anyReturnValue)` is called.
+
+Use `moiWindow.endDialog(anyReturnValue)` to close the current MoiHTMLWindow. Pass the return value (use -1 to indicate dialog was canceled) in anyReturnValue.
+
+The return value will be returned by `aValue = moiWindow.doModal()`.
+
+
+To reasearch...
+
+```js
+var aBool = moiWindow.canChangeMaximizedSize();
+```
+
 To sort....
 
 
@@ -612,9 +669,7 @@ canvas does work though, but I have SVG disabled.
 Perhaps I've found a bug, If I use this script - script: /* Toggle browser pane on/off */ moi.ui.showBrowserPane = !moi.ui.showBrowserPane; or this- script: /* Toggle between opposite and inline browser modes */ moi.ui.browserPosition = (moi.ui.browserPosition == 'Inside' ? 'Opposite' : 'Inside');
 
 
-Use `moiWindow.endDialog(anyValue)` to close current window. Pass the return value (use -1 to indicate dialog was cancelled) in anyValue.
 
-The return value will be returned by `el.window.doModal()`. The function `doModal()` will wait for the window to close and return the value provided by endDialog
 
 
 moi.ui.findElement( 'id' ) looks through all UIPanels for any element with the given id. Returns the element or null if not found.
