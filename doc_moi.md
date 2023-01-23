@@ -1,3 +1,7 @@
+# MoI
+
+
+*Work in progress...*
 
 You can run a command in the small box at the bottom of the window showing the coordinates. Erase the contents, type the name of a command and press enter to execute the command.
 
