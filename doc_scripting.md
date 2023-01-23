@@ -32,6 +32,8 @@ The name of the file becomes the name of the command. A command can be associate
 moi.command.execCommand( 'blend' );
 ```
 
+> TIP: `moi.command.execCommand()` also accepts the file path to a javascript file.
+
 You can create a dialog for your command by adding an HTML file with the same name as the javascript and the extension ".htm". If an html file is found a dialog is loaded on the top of side panel.
 
 
@@ -67,14 +69,14 @@ MoI renders using *AppleMetalOpenGLRenderer*.
 
 # Referencing resources #
 
-There're a couple of private URL (moi protocol) that we can use to reference resources in javascript/html. To specify an absolute path relative to the user application data with use the `moi://appdata/` url, for example 'moi://appdata/commands/file.css'; You can also access **MoI** internal resources, for example `moi://ui/icons/OffsetIcon.png`.
+There're a couple of private URL (moi protocol) that we can use to reference resources in javascript/html. To specify an absolute path relative to the user application data we use the `moi://appdata/` url, for example 'moi://appdata/commands/file.css'; You can also access **MoI** internal resources, for example, `moi://ui/icons/OffsetIcon.png`.
 
 When resolving a resource that doesn't use the `moi://` absolute url, **MoI** will search various paths for the resource. The first is the user's `commands` folder, then it will look in the app's `ui` and `commands` folders.
 
 
 # Building a UI #
 
-**MoI** builds dialogs, menus and panels using almost standard HTML by means of QtWebKit. There are some quirks that will try to discuss as we explain how to build a UI.
+**MoI** builds dialogs, menus, and panels using almost standard HTML by means of QtWebKit. There are some quirks that we will try to discuss as we explain how to build a UI.
 
 
 To sort out....
@@ -89,7 +91,7 @@ function Initialize(){
 }
 ```
 
-In similar faction you can add a `Shutdown` function that will be called when the view is closed.
+In a similar faction, you can add a `Shutdown` function that will be called when the view is closed.
 
 ```js
 function Shutdown(){
@@ -99,7 +101,7 @@ function Shutdown(){
 
 ## MoI UI ##
 
-The UI is made of of mainly html templates. The UI files can be found in the "ui" folder. On Mac the ui folder is located in the application's resources. You can right click on the app and select the "Show Package contents" to browser the Resources folder where you will find the "ui" folder.
+The UI is made of mainly HTML templates. The UI files can be found in the "ui" folder. On Mac the ui folder is located in the application's resources. You can right-click on the app and select the "Show Package contents" to browser the Resources folder where you will find the "ui" folder.
 
 > In the Terminal you can use the command `open /Applications/MoI\ v4.app/Contents/Resources/ui/` to quickly open the folder.
 
@@ -112,27 +114,5 @@ A command button is build as follows:
 <moi:CommandButton icon="icons/CustomIcon.png" command="CommandName">Button text label here</moi:CommandButton>
 ```
 
-The icons are located in "icons" folder.
+The icons are located in the "icons" folder.
 
-
-
-# Select a point #
-
-var pointpicker = moi.ui.createPointPicker();
-if ( !GetPoint( pointpicker ) ) return;
-var aPoint = pointpicker.pt;	
-
-
-function GetPoint( pointpicker )
-{
-	while ( 1 )
-	{
-		if ( !pointpicker.waitForEvent() )
-			return false;
-			
-		if ( pointpicker.event == 'finished' )
-			break;
-	}
-	
-	return true;
-}

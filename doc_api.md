@@ -94,6 +94,34 @@ if ( pointpicker.controlDown ){
 ```
 
 
+PointPicker Callback
+```js
+pointpicker.bindFunc()
+```
+
+## Select a point
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+if ( !GetPoint( pointpicker ) ) return;
+var aPoint = pointpicker.pt;	
+
+
+function GetPoint( pointpicker )
+{
+	while ( 1 )
+	{
+		if ( !pointpicker.waitForEvent() )
+			return false;
+			
+		if ( pointpicker.event == 'finished' )
+			break;
+	}
+	
+	return true;
+}
+```
+
 # GeometryObjList
 
 A collection of objects.
@@ -245,6 +273,70 @@ int whichInput,
 any value
 update		
 
+
+# Command #
+
+
+
+We can pass parameters after a command name:
+
+```js
+moi.command.execCommand( 'importpart ' + file);
+```
+
+The command can read the parameter string using `getCommandLineParams`:
+
+```js
+var params = moi.command.getCommandLineParams();
+```
+
+Storing and getting options:
+
+```js
+
+var myOptions = { size: 13, color: "red" };
+
+moi.command.setOption('myOptions', JSON.stringify(myOptions), true);
+
+try  { 
+	strData = moi.command.getOption('myOptions', true); 
+	if(strData){
+		myOptions = JSON.parse(strData);
+	}
+} catch (e) {};
+```
+
+
+```js
+var hotkeys = ["1", "2", "3", "4", "5", "6"];
+for ( var i in hotkeys ){
+	moi.command.registerCommandSpecificShortcutKey(hotkeys[i]);
+}
+
+while ( true ){
+	moi.ui.commandDialog.waitForEvent();
+	var e  = moi.ui.commandDialog.event;
+	if( e == "1" ){
+		moi.ui.alert("A local hotkey was pressed!");
+	}
+
+	if ( e == 'cancel' ) { 
+		moi.ui.commandUI.cancel(); 
+		return; 
+	}else if ( e == 'done' ) { 
+		moi.ui.commandUI.done(); 
+		return; 
+	}
+}
+```
+
+To document:
+
+```js
+moi.command.setCommandSpecificUndo( true );
+var params = moi.command.getCommandLineParams();
+```
+
 # FileSystem #
 
 > **WARNING** All paths returned by MoI's API are Windows paths, to write crossplatform code you have to pass those by `moi.filesystem.toNativePath()`.
@@ -277,12 +369,24 @@ var filePath = moi.filesystem.toNativePath(currFile);
 var fileShortPath = moi.filesystem.getCompactPath( currFile, 29 );
 var fileName = moi.filesystem.getFileNameFromPath(filePath);
 
+var aPath = moi.filesystem.getProcessDir();
+var aPath = moi.filesystem.getCommandsDir();
+
+var aBool = moi.filesystem.dirExists(aPath);
+var aBool = moi.filesystem.fileExists(filePath);
+
+
 //In MacOs getAppDataDir() produces a Windows path like "z:\Users\ctk\Library\Application Support\Moi\".
 var appDataPath = moi.filesystem.getAppDataDir(); //Incorrect
 var appDataPath = moi.filesystem.toNativePath(moi.filesystem.getAppDataDir()); //Incorrect
 
 moi.filesystem.copyFile(aPathSrc, aPathDest);
 moi.filesystem.deleteFile(aPath);
+
+var files = moi.filesystem.getFiles(aPath, '*.js' );
+for ( var i = 0; i < files.length; ++i ){
+	var file files.item(i);
+}
 
 var filename = moi.filesystem.getSaveFileName( 'Text file name', 'Text files (*.txt)|*.txt' );
 
@@ -315,19 +419,87 @@ The underlying UI in MoI is provided by QT. If your are curious here are some go
 > In order to set the size of a window we have to set the option `resizeable`.
 
 
-> In MoI's api there are two 
 
 
-`moi.ui.mainWindow.viewpanel.mode`
+# Sketch Views
 
-Viewports modes are "3D", "Right", "Left", "Top", "Split".
+MoI UI displays a view in different modes. A view can have one of these modes "3D", "Right", "Left", "Top", "Bottom", "Front", "Back" or "Split".
 
 
-moi.ui.mainWindow.viewpanel.mode != 'split'
-var g_Viewport = moi.ui.mainWindow.viewpanel.getViewport('3D')
-moi.ui.mainWindow.viewpanel.getViewport('Right').name
+The active view is referenced by `moi.ui.mainWindow.viewpanel`.
 
-<canvas> does work though, but I have SVG disabled.
+
+We change the mode using the string property `moi.ui.mainWindow.viewpanel.mode`.
+
+Each mode becomes a ViewPort and MoI can display up to 4 views when the "Split" mode is active.
+
+```js
+var strMode = moi.ui.mainWindow.viewpanel.mode;
+
+var objViewPort = moi.ui.mainWindow.viewpanel.getViewport('3D');
+
+var objViewPort = moi.ui.getViewportUnderMouse(); 
+if ( viewport ){
+	//do something...
+}
+
+var strName = moi.ui.mainWindow.viewpanel.getViewport('Right').name;
+
+```
+
+## Change and update the viewports
+
+```js
+
+var viewPanel = moi.ui.mainWindow.viewpanel;
+var vname = "Top";
+
+viewPanel.mode = vname;
+
+//Found this in some script not sure what is reverseView()?
+//Probably due to the duality of this view ie "Front/Back", "Top/Bottom"?
+if ( viewPanel.getViewport(vname).name != vname ) viewPanel.reverseView( vname );
+
+
+moi.ui.redrawViewports();
+```
+
+## Viewport manipulation:
+
+```js
+//Move the camera...
+var objViewPort = moi.ui.mainWindow.viewpanel.getViewport('3D'); 
+objViewPort.cameraPt = moi.vectorMath.createPoint(50.2, 30.5, 10.1);
+
+
+//Get current frames
+var frame = objViewPort.cameraFrame;
+var frame objViewPort.targetFrame;
+
+var a = objViewPort.tiltAngle; //writable property
+
+objViewPort.reset(); 
+
+objViewPort.zoom(2); //1,2,..? whats the range
+
+//View front
+objViewPort.setAngles( 90, 0 );
+
+
+//Change Projection
+var isPerspective = (objViewPort.projection == 'Perspective');
+var isParallel = (objViewPort.projection == 'Parallel');
+
+objViewPort.projection = 'Perspective';
+
+```
+
+
+
+moi.geometryDatabase.fileImport( moi.command.getCommandLineParams(), true );
+
+
+canvas does work though, but I have SVG disabled.
 
 Perhaps I've found a bug, If I use this script - script: /* Toggle browser pane on/off */ moi.ui.showBrowserPane = !moi.ui.showBrowserPane; or this- script: /* Toggle between opposite and inline browser modes */ moi.ui.browserPosition = (moi.ui.browserPosition == 'Inside' ? 'Opposite' : 'Inside');
 

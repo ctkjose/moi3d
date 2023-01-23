@@ -1,3 +1,20 @@
+Feature Requests
+
+Creating tools and panels:
+
+I would like to see a `moi.ui.createWindow([url|html], windowOptions)` similar to js `window.open()`.
+
+The `moi.ui.createDialog()` has some limitations. It add behaviors and make assumptions about its use. For example:
+
+- The `esc` key closes the window. 
+- Mouse events like scrolls and other are stolen by the main viewport regardless of any attempts to force focus on the HTML element. 
+- The window opens centered relative to the main window.
+- Handling of keys is limited. Copy/Paste, Command Keys are stolen by Moi.
+
+
+
+
+
 # Paste Board
 This a a temporary repository of random information, to be used somewhere else, and sorted out...
 

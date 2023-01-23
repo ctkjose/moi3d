@@ -1,3 +1,94 @@
+////////////////////////////////////
+<div id="commandList" data-bind-tab="tab1" class="moi-panel padded moi-tab-body" style="display: auto;">
+	<div class="moi-tool-icon">
+	  <div class="moi-tool-img"><img src="moi://ui/icons/BoxSetIcon.png" /></div>
+	</div>
+	<div class="moi-tool-icon">
+	  <div class="moi-tool-img"><img src="moi://ui/icons/BlendIcon.png" /></div>
+	</div>
+</div>
+
+////////////////////////////////////
+
+createObserver: function(el){
+	var observer;
+	var handler = {target: target, mo:observer};
+	
+	handler.fnHooksAdditions = [];
+	handler.fnHooksRemovals = [];
+	
+	handler.disconnect = function(){
+		if(observer) return observer.disconnect();
+		return undefined;
+	};
+	handler.connect = function(){
+		observer = (d, { childList: true,subtree:true });
+	};
+	handler.fnProcess =function(mutations){
+		mutations.forEach(function( mutation ) {
+			handler.handleNodesAdded(mutation);
+			handler.handleNodesRemoved(mutation);
+		});
+	};
+	handler.handleNodesAdded = function(mutation){
+		if (mutation.type !== 'childList') return;
+		var nodes = mutation.addedNodes;
+		if( nodes === null ) return;
+		nodes = Array.from(nodes);
+		if(!nodes.length) return;
+		nodes.forEach(function(n){ 
+			if(n.nodeType != 1) return; 
+			handler.fnHooksAdditions.forEach(function(fn){
+				fn.call(fn, n);
+			});
+		});
+	},
+	handler.handleNodesRemoved = function(mutation, onRemoval){
+		if (mutation.type !== 'childList') return;
+		var nodes = mutation.removedNodes;
+		if( nodes === null ) return;
+		nodes = Array.from(nodes);
+		if(!nodes.length) return;
+		nodes.forEach(function(n){ 
+			if(n.nodeType != 1) return; 
+			handler.fnHooksRemovals.forEach(function(fn){
+				fn.call(fn, n);
+			});
+		});
+	}
+		
+	handler.dispose = function(){
+		handler.fnHooksAdditions = [];
+		handler.fnHooksRemovals = [];
+		if(observer) observer.disconnect();
+	};
+	
+	handler.onElementAdded = function(fn){
+		handler.fnHooksAdditions.push(fn);
+	
+		return {remove:function(){
+			handler.fnHooksAdditions = handler.fnHooksAdditions.filter(function(v){
+				return (v !== fn);
+			});
+		}};
+	};
+	handler.onElementRemoved = function(fn){
+		handler.fnHooksRemovals.push(fn);
+	
+		return {remove:function(){
+			handler.fnHooksRemovals = handler.fnHooksRemovals.filter(function(v){
+				return (v !== fn);
+			});
+		}};
+	};
+	
+	observer = new MutationObserver(handler.fnProcess);
+	observer.observe(el, { childList: true, subtree:true });
+	
+	return handler;
+}
+
+
 var spMoiWnd = moi.ui.getUIPanel('moi://ui/SidePane.htm');
 
 var spDoc = spMoiWnd.document;
