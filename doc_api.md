@@ -6,24 +6,23 @@
 
 This page is dedicated to the vanilla JavaScript API in MoI and it complements the documentation on the PluginSDK. The PluginSDK is not an official part of MoI it's just a user contributed an additional javascript layer to help plugin development.
 
-# Objects and Documents
+# Understanding Objects and Documents
 
 A sketch is made up of objects. Objects represent geometry (shapes, curves, surfaces, etc ) and other assets like text, construction lines, images, etc.
 
-The `moi.geometryDatabase` is the interface used to obtain and manipulate objects in a sketch, you can think of it as the actual document.
+The [`moi.geometryDatabase`](#GeometryDatabase) is the interface used to obtain and manipulate objects in a sketch, you can think of it as the actual document.
 
-We add and remove objects from the `moi.geometryDatabase` using `moi.geometryDatabase.addObject(GeometryObj)`, `moi.geometryDatabase.addObjects(GeometryObjList)`, `moi.geometryDatabase.removeObject(GeometryObj)` and `moi.geometryDatabase.removeObjects(GeometryObjList)`. 
+We add and remove objects from the `moi.geometryDatabase` using methods like `addObject()`, `addObjects()`, `removeObject()` and `removeObjects()`. 
 
-We use [factories](#GeometryFactory) to create objects in the `geometryDatabase`.
+See section [GeometryDatabase](#GeometryDatabase) for more details.
 
-Before we look at these we need to learn a bit about the `GeometryObjList`.
+We use [factories](#GeometryFactory) to create objects in the `geometryDatabase`. 
 
+Manipulating objects from the `moi.geometryDatabase` is mainly done in a collection known as a [`GeometryObjList`](#GeometryObjList). As the name implies it is a native object (MoiObject) that holds objects.
 
-# Object Lists
+The property `ObjectList.length` indicates the number of items in the list and we use `ObjectList.item(idx)` to access an object in the list. The first item in the collection is at index 0. 
 
-Manipulating objects from the `moi.geometryDatabase` is mainly done in a collection known as a `GeometryObjList`. As the name implies it is a native object (MoiObject) that holds objects.
-
-The property `ObjectList.length` indicates the number of items in the list and we use `ObjectList.item(idx)` to access an object in the list. The first item in the collection is at index 0. See [ObjectList](#GeometryObjList) for more details.
+See [ObjectList](#GeometryObjList) for more details.
 
 
 
@@ -35,13 +34,17 @@ The property `ObjectList.length` indicates the number of items in the list and w
 var objects = moi.geometryDatabase.getSelectedObjects();
 ```
 
+This function returns a [`GeometryObjList`](#GeometryObjList).
+
 ## Filter a GeometryObjList.
 
-Filter a `GeometryObjList` by object types using one of the following `getConstructionLines()`, `getCurves()`, `getSolids()`, `getBReps()`, `getFaces()`, `getPoints()`, `getEdges()`, `getOpenBReps()`, `getStandaloneCurves()`, `getTopLevelObjects()`:
+Filter a `GeometryObjList` by object types using one of the following `getConstructionLines()`, `getCurves()`, `getSolids()`, `getBReps()`, `getFaces()`, `getPoints()`, `getEdges()`, `getOpenBReps()`, `getStandaloneCurves()`, `getTopLevelObjects()`. These functions returns a [`GeometryObjList`](#GeometryObjList).
 
 ```js
-var objects = moi.geometryDatabase.getSelectedObjects().getCurves();
-``` 
+var selectedObjects = moi.geometryDatabase.getSelectedObjects();
+var objects = selectedObjects.getCurves();
+```
+
 
 ## Deselect items.
 
@@ -49,7 +52,7 @@ var objects = moi.geometryDatabase.getSelectedObjects().getCurves();
 moi.geometryDatabase.deselectAll();
 ```
 
-## Select given types of items.
+## Select a given type of items.
 
 ```js
 moi.selection.setFilter( 'Types', 'Curves', true );
@@ -76,6 +79,8 @@ The coordinates of the `Point` are accessed with the float properties `Point.x`,
 
 
 # PointPicker
+
+The **PointPicker** allows you to prompt the user to select a point or points.
 
 ```js
 var pointpicker = moi.ui.createPointPicker();
@@ -107,19 +112,79 @@ if ( !GetPoint( pointpicker ) ) return;
 var aPoint = pointpicker.pt;	
 
 
-function GetPoint( pointpicker )
-{
-	while ( 1 )
-	{
-		if ( !pointpicker.waitForEvent() )
-			return false;
+function GetPoint( pointpicker ){
+	while ( 1 ){
+		if ( !pointpicker.waitForEvent() ) return false;
 			
-		if ( pointpicker.event == 'finished' )
-			break;
+		if ( pointpicker.event == 'finished' ) break;
 	}
 	
 	return true;
 }
+```
+
+## Select multiple points
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+var points = GetPoints( pointpicker );
+if(!points.length) return;
+
+var aPoint = points[0]; //first point...
+
+function GetPoint( pointpicker ){
+	while ( 1 ){
+		if ( !pointpicker.waitForEvent() ) return false;
+			
+		if ( pointpicker.event == 'finished' ) break;
+	}
+	
+	return true;
+}
+```
+
+# GeometryDatabase
+
+The `moi.geometryDatabase` is the interface used to obtain and manipulate objects in a sketch, you can think of it as the actual document.
+
+
+## Adding and removing objects to the document.
+
+Add or remove a single object using `addObject` and `removeObject`:
+
+`moi.geometryDatabase.addObject(GeometryObj)`<br>
+`moi.geometryDatabase.removeObject(GeometryObj)`<br>
+
+
+Add or remove a group of objects using `addObjects` and `removeObjects`:
+
+`moi.geometryDatabase.addObjects(GeometryObjList)`<br>
+`moi.geometryDatabase.removeObjects(GeometryObjList)`<br>
+
+## Exporting the document
+
+```js
+// Different possible semi-colon delimited options:
+// NoUI=true
+// Angle=12.0
+// Output=ngons | quads | triangles
+// MaxLength=0.0
+// MaxLengthApplyTo=curved | planes | all
+// MinLength=0.0
+// AspectRatio=0.0
+// Weld=true
+// Display=shadedwithedges | shadednoedges | wireframe
+// ExpandedDialog=false
+
+var options = 'NoUI=true;Angle=6';
+
+moi.geometryDatabase.fileExport( g_Directory + filename + '.stl', options );
+```
+
+## Importing a file into the document.
+
+```js
+moi.geometryDatabase.fileImport( strFilePath, true );
 ```
 
 # GeometryObjList
@@ -306,30 +371,6 @@ try  {
 } catch (e) {};
 ```
 
-
-```js
-var hotkeys = ["1", "2", "3", "4", "5", "6"];
-for ( var i in hotkeys ){
-	moi.command.registerCommandSpecificShortcutKey(hotkeys[i]);
-}
-
-while ( true ){
-	moi.ui.commandDialog.waitForEvent();
-	var e  = moi.ui.commandDialog.event;
-	if( e == "1" ){
-		moi.ui.alert("A local hotkey was pressed!");
-	}
-
-	if ( e == 'cancel' ) { 
-		moi.ui.commandUI.cancel(); 
-		return; 
-	}else if ( e == 'done' ) { 
-		moi.ui.commandUI.done(); 
-		return; 
-	}
-}
-```
-
 To document:
 
 ```js
@@ -494,9 +535,61 @@ objViewPort.projection = 'Perspective';
 
 ```
 
+## Setup temporary hotkeys
+
+```js
+var hotkeys = ["1", "2", "3", "4", "5", "6"];
+for ( var i in hotkeys ){
+	moi.command.registerCommandSpecificShortcutKey(hotkeys[i]);
+}
+
+while ( true ){
+	moi.ui.commandDialog.waitForEvent();
+	var e  = moi.ui.commandDialog.event;
+	if( e == "1" ){
+		moi.ui.alert("A local hotkey was pressed!");
+	}
+
+	if ( e == 'cancel' ) { 
+		moi.ui.commandUI.cancel(); 
+		return; 
+	}else if ( e == 'done' ) { 
+		moi.ui.commandUI.done(); 
+		return; 
+	}
+}
+```
+
+> Note: `registerCommandSpecificShortcutKey` only works if we have a UI.
 
 
-moi.geometryDatabase.fileImport( moi.command.getCommandLineParams(), true );
+## CommandUI
+
+
+> IMPORTANT: `moi.ui.commandUI` only exists if we have an HTML UI for our command.
+
+
+Access the [HTMLDocument](http://developer.mozilla.org/en-US/docs/Web/API/HTMLDocument) of your UI:
+
+```js
+var htmlDocument = moi.ui.commandUI.document;
+
+```
+
+Global variables in the UI's HTML are accessed in your javascript `moi.ui.commandUI`. For example if in your html you have something like:
+
+```html
+<script>
+	var g_size = 10;
+</script>
+```
+
+Then in your javascript you can access `g_size` as `moi.ui.commandUI.g_size`.
+
+
+
+To sort....
+
 
 
 canvas does work though, but I have SVG disabled.
