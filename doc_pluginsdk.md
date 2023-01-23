@@ -2,6 +2,8 @@
 
 MoI](http://moi3d.com) (Moment of Inspiration) is a superb CAD software that's designed to be simple and easy to use. MoI is mainly designed for CAD solids and surface modeling and provides a great JavaScript API to let you expand and modify the application.
 
+PluginSDK is inspired by ATOM/VSCode plugin architecture, albeit with the limitations of QTWebView (V5) and ES5.
+
 PluginSDK is a community-based javascript library that compliments MoI's [API](doc_api.md) to make extending MoI even easier.
 
 
@@ -23,7 +25,6 @@ PluginSDK is a community-based javascript library that compliments MoI's [API](d
 
 
 
-
 # Anatomy of the PluginSDK
 
 PluginSDK operates parallel to MoI commands and has its own UI and invocation means.
@@ -31,8 +32,12 @@ PluginSDK operates parallel to MoI commands and has its own UI and invocation me
 
 The PluginSDK will bootstrap itself as a startup script and inject HTML and code into the MoI main window. This step injects reusable html widgets/and elements and functionality.
 
-Plugins that want to run under the PluginSDK are installed in the "Plugins" folder. 
+Plugins that want to run under the PluginSDK are installed in the "Plugins" folder.
 
+
+# MoI Application
+
+In javascript the main interface for the PluginSDK is `moiApp`. The `moiApp` serves as the main namespace used to access the functionality provided by the SDK.
 
 
 # Displaying Notifications
@@ -41,7 +46,7 @@ Plugins that want to run under the PluginSDK are installed in the "Plugins" fold
 
 `moiApp.showNotification(strType, strMessage, boolIsModal)`
 
-Notifications are displayed on the side panel of MoI. The float on top of the side panel content. Some notifications will fade out by themselves depending on the `type` and others will stay on the side until the user closes the dialog. Notifications are not modal. If you set isModal to true then a traditional alert will be created.
+Notifications are displayed on the side panel of MoI. Notifications float on top of the side panel content. Some notifications will fade out by themselves depending on the `type` and others will stay on the side until the user closes the dialog. Notifications are not modal. If you set isModal to true then a traditional alert will be created.
 
 | Type | Description |
 | --- | --- |
@@ -52,7 +57,9 @@ Notifications are displayed on the side panel of MoI. The float on top of the si
 
 # Open a Window
 
-`moiView view = moiApp.showDialog( url|html , options)`
+```js
+var aPromise = moiApp.showDialog( url|html , options)
+```
 
 The parameter `options` is a plain object used to configure our dialog.
 
@@ -61,10 +68,19 @@ The parameter `options` is a plain object used to configure our dialog.
 | --- | --- |
 | `width` | Initial width of the dialog. |
 | `height` | Initial height of the dialog. |
+| `minWidth` | Minimum width of the dialog. |
+| `minHeight` | Minimum height of the dialog. |
 | `resizable` | Boolean. Indicate if the dialog is resizable. |
 | `onViewLoaded` | Function. The event handler for the given event. |
 | `onViewClosed` | Function. The event handler for the given event. |
 
+
+```js
+
+moiApp.showDialog( strHTML , myOptionsObj ).then(function(view){
+	moi.ui.alert("My dialog is ready!");
+});
+```
 
 The [`moiView `](#moiView) is a helper object to interact with your dialog.
 

@@ -592,6 +592,21 @@ To sort....
 
 
 
+v5 beta work by Michael Gibson to manipulate edit points:
+
+
+```
+Edit points scripting - Add scripting interface on objects for:
+    obj.hasEditPoints - read-only property true if object has edit points, false if not.
+    obj.hasSelectedEditPoints - read-only property true if object has any selected edit points.
+    obj.numEditPoints - read-only property for number of edit points.
+    obj.getEditPoint( index ) - method that returns an x,y,z point for the given edit point index.
+    obj.getEditPointSelected( index ) - method that returns true if the given edit point is selected.
+
+There may not be enough stuff in there yet for editing the points though, you would need to select it and then use the Move factory to create a new object with a moved point. Although you can read selection currently there isn't a set selection yet.
+```
+
+
 canvas does work though, but I have SVG disabled.
 
 Perhaps I've found a bug, If I use this script - script: /* Toggle browser pane on/off */ moi.ui.showBrowserPane = !moi.ui.showBrowserPane; or this- script: /* Toggle between opposite and inline browser modes */ moi.ui.browserPosition = (moi.ui.browserPosition == 'Inside' ? 'Opposite' : 'Inside');
