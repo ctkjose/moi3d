@@ -576,7 +576,7 @@ var htmlDocument = moi.ui.commandUI.document;
 
 ```
 
-Global variables in the UI's HTML are accessed in your javascript `moi.ui.commandUI`. For example if in your html you have something like:
+Global variables in the UI's HTML are accessed in your javascript with the object  `moi.ui.commandUI`. For example, if in your html you have something like:
 
 ```html
 <script>
@@ -584,7 +584,7 @@ Global variables in the UI's HTML are accessed in your javascript `moi.ui.comman
 </script>
 ```
 
-Then in your javascript you can access `g_size` as `moi.ui.commandUI.g_size`.
+Then in your javascript, you can access `g_size` as `moi.ui.commandUI.g_size`.
 
 
 
@@ -630,16 +630,16 @@ The property `MoiHTMLWindow.window` is your instance of the [`moiWindow`](#MoiWi
 
 ## Modal Dialog
 
-You can present your HTML content in a blocking mode by using `moiWindow.doModal()`.
+You can present your HTML content and wait for the content to be dismissed using `moiWindow.doModal()`.
 
 The function `doModal()` will block the execution of the code until a corresponding call to `moiWindow.endDialog(anyReturnValue)` is called.
 
-Use `moiWindow.endDialog(anyReturnValue)` to close the current MoiHTMLWindow. Pass the return value (use -1 to indicate dialog was canceled) in anyReturnValue.
+Use `moiWindow.endDialog(anyReturnValue)` to close the current MoiHTMLWindow. Pass the return value in anyReturnValue (use -1 to indicate dialog was canceled).
 
 The return value will be returned by `aValue = moiWindow.doModal()`.
 
 
-To reasearch...
+To research...
 
 ```js
 var aBool = moiWindow.canChangeMaximizedSize();
