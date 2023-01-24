@@ -417,7 +417,7 @@ pointpicker.disableTanPerpObjectSnap = true;
 pointpicker.resetOnMouseLeave = true;
 
 
-
+moi.ui.clearPickedPoints();
 
 //pointpicker.restrictToObject( face );
 
@@ -732,6 +732,26 @@ To sort....
 | defaultHeight | Numeric, initial height of window. |
 
 
+## moi.ui
+
+
+```js
+var aMoiWindow = moi.ui.mainWindow;
+var aMoiHTMLWindow = moi.ui.commandDialog;
+
+
+moi.ui.fireUIEvent( 'done' );
+
+moi.ui.getTemplatedText( 'License dialog key label', String(ver) );
+
+
+moi.ui.commandUI //what is this???
+
+
+var pointpicker = moi.ui.createPointPicker()
+var objectpicker = moi.ui.createObjectPicker();
+
+```
 
 v5 beta work by Michael Gibson to manipulate edit points:
 
