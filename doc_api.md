@@ -30,23 +30,7 @@ The coordinates of the `Point` are accessed with the float properties `Point.x`,
 
 
 
-# Command #
 
-
-
-We can pass parameters after a command name:
-
-```js
-moi.command.execCommand( 'importpart ' + file);
-```
-
-The command can read the parameter string using `getCommandLineParams`:
-
-```js
-var params = moi.command.getCommandLineParams();
-```
-
-> **Trick:** MoI will take the value of any parameter that matches the Id of an HTML control and set the control value to that value.<br><br>`"mycomand param1=value" `
 
 
 

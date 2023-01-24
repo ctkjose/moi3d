@@ -20,16 +20,38 @@ The property `ObjectList.length` indicates the number of items in the list and w
 See [ObjectList](doc_moi_geometrydb.md#GeometryObjList) for more details.
 
 
-# Sketch objects
+## Sketch objects
 
 See [GeometryDatabase](doc_moi_geometrydb.md#GeometryDatabase).<br>
 See [ObjectList](doc_moi_geometrydb.md#GeometryObjList).<br>
 
 
-# Creating objects with Factories
+## Creating objects with Factories
 
 See [GeometryFactory](doc_moi_factories.md#GeometryFactory).<br>
 See [Moi V4 Factories](doc_moi_factories.md#geometry-factories).<br>
 
 
+
+# Executing Commands #
+
+We can invoke MoI's commands and user's commands from javascript. Instead of a command name you can also pass a moi url to the javascript file.
+
+```js
+moi.command.execCommand( strCommandName );
+```
+
+We can pass parameters after a command name:
+
+```js
+moi.command.execCommand( 'importpart ' + file);
+```
+
+The command can read the parameter string using `getCommandLineParams`:
+
+```js
+var params = moi.command.getCommandLineParams();
+```
+
+> **Trick:** MoI will take the value of any parameter that matches the Id of an HTML control and set the control value to that value.<br><br>`"mycomand param1=value" `
 
