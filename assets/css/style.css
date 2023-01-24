@@ -1,0 +1,21 @@
+.toc-index {
+	margin-bottom: 1rem;
+}
+
+.toc-index ul {
+	-webkit-columns: 3;
+	column-count: 3;
+}
+
+.toc-index ul {
+	margin: .5rem 0 2rem;
+	list-style: disc;
+	padding-left: 2rem;
+}
+.toc-index ul li {
+	margin: 0 0 .5rem;
+}
+
+.main-page-content ul {
+	list-style: disc;
+}
