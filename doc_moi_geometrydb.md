@@ -45,7 +45,7 @@ moi.geometryDatabase.fileExport( g_Directory + filename + '.stl', options );
 moi.geometryDatabase.fileImport( strFilePath, true );
 ```
 
-
+<br><br><hr>
 # GeometryObjList
 
 A collection of objects.
@@ -74,7 +74,7 @@ A collection of objects.
 | `ObjectList.numPoints` | **Property** **Integer** |
 
 
-
+<br><br><hr>
 # Object Selection
 
 ## Obtain a GeometryObjList of all selected objects.

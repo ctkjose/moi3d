@@ -32,7 +32,7 @@ See [GeometryFactory](doc_moi_factories.md#GeometryFactory).<br>
 See [Moi V4 Factories](doc_moi_factories.md#geometry-factories).<br>
 
 
-
+<br><br><hr>
 # Executing Commands #
 
 We can invoke MoI's commands and user's commands from javascript. Instead of a command name you can also pass a moi url to the javascript file.

@@ -90,7 +90,7 @@ No idea, used in Sweep.js. It seems to be associated with disabling updates from
 | `GeometryFactory.numInputs` | int, read-only |
 
 
-
+<br><br><hr>
 # Geometry Factories
 
 See [GeometryFactory](#GeometryFactory) for an explanation of factories.
