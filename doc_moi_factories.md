@@ -4,6 +4,15 @@
 
 The `GeometryFactory` is a generic object that provides a common and abstracted api to create geometry objects in MoI.
 
+
+## Create a factory instance 
+
+See [Geometry Factories](#geometry-factories) for details on each factory.
+
+```js
+var myLineFactory = moi.command.createFactory( 'line' );
+```
+
 ## Managing input parameters
 
 Parameters used by the factory are represented as enumerated inputs. The first input is at index 0 and the last one is `GeometryFactory.numInputs - 1`.
