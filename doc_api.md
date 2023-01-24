@@ -448,8 +448,10 @@ To sort....
 
 | Parameter | Description |
 | --- | --- |
-| resizeable | |
+| resizable | resizeable |
 | fixedHeight | |
+| fixedWidth | |
+| noCloseButton | |
 | defaultWidth | Numeric, initial width of window. |
 | defaultHeight | Numeric, initial height of window. |
 

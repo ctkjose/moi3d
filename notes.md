@@ -12,8 +12,23 @@ The `moi.ui.createDialog()` has some limitations. It add behaviors and make assu
 - Handling of keys is limited. Copy/Paste, Command Keys are stolen by Moi.
 
 
+# MoI internals
 
+QMoiApplication
+MoiScriptableBase
+PropertiesPanelObjectModel
+MoiScriptable
+MoiScriptable18
+MakeFunctionObjectEMS_F10
+MoiVariantR10
+MethodArgsEE24
+ScriptableFunctionObject
 
+ShortcutKeyObjectModel
+
+WaitableObject
+	WaitForEventWorkerEvE
+		WaitableObjectEventLoop
 
 # Paste Board
 This a a temporary repository of random information, to be used somewhere else, and sorted out...
