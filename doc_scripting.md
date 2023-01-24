@@ -26,7 +26,9 @@ When scripting **MoI** we would make reference to folders and files locations us
 
 Commands are scripts that add a functionality that we can invoke. Commands are written in JavaScript and may define a UI in an HTML file. **MoI** uses javascript version [ES2009](https://www.w3schools.com/js/js_es5.asp) (ES5) so be mindful of the different functionality and syntax limitations of ES5 vs ES6. 
 
-The name of the file becomes the name of the command. A command can be associated to a keyboard shortcut using the "Shortcuts" tab in the settings or editing the `[Shortcut Keys Mac]` or the `[Shortcut Keys]` of your "moi.ini". You can run a command in the small box at the bottom of the window showing the coordinates. Erase the contents, type the name of a command and press enter to execute the command. From javascript we can use the API to execute a command:
+The name of the file becomes the name of the command. A command can be associated to a keyboard shortcut using the "Shortcuts" tab in the settings or editing the `[Shortcut Keys Mac]` or the `[Shortcut Keys]` of your "moi.ini". You can run a command in the small box at the bottom of the window showing the coordinates. Erase the contents, type the name of a command and press enter to execute the command. 
+
+From javascript we can use the API to execute a command:
 
 ```js
 moi.command.execCommand( 'blend' );
@@ -55,7 +57,7 @@ The code in the main js script is executed sequentially. When the execution term
 
 ## Startup Scripts ##
 
-In addition of commands your can execute arbitrary javascript on **MoI** startup, and we call them "startup scripts".  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order. 
+In addition of commands your can execute arbitrary javascript on **MoI** startup, and we call them "startup scripts".  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order.
 
 To install a startup script copy the `.js` and `.htm` files to your user `startup` folder.
 
@@ -69,7 +71,7 @@ MoI renders using *AppleMetalOpenGLRenderer*.
 
 # Referencing resources #
 
-There're a couple of private URL (moi protocol) that we can use to reference resources in javascript/html. To specify an absolute path relative to the user application data we use the `moi://appdata/` url, for example 'moi://appdata/commands/file.css'; You can also access **MoI** internal resources, for example, `moi://ui/icons/OffsetIcon.png`.
+MoI implements a private URL protocol (moi://) that we can use to reference resources in javascript/html. To specify an absolute path relative to the user application data we use the `moi://appdata/` url, for example 'moi://appdata/commands/file.css'; You can also access **MoI** internal resources, for example, `moi://ui/icons/OffsetIcon.png`.
 
 When resolving a resource that doesn't use the `moi://` absolute url, **MoI** will search various paths for the resource. The first is the user's `commands` folder, then it will look in the app's `ui` and `commands` folders.
 

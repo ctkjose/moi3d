@@ -194,21 +194,24 @@ The `GeometryFactory` is a generic object that provides a common and abstracted 
 
 Parameters used by the factory are represented as enumerated inputs. The first input is at index 0 and the last one is `GeometryFactory.numInputs - 1`.
 
+
+Set the value of an input with:<br>
 `GeometryFactory.setInput(inputIdx, anyValue)`
 
-Sets the value of a given input.
-
+Unsets the value of a given input with:<br>
 `GeometryFactory.clearInput(inputIdx)`
 
-Unsets the value of a given input.
-
-`GeometryFactory.removeLastInput()`
 
 Remove last input! Useful when multiple optional inputs are required, for example in "DoCurve.js" it is used to remove points from the input.
 
+`GeometryFactory.removeLastInput()`
+
+
+When the input parameter is a list we use `addToListInput` instead of `setInput`.
+
 `GeometryFactory.addToListInput(inputIdx, anyValue)`
  
-When the input parameter is a list we use `addToListInput` instead of `setInput`. For example:
+ For example:
 
 ```js
 var isoinfo = moi.createList();
@@ -217,26 +220,39 @@ isoinfo.add( moi.ui.commandUI.isodir.value );
 factory.addToListInput( 6, isoinfo );		
 ```
 
+### Input proxies
+
 `GeometryFactoryInput inputProxy = GeometryFactory.getInput(inputIdx)`
 
 Returns null or `GeometryFactoryInput` proxy object, which implements the methods `GeometryFactoryInput.setValue(anyValue)` and `GeometryFactoryInput.getValue(anyValue)`.
 
+We use input proxies to bind a factory input to a picker or others.
+
 
 ## Getting the factory output
 
-`ObjectList results = GeometryFactory.calculate()`
+```js
+var createdObjList = GeometryFactory.calculate();
+```
 
 Updates the factory based on its inputs and return an ObjectList with the objects created.
 
-`GeometryFactory.update()`
+## Add factory object to the moi.geometryDatabase
 
-`GeometryFactory.commit()`
+```js
+GeometryFactory.update();
+GeometryFactory.commit();
+```
 
-Adds the objects created directly to `moi.geometryDatabase`. You must call `GeometryFactory.update()` before to produce the actual objects.
+To add the objects created directly to `moi.geometryDatabase` you must call `GeometryFactory.update()` before producing the actual objects with `GeometryFactory.commit()`.
+
+## Cancel the factory 
 
 `GeometryFactory.cancel()`
 
 Cancels the object creation and disposes the factory.
+
+## Misc methods and properties
 
 `GeometryFactory.disableUpdate(boolState)`
 No idea, used in Sweep.js. It seems to be associated with disabling updates from when inputs are binded to ui widgets.
