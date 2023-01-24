@@ -1,4 +1,4 @@
-**TOPICS** - [API](doc_moi_api.md) [GeometryFactory](#GeometryFactory) - [Geometry Factories](#geometry-factories)
+**TOPICS** - [API](doc_moi_api.md) - [GeometryFactory](#GeometryFactory) - [Geometry Factories](#geometry-factories)
 
 
 # Creating objects with Factories
