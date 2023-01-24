@@ -118,10 +118,12 @@ See [GeometryFactory](#GeometryFactory) for an explanation of factories.
   </tr>
 </table>
 
+
 # Factory addpoint
 ```js
 var factory = moi.command.createFactory( "addpoint" );
 ```
+
 <table>
 		<tr>
 			<td class="caption" colspan="3"><b>Inputs</b></td>
@@ -144,6 +146,7 @@ var factory = moi.command.createFactory( "addpoint" );
 ```js
 var factory = moi.command.createFactory( "align" );
 ```
+
 
 <table>
 		<tr>
@@ -180,7 +183,8 @@ var factory = moi.command.createFactory( "align" );
 # Factory alignbackgroundimage
 ```js
 var factory = moi.command.createFactory( "alignbackgroundimage" );
-```<table>
+```
+<table>
 		<tr>
 			<td class="caption" colspan="3"><b>Inputs</b></td>
 		</tr>
@@ -226,6 +230,7 @@ var factory = moi.command.createFactory( "alignbackgroundimage" );
 var factory = moi.command.createFactory( "arc3pt" );
 ```
 
+
 <table>
 		<tr>
 			<td class="caption" colspan="3"><b>Inputs</b></td>
@@ -269,6 +274,7 @@ var factory = moi.command.createFactory( "arc3pt" );
 ```js
 var factory = moi.command.createFactory( "arccenter" );
 ```
+
 
 <table>
 		<tr>
@@ -319,6 +325,7 @@ var factory = moi.command.createFactory( "arccenter" );
 var factory = moi.command.createFactory( "arccontinue" );
 ```
 
+
 <table>
 		<tr>
 			<td class="caption" colspan="3"><b>Inputs</b></td>
@@ -355,6 +362,7 @@ var factory = moi.command.createFactory( "arccontinue" );
 ```js
 var factory = moi.command.createFactory( "arctangent" );
 ```
+
 
 <table>
 	<tr>
@@ -414,6 +422,7 @@ var factory = moi.command.createFactory( "arctangent" );
 var factory = moi.command.createFactory( "arraycircular" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -472,6 +481,7 @@ var factory = moi.command.createFactory( "arraycircular" );
 ```js
 var factory = moi.command.createFactory( "arraycurve" );
 ```
+
 
 <table>
 	<tr>
@@ -541,6 +551,7 @@ var factory = moi.command.createFactory( "arraycurve" );
 var factory = moi.command.createFactory( "arraydir" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -598,6 +609,7 @@ var factory = moi.command.createFactory( "arraydir" );
 ```js
 var factory = moi.command.createFactory( "arraygrid" );
 ```
+
 
 <table>
 		<tr>
@@ -675,6 +687,7 @@ var factory = moi.command.createFactory( "arraygrid" );
 var factory = moi.command.createFactory( "backgroundimage" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -713,6 +726,7 @@ var factory = moi.command.createFactory( "backgroundimage" );
 ```js
 var factory = moi.command.createFactory( "blend" );
 ```
+
 
 <table>
 	<tr>
@@ -758,6 +772,7 @@ var factory = moi.command.createFactory( "blend" );
 var factory = moi.command.createFactory( "booleandifference" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -797,6 +812,7 @@ var factory = moi.command.createFactory( "booleandifference" );
 var factory = moi.command.createFactory( "booleanintersection" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -831,6 +847,7 @@ var factory = moi.command.createFactory( "booleanintersection" );
 var factory = moi.command.createFactory( "booleanmerge" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -858,6 +875,7 @@ var factory = moi.command.createFactory( "booleanmerge" );
 var factory = moi.command.createFactory( "booleanunion" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -884,6 +902,7 @@ var factory = moi.command.createFactory( "booleanunion" );
 ```js
 var factory = moi.command.createFactory( "box" );
 ```
+
 
 <table>
 	<tr>
@@ -940,6 +959,7 @@ var factory = moi.command.createFactory( "box" );
 ```js
 var factory = moi.command.createFactory( "box3pts" );
 ```
+
 
 <table>
 	<tr>
@@ -1004,6 +1024,7 @@ var factory = moi.command.createFactory( "box3pts" );
 var factory = moi.command.createFactory( "boxcenter" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1060,6 +1081,7 @@ var factory = moi.command.createFactory( "boxcenter" );
 var factory = moi.command.createFactory( "chamfer" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1108,6 +1130,7 @@ var factory = moi.command.createFactory( "chamfer" );
 ```js
 var factory = moi.command.createFactory( "circle" );
 ```
+
 
 <table>
 	<tr>
@@ -1158,6 +1181,7 @@ var factory = moi.command.createFactory( "circle" );
 var factory = moi.command.createFactory( "circle3pt" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1199,6 +1223,7 @@ var factory = moi.command.createFactory( "circle3pt" );
 var factory = moi.command.createFactory( "circlediameter" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1237,6 +1262,7 @@ var factory = moi.command.createFactory( "circlediameter" );
 ```js
 var factory = moi.command.createFactory( "circletangent" );
 ```
+
 
 <table>
 	<tr>
@@ -1288,6 +1314,7 @@ var factory = moi.command.createFactory( "circletangent" );
 ```js
 var factory = moi.command.createFactory( "cone" );
 ```
+
 
 <table>
 	<tr>
@@ -1344,6 +1371,7 @@ var factory = moi.command.createFactory( "cone" );
 ```js
 var factory = moi.command.createFactory( "copy" );
 ```
+
 
 <table>
 	<tr>
@@ -1403,6 +1431,7 @@ var factory = moi.command.createFactory( "copy" );
 var factory = moi.command.createFactory( "curve" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1422,6 +1451,7 @@ var factory = moi.command.createFactory( "curve" );
 ```js
 var factory = moi.command.createFactory( "cylinder" );
 ```
+
 
 <table>
 	<tr>
@@ -1479,6 +1509,7 @@ var factory = moi.command.createFactory( "cylinder" );
 var factory = moi.command.createFactory( "delete" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1505,6 +1536,7 @@ var factory = moi.command.createFactory( "delete" );
 ```js
 var factory = moi.command.createFactory( "ellipse" );
 ```
+
 
 <table>
 	<tr>
@@ -1557,6 +1589,7 @@ var factory = moi.command.createFactory( "ellipse" );
 var factory = moi.command.createFactory( "ellipsecorner" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1601,6 +1634,7 @@ var factory = moi.command.createFactory( "ellipsecorner" );
 var factory = moi.command.createFactory( "ellipsediameter" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1642,6 +1676,7 @@ var factory = moi.command.createFactory( "ellipsediameter" );
 var factory = moi.command.createFactory( "extend" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1675,6 +1710,7 @@ var factory = moi.command.createFactory( "extend" );
 ```js
 var factory = moi.command.createFactory( "extrude" );
 ```
+
 
 <table>
 	<tr>
@@ -1751,6 +1787,7 @@ var factory = moi.command.createFactory( "extrude" );
 var factory = moi.command.createFactory( "fillet" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1805,6 +1842,7 @@ var factory = moi.command.createFactory( "fillet" );
 var factory = moi.command.createFactory( "flip" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1831,6 +1869,7 @@ var factory = moi.command.createFactory( "flip" );
 ```js
 var factory = moi.command.createFactory( "helix" );
 ```
+
 
 <table>
 	<tr>
@@ -1910,6 +1949,7 @@ var factory = moi.command.createFactory( "helix" );
 var factory = moi.command.createFactory( "interpcurve" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1929,6 +1969,7 @@ var factory = moi.command.createFactory( "interpcurve" );
 ```js
 var factory = moi.command.createFactory( "intersect" );
 ```
+
 
 <table>
 	<tr>
@@ -1957,6 +1998,7 @@ var factory = moi.command.createFactory( "intersect" );
 var factory = moi.command.createFactory( "join" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -1983,6 +2025,7 @@ var factory = moi.command.createFactory( "join" );
 ```js
 var factory = moi.command.createFactory( "line" );
 ```
+
 
 <table>
 	<tr>
@@ -2017,6 +2060,7 @@ var factory = moi.command.createFactory( "line" );
 ```js
 var factory = moi.command.createFactory( "loft" );
 ```
+
 
 <table>
 	<tr>
@@ -2077,6 +2121,7 @@ var factory = moi.command.createFactory( "loft" );
 var factory = moi.command.createFactory( "merge" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2103,6 +2148,7 @@ var factory = moi.command.createFactory( "merge" );
 ```js
 var factory = moi.command.createFactory( "mirror" );
 ```
+
 
 <table>
 	<tr>
@@ -2149,6 +2195,7 @@ var factory = moi.command.createFactory( "mirror" );
 ```js
 var factory = moi.command.createFactory( "move" );
 ```
+
 
 <table>
 	<tr>
@@ -2208,6 +2255,7 @@ var factory = moi.command.createFactory( "move" );
 var factory = moi.command.createFactory( "network" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2255,6 +2303,7 @@ var factory = moi.command.createFactory( "network" );
 ```js
 var factory = moi.command.createFactory( "offset" );
 ```
+
 
 <table>
 	<tr>
@@ -2320,6 +2369,7 @@ var factory = moi.command.createFactory( "offset" );
 var factory = moi.command.createFactory( "planarsrf" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2346,6 +2396,7 @@ var factory = moi.command.createFactory( "planarsrf" );
 ```js
 var factory = moi.command.createFactory( "plane" );
 ```
+
 
 <table>
 	<tr>
@@ -2390,6 +2441,7 @@ var factory = moi.command.createFactory( "plane" );
 ```js
 var factory = moi.command.createFactory( "plane3pts" );
 ```
+
 
 <table>
 	<tr>
@@ -2442,6 +2494,7 @@ var factory = moi.command.createFactory( "plane3pts" );
 var factory = moi.command.createFactory( "planecenter" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2486,6 +2539,7 @@ var factory = moi.command.createFactory( "planecenter" );
 var factory = moi.command.createFactory( "point" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2512,6 +2566,7 @@ var factory = moi.command.createFactory( "point" );
 ```js
 var factory = moi.command.createFactory( "polygon" );
 ```
+
 
 <table>
 	<tr>
@@ -2551,6 +2606,7 @@ var factory = moi.command.createFactory( "polygon" );
 ```js
 var factory = moi.command.createFactory( "polygonedge" );
 ```
+
 
 <table>
 	<tr>
@@ -2595,6 +2651,7 @@ var factory = moi.command.createFactory( "polygonedge" );
 ```js
 var factory = moi.command.createFactory( "polygonstar" );
 ```
+
 
 <table>
 	<tr>
@@ -2642,6 +2699,7 @@ var factory = moi.command.createFactory( "polygonstar" );
 var factory = moi.command.createFactory( "polyline" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2661,6 +2719,7 @@ var factory = moi.command.createFactory( "polyline" );
 ```js
 var factory = moi.command.createFactory( "project" );
 ```
+
 
 <table>
 	<tr>
@@ -2715,6 +2774,7 @@ var factory = moi.command.createFactory( "project" );
 var factory = moi.command.createFactory( "railrevolve" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2767,6 +2827,7 @@ var factory = moi.command.createFactory( "railrevolve" );
 ```js
 var factory = moi.command.createFactory( "rect3pts" );
 ```
+
 
 <table>
 	<tr>
@@ -2836,6 +2897,7 @@ var factory = moi.command.createFactory( "rect3pts" );
 var factory = moi.command.createFactory( "rectangle" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -2896,6 +2958,7 @@ var factory = moi.command.createFactory( "rectangle" );
 ```js
 var factory = moi.command.createFactory( "rectcenter" );
 ```
+
 
 <table>
 	<tr>
@@ -2958,6 +3021,7 @@ var factory = moi.command.createFactory( "rectcenter" );
 var factory = moi.command.createFactory( "revolve" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3008,6 +3072,7 @@ var factory = moi.command.createFactory( "revolve" );
 ```js
 var factory = moi.command.createFactory( "rotate" );
 ```
+
 
 <table>
 	<tr>
@@ -3066,6 +3131,7 @@ var factory = moi.command.createFactory( "rotate" );
 ```js
 var factory = moi.command.createFactory( "rotateaxis" );
 ```
+
 
 <table>
 	<tr>
@@ -3132,6 +3198,7 @@ var factory = moi.command.createFactory( "rotateaxis" );
 var factory = moi.command.createFactory( "scale" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3189,6 +3256,7 @@ var factory = moi.command.createFactory( "scale" );
 ```js
 var factory = moi.command.createFactory( "scale1d" );
 ```
+
 
 <table>
 	<tr>
@@ -3248,6 +3316,7 @@ var factory = moi.command.createFactory( "scale1d" );
 var factory = moi.command.createFactory( "scale2d" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3306,6 +3375,7 @@ var factory = moi.command.createFactory( "scale2d" );
 var factory = moi.command.createFactory( "separate" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3332,6 +3402,7 @@ var factory = moi.command.createFactory( "separate" );
 ```js
 var factory = moi.command.createFactory( "shell" );
 ```
+
 
 <table>
 	<tr>
@@ -3375,6 +3446,7 @@ var factory = moi.command.createFactory( "shell" );
 var factory = moi.command.createFactory( "shrinktrimmedsrf" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3402,6 +3474,7 @@ var factory = moi.command.createFactory( "shrinktrimmedsrf" );
 var factory = moi.command.createFactory( "sketchcurve" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3421,6 +3494,7 @@ var factory = moi.command.createFactory( "sketchcurve" );
 ```js
 var factory = moi.command.createFactory( "sphere" );
 ```
+
 
 <table>
 	<tr>
@@ -3465,6 +3539,7 @@ var factory = moi.command.createFactory( "sphere" );
 ```js
 var factory = moi.command.createFactory( "sweep" );
 ```
+
 
 <table>
 	<tr>
@@ -3556,6 +3631,7 @@ var factory = moi.command.createFactory( "sweep" );
 var factory = moi.command.createFactory( "text" );
 ```
 
+
 <table>
 	<tr>
 			<td class="caption" colspan="3">
@@ -3622,6 +3698,7 @@ var factory = moi.command.createFactory( "text" );
 ```js
 var factory = moi.command.createFactory( "trim" );
 ```
+
 
 <table>
 	<tr>
