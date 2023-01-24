@@ -5,115 +5,115 @@ See [GeometryFactory](#GeometryFactory) for an explanation of factories.
 
 <table>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">addpoint</a></td>
-	<td class="toc"><a href="#factory-(.*)">booleanunion</a></td>
-	<td class="toc"><a href="#factory-(.*)">ellipsediameter</a></td>
-	<td class="toc"><a href="#factory-(.*)">planarsrf</a></td>
-	<td class="toc"><a href="#factory-(.*)">rotateaxis</a></td>
+	<td class="toc"><a href="#factory-addpoint">addpoint</a></td>
+	<td class="toc"><a href="#factory-booleanunion">booleanunion</a></td>
+	<td class="toc"><a href="#factory-ellipsediameter">ellipsediameter</a></td>
+	<td class="toc"><a href="#factory-planarsrf">planarsrf</a></td>
+	<td class="toc"><a href="#factory-rotateaxis">rotateaxis</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">align</a></td>
-	<td class="toc"><a href="#factory-(.*)">box</a></td>
-	<td class="toc"><a href="#factory-(.*)">extend</a></td>
-	<td class="toc"><a href="#factory-(.*)">plane</a></td>
-	<td class="toc"><a href="#factory-(.*)">scale</a></td>
+	<td class="toc"><a href="#factory-align">align</a></td>
+	<td class="toc"><a href="#factory-box">box</a></td>
+	<td class="toc"><a href="#factory-extend">extend</a></td>
+	<td class="toc"><a href="#factory-plane">plane</a></td>
+	<td class="toc"><a href="#factory-scale">scale</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">alignbackgroundimage</a></td>
-	<td class="toc"><a href="#factory-(.*)">box3pts</a></td>
-	<td class="toc"><a href="#factory-(.*)">extrude</a></td>
-	<td class="toc"><a href="#factory-(.*)">plane3pts</a></td>
-	<td class="toc"><a href="#factory-(.*)">scale1d</a></td>
+	<td class="toc"><a href="#factory-alignbackgroundimage">alignbackgroundimage</a></td>
+	<td class="toc"><a href="#factory-box3pts">box3pts</a></td>
+	<td class="toc"><a href="#factory-extrude">extrude</a></td>
+	<td class="toc"><a href="#factory-plane3pts">plane3pts</a></td>
+	<td class="toc"><a href="#factory-scale1d">scale1d</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arc3pt</a></td>
-	<td class="toc"><a href="#factory-(.*)">boxcenter</a></td>
-	<td class="toc"><a href="#factory-(.*)">fillet</a></td>
-	<td class="toc"><a href="#factory-(.*)">planecenter</a></td>
-	<td class="toc"><a href="#factory-(.*)">scale2d</a></td>
+	<td class="toc"><a href="#factory-arc3pt">arc3pt</a></td>
+	<td class="toc"><a href="#factory-boxcenter">boxcenter</a></td>
+	<td class="toc"><a href="#factory-fillet">fillet</a></td>
+	<td class="toc"><a href="#factory-planecenter">planecenter</a></td>
+	<td class="toc"><a href="#factory-scale2d">scale2d</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arccenter</a></td>
-	<td class="toc"><a href="#factory-(.*)">chamfer</a></td>
-	<td class="toc"><a href="#factory-(.*)">flip</a></td>
-	<td class="toc"><a href="#factory-(.*)">point</a></td>
-	<td class="toc"><a href="#factory-(.*)">separate</a></td>
+	<td class="toc"><a href="#factory-arccenter">arccenter</a></td>
+	<td class="toc"><a href="#factory-chamfer">chamfer</a></td>
+	<td class="toc"><a href="#factory-flip">flip</a></td>
+	<td class="toc"><a href="#factory-point">point</a></td>
+	<td class="toc"><a href="#factory-separate">separate</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arccontinue</a></td>
-	<td class="toc"><a href="#factory-(.*)">circle</a></td>
-	<td class="toc"><a href="#factory-(.*)">helix</a></td>
-	<td class="toc"><a href="#factory-(.*)">polygon</a></td>
-	<td class="toc"><a href="#factory-(.*)">shell</a></td>
+	<td class="toc"><a href="#factory-arccontinue">arccontinue</a></td>
+	<td class="toc"><a href="#factory-circle">circle</a></td>
+	<td class="toc"><a href="#factory-helix">helix</a></td>
+	<td class="toc"><a href="#factory-polygon">polygon</a></td>
+	<td class="toc"><a href="#factory-shell">shell</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arctangent</a></td>
-	<td class="toc"><a href="#factory-(.*)">circle3pt</a></td>
-	<td class="toc"><a href="#factory-(.*)">interpcurve</a></td>
-	<td class="toc"><a href="#factory-(.*)">polygonedge</a></td>
-	<td class="toc"><a href="#factory-(.*)">shrinktrimmedsrf</a></td>
+	<td class="toc"><a href="#factory-arctangent">arctangent</a></td>
+	<td class="toc"><a href="#factory-circle3pt">circle3pt</a></td>
+	<td class="toc"><a href="#factory-interpcurve">interpcurve</a></td>
+	<td class="toc"><a href="#factory-polygonedge">polygonedge</a></td>
+	<td class="toc"><a href="#factory-shrinktrimmedsrf">shrinktrimmedsrf</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arraycircular</a></td>
-	<td class="toc"><a href="#factory-(.*)">circlediameter</a></td>
-	<td class="toc"><a href="#factory-(.*)">intersect</a></td>
-	<td class="toc"><a href="#factory-(.*)">polygonstar</a></td>
-	<td class="toc"><a href="#factory-(.*)">sketchcurve</a></td>
+	<td class="toc"><a href="#factory-arraycircular">arraycircular</a></td>
+	<td class="toc"><a href="#factory-circlediameter">circlediameter</a></td>
+	<td class="toc"><a href="#factory-intersect">intersect</a></td>
+	<td class="toc"><a href="#factory-polygonstar">polygonstar</a></td>
+	<td class="toc"><a href="#factory-sketchcurve">sketchcurve</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arraycurve</a></td>
-	<td class="toc"><a href="#factory-(.*)">circletangent</a></td>
-	<td class="toc"><a href="#factory-(.*)">join</a></td>
-	<td class="toc"><a href="#factory-(.*)">polyline</a></td>
-	<td class="toc"><a href="#factory-(.*)">sphere</a></td>
+	<td class="toc"><a href="#factory-arraycurve">arraycurve</a></td>
+	<td class="toc"><a href="#factory-circletangent">circletangent</a></td>
+	<td class="toc"><a href="#factory-join">join</a></td>
+	<td class="toc"><a href="#factory-polyline">polyline</a></td>
+	<td class="toc"><a href="#factory-sphere">sphere</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arraydir</a></td>
-	<td class="toc"><a href="#factory-(.*)">cone</a></td>
-	<td class="toc"><a href="#factory-(.*)">line</a></td>
-	<td class="toc"><a href="#factory-(.*)">project</a></td>
-	<td class="toc"><a href="#factory-(.*)">sweep</a></td>
+	<td class="toc"><a href="#factory-arraydir">arraydir</a></td>
+	<td class="toc"><a href="#factory-cone">cone</a></td>
+	<td class="toc"><a href="#factory-line">line</a></td>
+	<td class="toc"><a href="#factory-project">project</a></td>
+	<td class="toc"><a href="#factory-sweep">sweep</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">arraygrid</a></td>
-	<td class="toc"><a href="#factory-(.*)">copy</a></td>
-	<td class="toc"><a href="#factory-(.*)">loft</a></td>
-	<td class="toc"><a href="#factory-(.*)">railrevolve</a></td>
-	<td class="toc"><a href="#factory-(.*)">text</a></td>
+	<td class="toc"><a href="#factory-arraygrid">arraygrid</a></td>
+	<td class="toc"><a href="#factory-copy">copy</a></td>
+	<td class="toc"><a href="#factory-loft">loft</a></td>
+	<td class="toc"><a href="#factory-railrevolve">railrevolve</a></td>
+	<td class="toc"><a href="#factory-text">text</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">backgroundimage</a></td>
-	<td class="toc"><a href="#factory-(.*)">curve</a></td>
-	<td class="toc"><a href="#factory-(.*)">merge</a></td>
-	<td class="toc"><a href="#factory-(.*)">rect3pts</a></td>
-	<td class="toc"><a href="#factory-(.*)">trim</a></td>
+	<td class="toc"><a href="#factory-backgroundimage">backgroundimage</a></td>
+	<td class="toc"><a href="#factory-curve">curve</a></td>
+	<td class="toc"><a href="#factory-merge">merge</a></td>
+	<td class="toc"><a href="#factory-rect3pts">rect3pts</a></td>
+	<td class="toc"><a href="#factory-trim">trim</a></td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">blend</a></td>
-	<td class="toc"><a href="#factory-(.*)">cylinder</a></td>
-	<td class="toc"><a href="#factory-(.*)">mirror</a></td>
-	<td class="toc"><a href="#factory-(.*)">rectangle</a></td>
+	<td class="toc"><a href="#factory-blend">blend</a></td>
+	<td class="toc"><a href="#factory-cylinder">cylinder</a></td>
+	<td class="toc"><a href="#factory-mirror">mirror</a></td>
+	<td class="toc"><a href="#factory-rectangle">rectangle</a></td>
 	<td class="toc">&nbsp;</td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">booleandifference</a></td>
-	<td class="toc"><a href="#factory-(.*)">delete</a></td>
-	<td class="toc"><a href="#factory-(.*)">move</a></td>
-	<td class="toc"><a href="#factory-(.*)">rectcenter</a></td>
+	<td class="toc"><a href="#factory-booleandifference">booleandifference</a></td>
+	<td class="toc"><a href="#factory-delete">delete</a></td>
+	<td class="toc"><a href="#factory-move">move</a></td>
+	<td class="toc"><a href="#factory-rectcenter">rectcenter</a></td>
 	<td class="toc">&nbsp;</td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">booleanintersection</a></td>
-	<td class="toc"><a href="#factory-(.*)">ellipse</a></td>
-	<td class="toc"><a href="#factory-(.*)">network</a></td>
-	<td class="toc"><a href="#factory-(.*)">revolve</a></td>
+	<td class="toc"><a href="#factory-booleanintersection">booleanintersection</a></td>
+	<td class="toc"><a href="#factory-ellipse">ellipse</a></td>
+	<td class="toc"><a href="#factory-network">network</a></td>
+	<td class="toc"><a href="#factory-revolve">revolve</a></td>
 	<td class="toc">&nbsp;</td>
   </tr>
   <tr>
-	<td class="toc"><a href="#factory-(.*)">booleanmerge</a></td>
-	<td class="toc"><a href="#factory-(.*)">ellipsecorner</a></td>
-	<td class="toc"><a href="#factory-(.*)">offset</a></td>
-	<td class="toc"><a href="#factory-(.*)">rotate</a></td>
+	<td class="toc"><a href="#factory-booleanmerge">booleanmerge</a></td>
+	<td class="toc"><a href="#factory-ellipsecorner">ellipsecorner</a></td>
+	<td class="toc"><a href="#factory-offset">offset</a></td>
+	<td class="toc"><a href="#factory-rotate">rotate</a></td>
 	<td class="toc">&nbsp;</td>
   </tr>
 </table>
