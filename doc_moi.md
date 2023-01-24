@@ -27,14 +27,14 @@ Also, with the Ui you describe, how would you move this point and attach it to t
 # moi.ini
 
 
-## Change line colors
+| Scope | Key | Values | Description |
+| --- | --- | --- | --- |
+| View | LineUnselectedColor | R,G,B | |
+| View | LineSelectedColor | R,G,B | |
+| UI | CommandLineTypeTextEntry | [y/n] | keystrokes go into the XYZ input without needing to press the Tab key. |
+| UI | TreatSpaceAsEnter | [y/n] | Pressing space in the XYZ box will be traeted as Enter. |
 
-```
-[View]
-LineUnselectedColor=0,0,0
-LineSelectedColor=0,122,255
 
-```
 
 
 # Alternative UI

@@ -1,0 +1,297 @@
+<html xmlns:moi>
+
+<head>
+  <link rel="stylesheet" href="moi://ui/moi.css" type="text/css">
+  <script>
+    // ****************************************
+    // View Manager v0.2.2
+    // ****************************************
+    // var selViews = document.getElementById('selViews');
+    // version 0.2: Modified by Michael Gibson - added "up" direction save/restore.
+    // version 0.2.1: Fix for locale comma separator problem by Michael Gibson. Fixed renaming bug and better logic for creating new view names.
+    // version 0.2.2: Delete and Rename buttons are only enabled when a view is selected. Renaming a view now uses a dialog prompt.
+
+    var views = new Array();
+    var fileExtension = '.views.json';
+    var viewFileFullPath = ".";
+    var version = '0.2';
+
+    function init() {
+      resetViewsMenu();
+      loadViewsFile();
+      
+      selViews.selectedIndex = 0;
+      deleteViewButton.disabled = true;
+      showRenameViewButton.disabled = true;
+    }
+
+    function createView() {
+      var vp = moi.ui.mainWindow.viewpanel.getViewport('3D');
+      var data = new Object;
+      var numViews = views.length;
+
+      var opt = document.createElement("option");
+      opt.value = numViews;
+      opt.text = getNewViewName();
+      selViews.add(opt);
+
+      data.name = opt.text;
+      data.camera = ptToString(vp.cameraPt);
+      data.target = ptToString(vp.targetPt);
+      data.up = ptToString(vp.cameraFrame.yaxis);
+
+      views.push(data);
+      saveViewFile(viewFileFullPath);
+      
+      selViews.selectedIndex = selViews.options.length - 1;
+      
+      deleteViewButton.disabled = false;
+      showRenameViewButton.disabled = false;
+    }
+
+    function restoreView(data) {
+      var vp = moi.ui.mainWindow.viewpanel.getViewport('3D');
+      var camCoords = data.camera.split(',');
+      var cameraPoint = moi.VectorMath.createPoint(camCoords[0], camCoords[1], camCoords[2]);
+      var targetCoords = data.target.split(',');
+      var targetPoint = moi.VectorMath.createPoint(targetCoords[0], targetCoords[1], targetCoords[2]);
+
+      var upPoint = null;
+      if (data.up) {
+        var upCoords = data.up.split(',');
+        upPoint = moi.VectorMath.createPoint(upCoords[0], upCoords[1], upCoords[2]);
+      }
+
+      vp.setCameraAndTarget(cameraPoint, targetPoint, upPoint);
+    }
+
+    function deleteView() {
+      if (selViews.options.length <= 1) {
+        return;
+      }
+
+      var viewIndex = selViews.options[selViews.selectedIndex].value;
+      views.splice(viewIndex, 1);
+
+      saveViewFile(viewFileFullPath);
+      views = new Array();
+
+      // rebuild the views menu
+      resetViewsMenu();
+
+      loadViewsFile();
+
+      deleteViewButton.disabled = true;
+      showRenameViewButton.disabled = true;
+    }
+
+    // ****************************************
+    // UI Handlers
+    // ****************************************
+
+    function handleViewChange() {
+      var viewIndex = selViews.options[selViews.selectedIndex].value;
+      var data = views[viewIndex];
+      restoreView(data);
+
+      deleteViewButton.disabled = false;
+      showRenameViewButton.disabled = false;
+    }
+
+    function renameView(newName) {
+      var selectedViewIndex = selViews.selectedIndex;
+      views[selectedViewIndex - 1].name = newName;
+
+      saveViewFile(viewFileFullPath);
+
+      resetViewsMenu();
+      loadViewsFile();
+
+      selViews.selectedIndex = selectedViewIndex;
+    }
+
+    function showRenameDialog() {
+      if (selViews.selectedIndex > 0) {
+        var dlg = moi.ui.createDialog('EditNameDialog.htm', 'resizeable,defaultWidth:26em,fixedHeight');
+
+        /* If you want to initialize the starting name text do this: */
+        var currentName = selViews.options[selViews.selectedIndex].text;
+        dlg.htmlWindow.nameval = currentName;
+
+        var result = dlg.window.doModal();
+        if (result !== -1) /* return value of -1 means canceled */ {
+          renameView(result);
+        }
+      }
+    }
+
+    // ****************************************
+    // File IO
+    // ****************************************
+
+    function createNewViewFile(fileName) {
+      var viewData = { version: version, views: [] };
+
+      var f = moi.filesystem.openFileStream(fileName, 'w');
+      f.writeLine(JSON.stringify(viewData, null, 4));
+      f.close();
+    }
+
+    function loadViewsFile() {
+      var currentFileName = moi.geometryDatabase.currentFileName;
+      var currentDir = moi.geometryDatabase.currentFileNameDir;
+
+      var fileName = currentFileName.replace(currentDir, '');
+      var baseFileName = getBaseFileName(fileName);
+      var viewsFileName = baseFileName + fileExtension;
+      var fullViewsFileName = currentDir + viewsFileName;
+      viewFileFullPath = fullViewsFileName;
+
+      // look for existing file
+      try {
+        var f = moi.filesystem.openFileStream(fullViewsFileName, 'r');
+        // alert(f);
+        var fileContents = "";
+        while (f.atEOF == false) {
+          var newLine = f.readLine();
+          fileContents += newLine;
+        }
+        f.close();
+
+        if (fileContents.length == 0) {
+          createNewViewFile(fullViewsFileName);
+          return;
+        }
+
+        var fileData = JSON.parse(fileContents);
+        var fileViews = fileData.views;
+        var numViews = fileViews.length;
+
+        for (i = 0; i < numViews; i++) {
+          views.push(fileViews[i]);
+
+          var opt = document.createElement("option");
+          opt.value = i;
+          opt.text = fileViews[i].name;
+          selViews.add(opt);
+        }
+
+      }
+      catch (e) {
+        alert(e);
+      }
+    }
+
+    function saveViewFile(fileName) {
+      var viewData = { version: version, views: [] };
+      for (i = 0; i < views.length; i++) {
+        viewData.views.push(views[i]);
+      }
+
+      var f = moi.filesystem.openFileStream(fileName, 'w');
+      f.writeLine(JSON.stringify(viewData, null, 4));
+      f.close();
+    }
+
+    // ****************************************
+    // Utility functions
+    // ****************************************
+
+    function resetViewsMenu() {
+      var i;
+      var length = selViews.options.length;
+
+      for (i = length - 1; i >= 0; i--) {
+        selViews.remove(0);
+      }
+
+      var opt = document.createElement("option");
+      opt.value = "";
+      opt.text = "Select a view";
+      opt.disabled = "true";
+      opt.selected = "true";
+      selViews.add(opt);
+
+      views.length = 0;
+    }
+
+    function getNewViewName() {
+      var i = 1;
+      var proposedName = "View 1";
+      var inList = true;
+
+      while (inList == true) {
+        if (doesViewNameExist(proposedName) == true) {
+          i++;
+          proposedName = "View " + i;
+        } else {
+          inList = false;
+        }
+      }
+      return proposedName;
+    }
+
+    function doesViewNameExist(viewName) {
+      var i;
+      var length = selViews.options.length;
+
+      for (i = 0; i < length; i++) {
+        if (selViews.options[i].text == viewName) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function getBaseFileName(fileName) {
+      var nameWithoutExtension = fileName.replace('.3dm', '');
+
+      // strip off incremental save number
+      var re = /.*\D(?=\d)/;
+      var matches = nameWithoutExtension.match(re);
+
+      if (matches != null) {
+        var baseFileName = matches[0];
+        baseFileName = baseFileName.replace(/\s+$/, '');
+        return baseFileName;
+      }
+      else {
+        return nameWithoutExtension;
+      }
+    }
+
+    function ptToString(pt) {
+      return pt.x.toFixed(4) + ',' + pt.y.toFixed(4) + ',' + pt.z.toFixed(4);
+    }
+
+  </script>
+</head>
+
+<body class="commandbody" onload="init()">
+  <div class="commandheader">
+    <div id="ViewManagerPrompt" class="commandprompt">View Manager</div>
+    <!-- <div id="OptionsPrompt" class="hiddencommandprompt">Pipe options</div> -->
+  </div>
+
+  <moi:Select id="selViews" onchange="handleViewChange()" style="width: 100%">
+  </moi:Select>
+
+
+  <table style="width: 100%">
+    <tr>
+      <td>
+        <moi:PushButton id="createViewButton" onclick="createView()" style="width: 100%">Create</moi:PushButton>
+      </td>
+      <td>
+        <moi:PushButton id="deleteViewButton" onclick="deleteView()" style="width: 100%; color: firebrick">Delete
+        </moi:PushButton>
+      </td>
+    </tr>
+  </table>
+  <hr />
+  <moi:PushButton id="showRenameViewButton" onclick="showRenameDialog()">Rename View</moi:PushButton>
+  <hr />
+  <moi:CommandCancel />
+</body>
+
+</html>

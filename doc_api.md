@@ -78,70 +78,7 @@ The coordinates of the `Point` are accessed with the float properties `Point.x`,
 <p>Adds a point?</p>
 
 
-# PointPicker
 
-The **PointPicker** allows you to prompt the user to select a point or points.
-
-```js
-var pointpicker = moi.ui.createPointPicker();
-pointpicker.disableStraightSnap = true;
-pointpicker.disableObjectSnap = true;
-pointpicker.enableOnObjectSnap = true;
-pointpicker.allowMidObjectSnap = true;
-pointpicker.disableTanPerpObjectSnap = true;
-pointpicker.resetOnMouseLeave = true;
-
-//pointpicker.restrictToObject( face );
-
-if ( pointpicker.controlDown ){
-	//ctrl was pressed
-}
-```
-
-
-PointPicker Callback
-```js
-pointpicker.bindFunc()
-```
-
-## Select a point
-
-```js
-var pointpicker = moi.ui.createPointPicker();
-if ( !GetPoint( pointpicker ) ) return;
-var aPoint = pointpicker.pt;	
-
-
-function GetPoint( pointpicker ){
-	while ( 1 ){
-		if ( !pointpicker.waitForEvent() ) return false;
-			
-		if ( pointpicker.event == 'finished' ) break;
-	}
-	
-	return true;
-}
-```
-
-## Select multiple points
-
-```js
-var pointpicker = moi.ui.createPointPicker();
-var points = GetPoints( pointpicker );
-if(!points.length) return;
-
-var aPoint = points[0]; //first point...
-
-function GetPoint( pointpicker ){
-	while ( 1 ){
-		if ( !pointpicker.waitForEvent() ) return false;
-			
-		if ( pointpicker.event == 'finished' ) break;
-	}
-	
-	return true;
-}
-```
 
 # GeometryDatabase
 
@@ -355,7 +292,11 @@ The command can read the parameter string using `getCommandLineParams`:
 var params = moi.command.getCommandLineParams();
 ```
 
-Storing and getting options:
+> **Trick:** MoI will take the value of any parameter that matches the Id of an HTML control and set the control value to that value.<br><br>`"mycomand param1=value" `
+
+
+
+## Storing and getting options:
 
 ```js
 
@@ -444,6 +385,123 @@ fHndl.close();
 
 
 ```
+
+# PointPicker
+
+The **PointPicker** allows you to prompt the user to select a point or points.
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+
+pointpicker.disableStraightSnap = true;
+pointpicker.disableObjectSnap = true;
+pointpicker.enableOnObjectSnap = true;
+pointpicker.allowMidObjectSnap = true;
+pointpicker.disableTanPerpObjectSnap = true;
+pointpicker.resetOnMouseLeave = true;
+
+
+
+
+//pointpicker.restrictToObject( face );
+
+if ( pointpicker.controlDown ){
+	//ctrl was pressed
+}
+```
+
+# Snaps
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+
+pointpicker.clearSnapPoints();
+pointpicker.clearCurrentSnaps();
+
+pointpicker.addSnapPoint( aPoint , strALabel );
+
+```
+
+# PointPicker Callbacks
+
+```js
+pointpicker.bindFunc(fnCallback);
+```
+The signature of the callback function is:
+
+```js
+function myCallback( pointpicker ){
+ 	//My code...
+}
+```
+
+```js
+pointpicker.bindFuncPostUpdate(fnCallback);
+
+pointpicker.bindResultPt( factory.getInput(2) );
+
+```
+
+## Select a point
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+if ( !GetPoint( pointpicker ) ) return;
+var aPoint = pointpicker.pt;	
+
+
+function GetPoint( pointpicker ){
+	while ( 1 ){
+		if ( !pointpicker.waitForEvent() ) return false;
+			
+		if ( pointpicker.event == 'finished' ) break;
+	}
+	
+	return true;
+}
+```
+
+## Select multiple points
+
+```js
+var pointpicker = moi.ui.createPointPicker();
+var points = GetPoints( pointpicker );
+if(!points.length) return;
+
+var aPoint = points[0]; //first point...
+
+function GetPoints( pointpicker ){
+	out = [];
+	while ( 1 ){	
+		if ( !pointpicker.waitForEvent() ) return out;
+	
+		if ( pointpicker.event == 'finished' ){
+			out.push(pointpicker.pt);
+			continue;
+		}
+		
+		if ( pointpicker.event == 'cancel' ){
+			return [];
+		}
+		if( pointpicker.event == 'done' ){
+			break
+		}
+		
+	}
+	
+	return out;
+}
+```
+
+to sort out...
+
+Update PointPicker script properties so a script can tell if there is a straight snap currently active.
+
+Added pointpicker.hasBasePt , pointpicker.hasStraightSnap , pointpicker.straightSnapDir read only properties.
+This makes it possible to do a "direction lock" shortcut key:
+var pp = moi.ui.getActivePointPicker(); if ( pp && pp.hasStraightSnap ) { pp.restrictToLinePtDir( pp.basePt, pp.straightSnapDir, true ); }
+
+
 
 # UI #
 
@@ -648,6 +706,16 @@ var aBool = moiWindow.canChangeMaximizedSize();
 To sort....
 
 
+## moi.ui.createDialog()
+
+| Parameter | Description |
+| --- | --- |
+| resizeable | |
+| fixedHeight | |
+| defaultWidth | Numeric, initial width of window. |
+| defaultHeight | Numeric, initial height of window. |
+
+
 
 v5 beta work by Michael Gibson to manipulate edit points:
 
@@ -773,12 +841,4 @@ var sp = moi.ui.sidePane;
 sp.g_PropPanelUnits = (sp.g_PropPanelUnits == 'Inches' ? '' : 'Inches'); 
 sp.UpdatePropertiesPanel();
 ```
-
-# PointPicker
-
-Update PointPicker script properties so a script can tell if there is a straight snap currently active.
-
-Added pointpicker.hasBasePt , pointpicker.hasStraightSnap , pointpicker.straightSnapDir read only properties.
-This makes it possible to do a "direction lock" shortcut key:
-var pp = moi.ui.getActivePointPicker(); if ( pp && pp.hasStraightSnap ) { pp.restrictToLinePtDir( pp.basePt, pp.straightSnapDir, true ); }
 

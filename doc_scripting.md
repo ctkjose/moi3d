@@ -43,15 +43,15 @@ You can create a dialog for your command by adding an HTML file with the same na
 To install a command copy the `.js` and `.htm` files to your user `commands` folder.
 
 
-## Execution of Commands ##
+## Execution of Commands and UI ##
 
 If your command has a UI (an html file) the execution first loads the HTML, which means objects and variables declared in your JS file are not available to the html just yet. The JS file is executed after the window load is completed.
 
-> Global variables (window scope/object) you create in your HTML will be available to your main js script using the object `moi.ui.commandUI`. For example, if in my HTML we have something like `var myvariable;` (in the global/window scope), then in your main js you access the variable as `moi.ui.commandUI.myvariable`.
-
+MoI will parse the HTML and locate tags that start with the prefix `moi:`, for example `<moi:CommandDoneCancel>`, and replace them with a corresponding HTML template file found in its "ui" folder. The HTML template file has the same name as the tag for example "CommandDoneCancel.htm".
 
 The code in the main js script is executed sequentially. When the execution terminates the command is done.
 
+> Global variables (window scope/object) you create in your HTML will be available to your main js script using the object `moi.ui.commandUI`. For example, if in my HTML we have something like `var myvariable;` (in the global/window scope), then in your main js you access the variable as `moi.ui.commandUI.myvariable`.
 
 ## Startup Scripts ##
 
