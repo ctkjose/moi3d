@@ -24,9 +24,11 @@ When scripting **MoI** we would make reference to folders and files locations us
 
 ## Commands ##
 
-Commands are scripts that add a functionality that we can invoke. Commands are written in JavaScript and may define a UI in an HTML file. **MoI** uses javascript version [ES2009](https://www.w3schools.com/js/js_es5.asp) (ES5) so be mindful of the different functionality and syntax limitations of ES5 vs ES6. 
+Commands are scripts that add functionality that we can invoke. Commands are written in JavaScript and may define a UI in an HTML file. **MoI** uses javascript version [ES2009](https://www.w3schools.com/js/js_es5.asp) (ES5) so be mindful of the different functionality and syntax limitations of ES5 vs ES6. 
 
-The name of the file becomes the name of the command. A command can be associated to a keyboard shortcut using the "Shortcuts" tab in the settings or editing the `[Shortcut Keys Mac]` or the `[Shortcut Keys]` of your "moi.ini". You can run a command in the small box at the bottom of the window showing the coordinates. Erase the contents, type the name of a command and press enter to execute the command. 
+The name of the file becomes the name of the command. A command can be associated with a keyboard shortcut using the "Shortcuts" tab in the settings or editing the `[Shortcut Keys Mac]` or the `[Shortcut Keys]` of your "moi.ini". 
+
+You can run a command in the small box (the coordinate XYZ box) at the bottom of the window showing the coordinates. Erase the contents, type the name of a command, and press enter to execute the command.
 
 From javascript we can use the API to execute a command:
 
@@ -36,30 +38,34 @@ moi.command.execCommand( 'blend' );
 
 > TIP: `moi.command.execCommand()` also accepts the file path to a javascript file.
 
-You can create a dialog for your command by adding an HTML file with the same name as the javascript and the extension ".htm". If an html file is found a dialog is loaded on the top of side panel.
+You can create a dialog for your command by adding an HTML file with the same name as the javascript and the extension ".htm". If an HTML file is found a dialog is loaded on the top of the side panel.
 
 
-> **Command Cache** Commands are loaded during its first use and cached from that point on. You can disable the cache by editing your `moi.ini`. In the `[UI]` section add the line `DisableFileCaching=y`.
+> **Command Cache** Commands are loaded during their first use and cached from that point on. You can disable the cache by editing your `moi.ini`. In the `[UI]` section add the line `DisableFileCaching=y`.
 
 
 To install a command copy the `.js` and `.htm` files to your user `commands` folder.
 
 
+## Startup Scripts ##
+
+In addition of commands, your can execute arbitrary javascript on **MoI** startup, and we call them "startup scripts".  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order.
+
+To install a startup script copy the `.js` and `.htm` files to your user `startup` folder.
+
+
+
 ## Execution of Commands and UI ##
 
-If your command has a UI (an html file) the execution first loads the HTML, which means objects and variables declared in your JS file are not available to the html just yet. The JS file is executed after the window load is completed.
+If your command has a UI (an HTML file) the execution first loads the HTML, which means objects and variables declared in your JS file are not available to the html just yet. 
 
 MoI will parse the HTML and locate tags that start with the prefix `moi:`, for example `<moi:CommandDoneCancel>`, and replace them with a corresponding HTML template file found in its "ui" folder. The HTML template file has the same name as the tag for example "CommandDoneCancel.htm".
+
+The JS file is executed after the window load is completed.
 
 The code in the main js script is executed sequentially. When the execution terminates the command is done.
 
 > Global variables (window scope/object) you create in your HTML will be available to your main js script using the object `moi.ui.commandUI`. For example, if in my HTML we have something like `var myvariable;` (in the global/window scope), then in your main js you access the variable as `moi.ui.commandUI.myvariable`.
-
-## Startup Scripts ##
-
-In addition of commands your can execute arbitrary javascript on **MoI** startup, and we call them "startup scripts".  These scripts are intended to modify or add functionality in a global scope.  The scripts will run right before the main window is displayed - note that if the script puts up a modal dialog the main window won't show until the script finishes. Scripts will be run in alphabetical order.
-
-To install a startup script copy the `.js` and `.htm` files to your user `startup` folder.
 
 
 ## Notes JS Brigde ##
