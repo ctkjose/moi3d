@@ -7,7 +7,8 @@ This is my personal compendium of information on [MoI](http://moi3d.com) Javascr
 
 - [About MoI](doc_moi.md) 
 - [Scripting Overview](doc_scripting.md)
-- [MoI's API](doc_api.md) 
+- [MoI's API](doc_moi_api.md)
+- [More stuff WIP](doc_api.md) 
 
 
 # Plugin SDK

@@ -1,3 +1,5 @@
+**TOPICS** - [API](doc_moi_api.md) - [Scripting MoI](doc_scripting.md)
+
 # Scripting in MoI #
 
 [MoI](http://moi3d.com) (Moment of Inspiration) is a superb CAD software that's designed to be simple and easy to use. MoI is the created by Michael Gibson and his company Triple Squid Software Design based at Washington state (US).
